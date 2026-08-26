@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "target": "ES2022",
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -14,6 +15,8 @@
     "netlify/functions/**/*.ts",
     "tests/**/*.ts",
     "src/shared/**/*.ts",
+    "src/content/**/*.ts",
     "src/content/**/*.json"
   ]
 }
+
