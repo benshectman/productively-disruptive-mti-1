@@ -1,0 +1,92 @@
+.evidence-signal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem;
+  margin: 1.5rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.evidence-signal strong { color: var(--color-text-primary); }
+
+.evidence-signal button {
+  appearance: none;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  padding: .15rem .1rem;
+  background: transparent;
+  color: var(--color-text-link, var(--color-text-primary));
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.evidence-signal button:hover { border-bottom-width: 2px; }
+
+.evidence-signal button:focus-visible {
+  outline: 3px solid var(--color-focus, currentColor);
+  outline-offset: 3px;
+}
+
+.evidence-dialog {
+  --evidence-card-width: calc((min(88vw, 76rem) - 5rem) / 3);
+}
+
+.evidence-dialog-body {
+  overflow: hidden;
+  padding: 1.25rem 1.5rem 1.75rem;
+}
+
+.evidence-dialog-intro {
+  max-width: 68ch;
+  margin: 0 0 1.25rem;
+  color: var(--color-text-secondary);
+}
+
+.evidence-card {
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+  box-sizing: border-box;
+}
+
+.evidence-card-position,
+.evidence-card-id {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.evidence-card-claim {
+  flex: 1;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.evidence-card-attribution {
+  margin: 0;
+  padding-top: .75rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: capitalize;
+}
+
+@media (max-width: 900px) {
+  .evidence-dialog { --evidence-card-width: calc((88vw - 4rem) / 2); }
+}
+
+@media (max-width: 600px) {
+  .evidence-dialog { --evidence-card-width: calc(100vw - 5rem); }
+  .evidence-dialog-body { padding-inline: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .evidence-dialog *,
+  .evidence-dialog *::before,
+  .evidence-dialog *::after { scroll-behavior: auto !important; }
+}

@@ -32,4 +32,3 @@ describe("inverse-surface contrast regression", () => {
     expect(contrast("#f2f0e9", "#171714")).toBeGreaterThanOrEqual(4.5);
   });
 });
-
