@@ -5,4 +5,6 @@ dist
 .env.*
 !.env.example
 *.local
+*.tsbuildinfo
+.npm-cache
 .DS_Store
