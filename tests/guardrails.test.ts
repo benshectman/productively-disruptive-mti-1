@@ -1,13 +1,25 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { generateNarrative, validateAiNarrative } from "../netlify/functions/generate";
-import { assembleNarrative, selectEvidence } from "../src/shared/narrative";
+import { applyAiFraming, generateNarrative } from "../netlify/functions/generate";
+import { contentPacket } from "../src/content/content";
+import { assembleNarrative } from "../src/shared/narrative";
 
 afterEach(() => { delete process.env.OPENAI_API_KEY; });
 
 describe("bounded AI guardrails", () => {
-  it("rejects references outside the deterministically selected evidence", () => {
-    const candidate = { ...assembleNarrative([]), sections: assembleNarrative([]).sections.map((section, index) => index ? section : { ...section, evidenceRefs: ["E-999"] }) };
-    expect(validateAiNarrative(candidate, new Set(selectEvidence([]).map((item) => item.id)))).toBeNull();
+  it("merges framing without allowing the model to change structure or evidence", () => {
+    const fallback = assembleNarrative(["T-001"]);
+    const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: `Framed: ${section.headline}`, summary: `Framed: ${section.summary}` })) };
+    const result = applyAiFraming(framing, fallback)!;
+    expect(result.mode).toBe("ai");
+    expect(result.sections.map(({ id, purpose, evidenceRefs, disclosure, detail }) => ({ id, purpose, evidenceRefs, disclosure, detail })))
+      .toEqual(fallback.sections.map(({ id, purpose, evidenceRefs, disclosure, detail }) => ({ id, purpose, evidenceRefs, disclosure, detail })));
+  });
+  it.each([
+    { sections: [] },
+    { sections: assembleNarrative([]).sections.map((section) => ({ id: section.id, headline: section.headline, summary: section.summary, evidenceRefs: ["E-999"] })) },
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline, summary: section.summary })) }
+  ])("rejects framing that changes the bounded contract", (candidate) => {
+    expect(applyAiFraming(candidate, assembleNarrative([]))).toBeNull();
   });
   it("falls back when structured model output is invalid", async () => {
     process.env.OPENAI_API_KEY = "test-only";
@@ -19,5 +31,25 @@ describe("bounded AI guardrails", () => {
   it("falls back when OpenAI is unconfigured", async () => {
     expect(await generateNarrative(["T-002"])).toEqual(assembleNarrative(["T-002"]));
   });
+  it("sends only section-relevant approved evidence and requests strict structured framing", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    const fallback = assembleNarrative(["T-001", "T-002"]);
+    let requestBody: Record<string, unknown> | undefined;
+    const fakeFetch = async (_url: string | URL | Request, init?: RequestInit) => {
+      requestBody = JSON.parse(String(init?.body));
+      const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: section.headline, summary: section.summary })) };
+      return new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
+    };
+    const result = await generateNarrative(["T-001", "T-002"], fakeFetch as typeof fetch);
+    expect(result.mode).toBe("ai");
+    expect(requestBody?.store).toBe(false);
+    expect(requestBody?.text).toMatchObject({ format: { type: "json_schema", strict: true, name: "portfolio_framing" } });
+    const input = JSON.parse(String(requestBody?.input));
+    const visibleEvidence = input.sections.flatMap((section: { evidence: unknown[] }) => section.evidence);
+    const approvedIds = new Set(contentPacket.evidence.map((item) => item.id));
+    expect(visibleEvidence.length).toBeGreaterThan(0);
+    expect(visibleEvidence.every((item: { id: string }) => approvedIds.has(item.id))).toBe(true);
+    expect(JSON.stringify(visibleEvidence)).not.toContain("knowledge_only");
+    expect(JSON.stringify(visibleEvidence)).not.toContain('"sources"');
+  });
 });
-

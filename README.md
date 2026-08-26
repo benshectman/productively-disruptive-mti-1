@@ -29,12 +29,12 @@ When `OPENAI_API_KEY` is configured, the existing Netlify function:
 
 1. validates the locked design system, theme, and topic IDs;
 2. deterministically selects relevant approved evidence;
-3. sends only that constrained evidence, its unchanged attribution, and source-authority classes to the OpenAI Responses API;
-4. requests strict JSON-schema output;
-5. validates the result with Zod and verifies every evidence reference against the selected set;
-6. returns semantic narrative objects or the deterministic fallback.
+3. assigns only relevant approved evidence to each predetermined narrative section;
+4. asks the OpenAI Responses API only for rewritten headlines and summaries using strict JSON-schema output;
+5. validates the framing with Zod and merges it onto immutable deterministic section IDs, purposes, disclosures, details, and evidence references;
+6. returns the bounded semantic narrative or the deterministic fallback.
 
-AI may vary headings, summaries, transitions, and emphasis. It cannot introduce new evidence references, arbitrary markup, source artifacts, or unvalidated output.
+AI may vary headings, summaries, transitions, and emphasis. It cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
 
 The implementation uses the Responses API `text.format` JSON-schema configuration with strict schema adherence, as described in the [official OpenAI API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create).
 
@@ -59,4 +59,3 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 - `npm run build` performs TypeScript and production Vite builds.
 
 MTI-1 is intentionally a learning prototype. It does not introduce persistence, authentication, analytics, freeform prompts, job-description uploads, embeddings, vector retrieval, a CMS, or additional renderers/themes.
-

@@ -1,8 +1,9 @@
 import type { Handler } from "@netlify/functions";
 import crypto from "node:crypto";
 import { contentPacket, publicEvidenceView, sourceById } from "../../src/content/content";
-import { assembleNarrative, selectEvidence, validateNarrativeEvidence } from "../../src/shared/narrative";
-import { GenerateRequestSchema, NarrativeSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
+import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/narrative";
+import { z } from "zod";
+import { GenerateRequestSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 function allowedOrigin(origin = "") {
@@ -10,34 +11,49 @@ function allowedOrigin(origin = "") {
   return allowlist.includes(origin) ? origin : "";
 }
 
-const narrativeJsonSchema = {
+const framingJsonSchema = {
   type: "object", additionalProperties: false, required: ["sections"],
   properties: {
     sections: {
-      type: "array", minItems: 3, maxItems: 4,
+      type: "array", minItems: 4, maxItems: 4,
       items: {
         type: "object", additionalProperties: false,
-        required: ["id", "purpose", "headline", "summary", "evidenceRefs", "disclosure"],
+        required: ["id", "headline", "summary"],
         properties: {
-          id: { type: "string", minLength: 1, maxLength: 80 },
-          purpose: { type: "string", enum: ["proposition", "evidence", "transition", "story"] },
+          id: { type: "string", enum: ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"] },
           headline: { type: "string", minLength: 1, maxLength: 140 },
-          summary: { type: "string", minLength: 1, maxLength: 900 },
-          evidenceRefs: { type: "array", minItems: 1, maxItems: 9, items: { type: "string", pattern: "^E-\\d{3}$" } },
-          disclosure: { type: "string", enum: ["none", "inline", "deep-dive"] }
+          summary: { type: "string", minLength: 1, maxLength: 900 }
         }
       }
     }
   }
 };
 
-export function validateAiNarrative(value: unknown, allowedEvidenceIds: Set<string>): Narrative | null {
-  const result = NarrativeSchema.safeParse({ ...(typeof value === "object" && value ? value : {}), mode: "ai" });
-  return result.success && validateNarrativeEvidence(result.data, allowedEvidenceIds) ? result.data : null;
+const FramingSectionSchema = z.object({
+  id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
+  headline: z.string().min(1).max(140),
+  summary: z.string().min(1).max(900)
+}).strict();
+const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
+
+export function applyAiFraming(value: unknown, fallback: Narrative): Narrative | null {
+  const result = FramingSchema.safeParse(value);
+  if (!result.success) return null;
+  const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
+  if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) return null;
+  const narrative: Narrative = {
+    mode: "ai",
+    sections: fallback.sections.map((section) => {
+      const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
+      return { ...section, headline: framing.headline, summary: framing.summary };
+    })
+  };
+  return validateNarrativeEvidence(narrative) ? narrative : null;
 }
 
-function constrainedEvidence(topics: TopicId[]) {
-  return selectEvidence(topics).map((record) => ({
+function constrainedEvidence(fallback: Narrative) {
+  const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
+  return contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map((record) => ({
     ...publicEvidenceView(record),
     sourceAuthority: [...new Set(record.sources.map((id) => sourceById.get(id)?.authority).filter(Boolean))]
   }));
@@ -46,8 +62,7 @@ function constrainedEvidence(topics: TopicId[]) {
 export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch = fetch): Promise<Narrative> {
   const fallback = assembleNarrative(topics);
   if (!process.env.OPENAI_API_KEY) return fallback;
-  const evidence = constrainedEvidence(topics);
-  const allowedIds = new Set(evidence.map((item) => item.id));
+  const evidence = constrainedEvidence(fallback);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8500);
   try {
@@ -57,22 +72,32 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1400,
         instructions: [
-          "Frame a concise professional portfolio using only the approved proposition and evidence supplied.",
+          "Rewrite only the headline and summary framing for the four supplied portfolio sections.",
+          "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
+          "Use only the approved proposition and evidence assigned to each section.",
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Claims supported only by first_person_attestation must not be described as independently documented.",
-          "Return 3 or 4 intentionally sequenced semantic sections. Every section must cite only supplied evidence IDs.",
-          "Use plain external language. Experience Design Management Office (XDMO) is the approved expansion on first use."
+          "Use plain external language. Experience Design Management Office (XDMO) is the approved expansion on first use.",
+          "Do not return HTML, Markdown, evidence IDs, attribution fields, disclosure choices, or design-system markup."
         ].join(" "),
-        input: JSON.stringify({ selectedTopics: topics, approvedProposition: contentPacket.propositions[0], approvedEvidence: evidence }),
-        text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: narrativeJsonSchema } }
+        input: JSON.stringify({
+          selectedTopics: topics,
+          approvedProposition: contentPacket.propositions[0].statement,
+          sections: fallback.sections.map((section) => ({
+            id: section.id,
+            purpose: section.purpose,
+            evidence: evidence.filter((item) => section.evidenceRefs.includes(item.id))
+          }))
+        }),
+        text: { format: { type: "json_schema", name: "portfolio_framing", strict: true, schema: framingJsonSchema } }
       })
     });
     if (!response.ok) return fallback;
     const result = await response.json() as { output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }> };
     const text = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
     if (!text) return fallback;
-    return validateAiNarrative(JSON.parse(text), allowedIds) || fallback;
+    return applyAiFraming(JSON.parse(text), fallback) || fallback;
   } catch { return fallback; }
   finally { clearTimeout(timeout); }
 }
@@ -91,4 +116,3 @@ export const handler: Handler = async (event) => {
   const narrative = await generateNarrative(parsed.data.topics);
   return { statusCode: 200, headers: headersFor(corsOrigin), body: JSON.stringify({ narrative: { ...narrative, requestId }, requestId }) };
 };
-
