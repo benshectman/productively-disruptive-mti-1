@@ -1,0 +1,91 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Figtree", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.shell {
+  width: min(72rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 5rem 0;
+}
+
+.hero {
+  max-width: 54rem;
+  padding-bottom: 5rem;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 8vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  margin: 1rem 0 1.5rem;
+}
+
+.lede {
+  max-width: 42rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  line-height: 1.5;
+}
+
+.stages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1px;
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 6rem;
+}
+
+.stages li {
+  border-top: 1px solid currentColor;
+  padding: 1.25rem 1rem 2rem 0;
+}
+
+.stages span {
+  font-weight: 700;
+}
+
+.generator {
+  max-width: 48rem;
+  border-top: 1px solid currentColor;
+  padding-top: 3rem;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+textarea {
+  box-sizing: border-box;
+  min-height: 9rem;
+  width: 100%;
+  padding: 1rem;
+  font: inherit;
+}
+
+button {
+  justify-self: start;
+  padding: 0.75rem 1.25rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.answer {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-left: 3px solid currentColor;
+  white-space: pre-wrap;
+}
