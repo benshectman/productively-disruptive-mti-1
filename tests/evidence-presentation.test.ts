@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { contentPacket } from "../src/content/content";
 import { approvedPointsLabel, buildEvidencePresentation } from "../src/shared/evidence-presentation";
+
+const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+const evidenceCss = readFileSync(new URL("../src/evidence-dialog.css", import.meta.url), "utf8");
 
 describe("evidence presentation", () => {
   it.each([1, 3, 9])("resolves and counts %i approved evidence points", (count) => {
@@ -28,5 +32,15 @@ describe("evidence presentation", () => {
   it("uses readable singular and plural labels", () => {
     expect(approvedPointsLabel(1)).toBe("1 approved point");
     expect(approvedPointsLabel(9)).toBe("9 approved points");
+  });
+
+  it("keeps Astryx dialog content inset from every edge", () => {
+    expect(appSource).toContain("className=\"evidence-dialog\"");
+    expect(appSource).toContain("padding={4} purpose=\"info\"");
+    expect(evidenceCss).toContain("padding: 1.25rem 0 .5rem");
+  });
+
+  it("does not animate Astryx scroll-lock restoration on close", () => {
+    expect(evidenceCss).toMatch(/html\s*\{\s*scroll-behavior:\s*auto;/);
   });
 });

@@ -100,7 +100,7 @@ function EvidenceSignal({ refs, contextLabel, onOpen }: { refs: string[]; contex
 
 function EvidenceDialog({ presentation, onClose }: { presentation: EvidencePresentation | null; onClose: () => void }) {
   const count = presentation?.items.length ?? 0;
-  return <Dialog className="evidence-dialog" isOpen={Boolean(presentation)} onOpenChange={(open) => { if (!open) onClose(); }} width="min(92vw, 80rem)" maxHeight="88dvh" padding={0} purpose="info">
+  return <Dialog className="evidence-dialog" isOpen={Boolean(presentation)} onOpenChange={(open) => { if (!open) onClose(); }} width="min(92vw, 80rem)" maxHeight="88dvh" padding={4} purpose="info">
     {presentation && <>
       <DialogHeader title="Evidence behind this" subtitle={`${approvedPointsLabel(count)} supporting “${presentation.contextLabel}”`} onOpenChange={(open) => { if (!open) onClose(); }}/>
       <div className="evidence-dialog-body">
