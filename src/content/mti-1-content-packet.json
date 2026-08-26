@@ -1,0 +1,482 @@
+{
+  "meta": {
+    "name": "Productively Disruptive MTI-1 Content Packet",
+    "version": "0.1",
+    "status": "prototype",
+    "schema_status": "provisional",
+    "purpose": "Minimal grounded content set for the first AI-generated portfolio vertical slice.",
+    "governance": {
+      "model": "evidence_plus_proposition_approval",
+      "rule": "AI may reframe approved propositions and evidence, but may not invent new professional claims or alter attribution."
+    }
+  },
+  "terminology_rules": {
+    "expand_acronyms_on_first_use": true,
+    "prefer_external_descriptors_for_internal_names": true,
+    "do_not_invent_descriptors": true,
+    "notes": [
+      "Internal J&J acronyms and product names must be expanded or described for external visitors.",
+      "Approved presentation metadata should be used deterministically when available."
+    ]
+  },
+  "topics": [
+    {
+      "id": "T-001",
+      "label": "Design Leadership"
+    },
+    {
+      "id": "T-002",
+      "label": "Systems Thinking"
+    },
+    {
+      "id": "T-003",
+      "label": "Enterprise UX"
+    },
+    {
+      "id": "T-004",
+      "label": "UX Measurement"
+    }
+  ],
+  "propositions": [
+    {
+      "id": "P-001",
+      "statement": "Ben designs at multiple levels of the system. At the product level, he shapes experience strategy and raises quality through critique. At the organizational level, he designs the structures, practices, measures, and principles that allow good design to happen repeatedly at scale.",
+      "short_label": "Design at multiple levels of the system",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "evidence": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004",
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009",
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014",
+        "E-015"
+      ],
+      "approval_status": "approved"
+    }
+  ],
+  "sources": [
+    {
+      "id": "SRC-ATT-001",
+      "title": "Ben first-person chronology of J&J XD leadership",
+      "type": "attestation",
+      "authority": "first_person_attestation",
+      "visibility": "knowledge_only",
+      "shareable": false,
+      "notes": "Approved first-person source for chronology and role attribution where documentary artifacts are not yet available."
+    },
+    {
+      "id": "SRC-2020-LAUNCH",
+      "title": "CBT Experience Design Launch",
+      "type": "presentation",
+      "authority": "contemporaneous_artifact",
+      "visibility": "knowledge_only",
+      "shareable": false,
+      "date": "2020-04-30",
+      "presentation_metadata": {
+        "expanded_names": {
+          "XDMO": "Experience Design Management Office",
+          "CBT": "Corporate Business Technology",
+          "JJT": "Johnson & Johnson Technology"
+        }
+      }
+    },
+    {
+      "id": "SRC-2020-RASHA",
+      "title": "Rasha Abdou organizational announcement",
+      "type": "document",
+      "authority": "contemporaneous_artifact",
+      "visibility": "knowledge_only",
+      "shareable": false,
+      "date": "2020-07-27"
+    },
+    {
+      "id": "SRC-2025-CBT-QBR",
+      "title": "CBT XD Chapter Review Q1 2025",
+      "type": "presentation",
+      "authority": "contemporaneous_artifact",
+      "visibility": "knowledge_only",
+      "shareable": false
+    },
+    {
+      "id": "SRC-2025-ISRM-QBR",
+      "title": "ISRM XD Chapter Review Q1 2025",
+      "type": "presentation",
+      "authority": "contemporaneous_artifact",
+      "visibility": "knowledge_only",
+      "shareable": false
+    },
+    {
+      "id": "SRC-2025-TS-QBR",
+      "title": "Technology Services XD Chapter Review Q1 2025",
+      "type": "presentation",
+      "authority": "contemporaneous_artifact",
+      "visibility": "knowledge_only",
+      "shareable": false
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-001",
+      "claim": "Ben joined J&J in winter 2019 as the sole member of a newly defined UX/HCD Center of Excellence within Corporate Business Technology.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-ATT-001"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-002",
+      "claim": "During the first year, Ben partnered with his manager to establish the team and define how UX/HCD would operate within CBT's emerging product operating model, with Ben doing much of the hands-on work of defining and implementing that model.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-ATT-001"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-003",
+      "claim": "By April/May 2020, CBT had formally established and launched its Experience Design Management Office (XDMO) to support product squads.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-004",
+      "claim": "The 2020 XD operating model explicitly positioned Experience Design as part of the product operating model, not as a downstream production service.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-005",
+      "claim": "The early XD model distinguished between helping teams build the right things and build those things right.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-006",
+      "claim": "The operating model treated XD as a persistent part of product teams whose level of involvement could flex over the lifecycle, rather than as temporary project staffing.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-007",
+      "claim": "The early model already included mechanisms for scaling design beyond individual designers, including domain leadership, embedded designers, partner resources, shared assets, design systems, research, measurement, and quality oversight.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-008",
+      "claim": "Measurement was built into the XD model from the outset, including defining, baselining, and continuously measuring experience success.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-004"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-009",
+      "claim": "In July 2020, Ben made his first full-time XD hire, bringing Rasha Abdou into CBT as Product Experience Design Lead reporting directly to him. Her mandate included expanding the XD practice, maturing human-centered design within CBT, and leading XD efforts across the CBT product portfolio.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2020-RASHA",
+        "SRC-ATT-001"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-010",
+      "claim": "Roughly 2020-2021 were spent proving and refining the XD operating model within CBT through real product engagements.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-ATT-001",
+        "SRC-2020-LAUNCH"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-011",
+      "claim": "In early 2022, JJT leadership began working to scale the XD model beyond CBT, and Ben was tapped to participate in the cross-organizational working group.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-ATT-001"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-012",
+      "claim": "In parallel, Supply Chain Technology leadership asked Ben to help establish XD as part of its own product operating model transformation.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-ATT-001"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-013",
+      "claim": "By 2024-2025, the formal JJT-wide XD Chapter was operating with an enterprise service model covering Experience Strategy, User Research, Design, and UX Measurement, with explicit portfolio-level OKRs and governance.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2025-CBT-QBR",
+        "SRC-2025-ISRM-QBR",
+        "SRC-2025-TS-QBR"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-014",
+      "claim": "The mature XD model increasingly shifted its unit of thinking from isolated products toward end-to-end experiences that cross people, processes, technologies, and organizational silos.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2025-CBT-QBR",
+        "SRC-2025-ISRM-QBR",
+        "SRC-2025-TS-QBR"
+      ],
+      "approval_status": "approved"
+    },
+    {
+      "id": "E-015",
+      "claim": "The mature model sought to scale design influence beyond direct XD staffing through reusable assets, design systems, UX measurement, training, and common practices.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "supports": [
+        "P-001"
+      ],
+      "sources": [
+        "SRC-2025-CBT-QBR",
+        "SRC-2025-ISRM-QBR",
+        "SRC-2025-TS-QBR"
+      ],
+      "approval_status": "approved"
+    }
+  ],
+  "stories": [
+    {
+      "id": "S-001",
+      "title": "From UX Service to Organizational Capability",
+      "working_subtitle": "How Ben helped establish, prove, scale, and institutionalize Experience Design within J&J Technology",
+      "premise": "How do you establish human-centered design inside a large enterprise that is simultaneously transforming from project-based delivery to product-centric operating models, then make that capability scale beyond the designers who created it?",
+      "role_guardrail": "Ben began as the sole member of CBT's newly defined UX/HCD Center of Excellence and became a principal driver in establishing, refining, and expanding its product-centric XD operating model. As the model expanded beyond CBT, he helped adapt and scale those practices with other design and technology leaders, eventually serving as Enterprise Sub Chapter Lead within the formal JJT-wide XD Chapter.",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "beats": [
+        {
+          "id": "S-001-B1",
+          "label": "Establish",
+          "period": "2019-2020",
+          "summary": "Define the XD service, integrate it into the emerging product operating model, build stakeholder relationships, and begin forming the permanent team.",
+          "evidence": [
+            "E-001",
+            "E-002",
+            "E-003",
+            "E-004",
+            "E-005",
+            "E-006",
+            "E-007",
+            "E-008",
+            "E-009"
+          ]
+        },
+        {
+          "id": "S-001-B2",
+          "label": "Prove",
+          "period": "2020-2021",
+          "summary": "Refine the operating model through real product engagements and demonstrate that embedded strategy, research, design, and measurement can improve product decision-making.",
+          "evidence": [
+            "E-010"
+          ]
+        },
+        {
+          "id": "S-001-B3",
+          "label": "Scale",
+          "period": "2022-2023",
+          "summary": "Extend the model beyond CBT through JJT-wide scaling work and Supply Chain Technology adoption while continuing to expand the CBT footprint.",
+          "evidence": [
+            "E-011",
+            "E-012"
+          ]
+        },
+        {
+          "id": "S-001-B4",
+          "label": "Institutionalize",
+          "period": "2024-2025",
+          "summary": "Evolve the model into a formal enterprise XD Chapter with portfolio governance, experience measurement, reusable assets, capability building, and end-to-end journey orientation.",
+          "evidence": [
+            "E-013",
+            "E-014",
+            "E-015"
+          ]
+        }
+      ],
+      "approval_status": "approved"
+    }
+  ],
+  "runtime_defaults": {
+    "design_system": "to_be_selected",
+    "theme": "system_default",
+    "default_topics": [],
+    "fallback_story": "S-001",
+    "fallback_proposition": "P-001"
+  },
+  "generation_contract": {
+    "allowed": [
+      "Generate concise headings",
+      "Summarize supplied approved evidence",
+      "Reframe approved proposition based on selected topics",
+      "Generate transitions between approved story beats",
+      "Choose emphasis among supplied approved evidence"
+    ],
+    "forbidden": [
+      "Invent accomplishments, metrics, dates, or product descriptions",
+      "Create new professional propositions",
+      "Change attribution",
+      "Present team or organizational work as Ben's personal execution",
+      "Expose knowledge_only sources or source contents directly",
+      "Invent acronym expansions or external product descriptors",
+      "Imply documentary corroboration for claims sourced only from first-person attestation"
+    ],
+    "output_should_reference_evidence_ids": true
+  }
+}
