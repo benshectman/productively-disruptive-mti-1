@@ -1,0 +1,945 @@
+{
+  "meta": {
+    "name": "BenFacts portfolio migration candidates",
+    "version": "0.1",
+    "status": "review_required",
+    "generated_from": "benshectman/ben-gpt-backend:netlify/functions/ben-profile-v0.1-alpha.json",
+    "source_blob_sha": "bc6d4e67bade33a688b7ef0662b73075480b8d33",
+    "rule": "Nothing in this file is approved for generation. Candidates require source, attribution, visibility, atomicity, and overlap review before promotion."
+  },
+  "source": {
+    "id": "SRC-BENFACTS-001",
+    "type": "legacy_approved_chat_profile",
+    "authority": "unverified_migration_source",
+    "visibility": "knowledge_only",
+    "shareable": false
+  },
+  "summary": {
+    "total_candidates": 32,
+    "profile_candidates": 29,
+    "policy_candidates": 3,
+    "by_target_type": {
+      "proposition_candidate": 3,
+      "evidence_candidate": 11,
+      "project_candidate": 4,
+      "career_record_candidate": 5,
+      "credential_candidate": 2,
+      "topic_candidate": 4,
+      "policy_candidate": 3
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "BF-C-001",
+      "target_type": "proposition_candidate",
+      "original_text": "Ben Shectman is an executive UX and product design leader with more than 20 years of professional experience.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "P-001"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "30e2fe2d-10a4-5eba-a80c-181ec9c9a533",
+        "slug": "executive-ux-and-product-design-leader",
+        "version": 1,
+        "title": "Executive UX and product design leader"
+      }
+    },
+    {
+      "candidate_id": "BF-C-002",
+      "target_type": "proposition_candidate",
+      "original_text": "His work focuses on building and scaling design organizations and delivering enterprise-grade digital products.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "P-001"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "304b5fc2-0214-570b-87d0-0722e0b202df",
+        "slug": "focus-on-design-organizations-and-enterprise-grade-products",
+        "version": 1,
+        "title": "Focus on design organizations and enterprise-grade products"
+      }
+    },
+    {
+      "candidate_id": "BF-C-003",
+      "target_type": "proposition_candidate",
+      "original_text": "He specializes in complex, regulated, and multi-stakeholder enterprise environments.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "5e5fd753-3663-5209-8297-fe7b2ed86284",
+        "slug": "complex-regulated-multi-stakeholder-enterprise-environments",
+        "version": 1,
+        "title": "Complex regulated multi-stakeholder enterprise environments"
+      }
+    },
+    {
+      "candidate_id": "BF-C-004",
+      "target_type": "evidence_candidate",
+      "original_text": "From 2019 to 2025, Ben served as Experience Design Chapter Leader at Johnson & Johnson.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-013"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "d6e9f732-e04d-5d8d-8567-9114aaf5658a",
+        "slug": "experience-design-chapter-leader-at-johnson-johnson",
+        "version": 1,
+        "title": "Experience Design Chapter Leader at Johnson & Johnson"
+      }
+    },
+    {
+      "candidate_id": "BF-C-005",
+      "target_type": "evidence_candidate",
+      "original_text": "He established and scaled an Experience Design center of excellence supporting corporate, finance, supply chain, technology services, and information security organizations.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-003",
+          "E-011",
+          "E-012",
+          "E-013"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "21dbab04-0184-541f-ada2-0c37c941c5c9",
+        "slug": "established-and-scaled-experience-design-center-of-excellence",
+        "version": 1,
+        "title": "Established and scaled Experience Design center of excellence"
+      }
+    },
+    {
+      "candidate_id": "BF-C-006",
+      "target_type": "evidence_candidate",
+      "original_text": "He was accountable for UX leadership across more than 40 workforce-facing enterprise platforms.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "a423c783-e13f-5f64-a3d1-948794d915c6",
+        "slug": "ux-leadership-across-more-than-40-enterprise-platforms",
+        "version": 1,
+        "title": "UX leadership across more than 40 enterprise platforms"
+      }
+    },
+    {
+      "candidate_id": "BF-C-007",
+      "target_type": "evidence_candidate",
+      "original_text": "He built and led a design team that grew from one designer to more than twenty.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-009",
+          "E-013"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "5a987ef4-368d-57a0-a67e-1b0188febfdd",
+        "slug": "built-and-led-design-team-from-one-to-more-than-twenty",
+        "version": 1,
+        "title": "Built and led design team from one to more than twenty"
+      }
+    },
+    {
+      "candidate_id": "BF-C-008",
+      "target_type": "evidence_candidate",
+      "original_text": "He directed a design services portfolio exceeding $6M across more than 45 engagements.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "4e6f4d3d-bc65-5f74-82d2-268812071422",
+        "slug": "directed-design-services-portfolio-exceeding-six-million-dollars",
+        "version": 1,
+        "title": "Directed design services portfolio exceeding six million dollars"
+      }
+    },
+    {
+      "candidate_id": "BF-C-009",
+      "target_type": "project_candidate",
+      "original_text": "Ben led design for SigniFi, a multi-year global transformation of finance operations.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "73f84c6d-8201-592d-a651-f1487058846c",
+        "slug": "led-design-for-signifi-finance-transformation",
+        "version": 1,
+        "title": "Led design for SigniFi finance transformation"
+      }
+    },
+    {
+      "candidate_id": "BF-C-010",
+      "target_type": "project_candidate",
+      "original_text": "He oversaw UX for SupplierHub, a multi-sided platform connecting internal corporate functions with external suppliers.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "f3914bd6-f234-5371-af8c-2da141ffaaac",
+        "slug": "oversaw-ux-for-supplierhub",
+        "version": 1,
+        "title": "Oversaw UX for SupplierHub"
+      }
+    },
+    {
+      "candidate_id": "BF-C-011",
+      "target_type": "project_candidate",
+      "original_text": "He directed analytics-driven initiatives including Service Operations Performance Analytics and a Supply Chain Digital Twin.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "e2a88a81-604d-5c7d-86fe-3ac794aa6759",
+        "slug": "directed-analytics-driven-initiatives",
+        "version": 1,
+        "title": "Directed analytics-driven initiatives"
+      }
+    },
+    {
+      "candidate_id": "BF-C-012",
+      "target_type": "project_candidate",
+      "original_text": "He championed exploration of GenAI-enabled rapid prototyping tools to accelerate design discovery.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Current MTI-1 topic taxonomy does not fully represent this subject."
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "c9c5f643-1d8b-5b72-9758-a1f4318d6fbd",
+        "slug": "champion-of-genai-enabled-rapid-prototyping-exploration",
+        "version": 1,
+        "title": "Champion of GenAI-enabled rapid prototyping exploration"
+      }
+    },
+    {
+      "candidate_id": "BF-C-013",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben has established DesignOps practices, design systems, and governance models to support scaling teams.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-007",
+          "E-013",
+          "E-015"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "565cd6f4-a50d-53f7-b049-1af97192224a",
+        "slug": "established-designops-practices-design-systems-and-governance-models",
+        "version": 1,
+        "title": "Established DesignOps practices design systems and governance models"
+      }
+    },
+    {
+      "candidate_id": "BF-C-014",
+      "target_type": "evidence_candidate",
+      "original_text": "He has created component libraries and prototyping systems in collaboration with global brand organizations.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "22efe3f3-c04e-5228-99ff-eeee7b10b879",
+        "slug": "created-component-libraries-and-prototyping-systems",
+        "version": 1,
+        "title": "Created component libraries and prototyping systems"
+      }
+    },
+    {
+      "candidate_id": "BF-C-015",
+      "target_type": "evidence_candidate",
+      "original_text": "He has standardized UX practices across product delivery lifecycles and cross-functional product squads.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-004",
+          "E-006",
+          "E-015"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "13cdc678-53ff-5d5b-9827-1e340149523c",
+        "slug": "standardized-ux-practices-across-delivery-lifecycles-and-product-squads",
+        "version": 1,
+        "title": "Standardized UX practices across delivery lifecycles and product squads"
+      }
+    },
+    {
+      "candidate_id": "BF-C-016",
+      "target_type": "evidence_candidate",
+      "original_text": "He has mentored and coached designers, supporting skills development and career progression.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "ba57f231-44d2-5904-aac9-4023541a29b9",
+        "slug": "mentored-and-coached-designers",
+        "version": 1,
+        "title": "Mentored and coached designers"
+      }
+    },
+    {
+      "candidate_id": "BF-C-017",
+      "target_type": "career_record_candidate",
+      "original_text": "Director of User Experience at Crestron Electronics (2016-2018), leading UX across residential and enterprise control systems.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "0ff37638-c1a0-590d-b142-1b1288ffde73",
+        "slug": "director-of-user-experience-at-crestron-electronics",
+        "version": 1,
+        "title": "Director of User Experience at Crestron Electronics"
+      }
+    },
+    {
+      "candidate_id": "BF-C-018",
+      "target_type": "career_record_candidate",
+      "original_text": "Head of User Experience at REDI Global Technologies (2015), supporting institutional trading platform development.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "7b93168e-4a9f-5a6c-a4b9-acd95bf9bf6f",
+        "slug": "head-of-user-experience-at-redi-global-technologies",
+        "version": 1,
+        "title": "Head of User Experience at REDI Global Technologies"
+      }
+    },
+    {
+      "candidate_id": "BF-C-019",
+      "target_type": "career_record_candidate",
+      "original_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "23697c83-ad41-5d29-9983-ff7695bd4ba8",
+        "slug": "director-of-user-experience-at-sparta-systems",
+        "version": 1,
+        "title": "Director of User Experience at Sparta Systems"
+      }
+    },
+    {
+      "candidate_id": "BF-C-020",
+      "target_type": "career_record_candidate",
+      "original_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "a29a23dd-374e-5adf-b207-bb953a29194d",
+        "slug": "practice-lead-digital-strategy-at-emc2-global-consulting",
+        "version": 1,
+        "title": "Practice Lead Digital Strategy at EMC2 Global Consulting"
+      }
+    },
+    {
+      "candidate_id": "BF-C-021",
+      "target_type": "career_record_candidate",
+      "original_text": "Senior UX leadership roles at Pfizer and other digital and consulting organizations.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "28793e14-8337-5335-815d-cf4f34b5b392",
+        "slug": "senior-ux-leadership-roles-at-pfizer-and-other-organizations",
+        "version": 1,
+        "title": "Senior UX leadership roles at Pfizer and other organizations"
+      }
+    },
+    {
+      "candidate_id": "BF-C-022",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben has led qualitative and quantitative user research programs, including usability testing, contextual inquiry, and behavioral analysis.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-007",
+          "E-013"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "research_and_methods",
+        "uuid": "ee4a333a-be7a-5a27-b17a-b66be948a0b4",
+        "slug": "led-qualitative-and-quantitative-user-research-programs",
+        "version": 1,
+        "title": "Led qualitative and quantitative user research programs"
+      }
+    },
+    {
+      "candidate_id": "BF-C-023",
+      "target_type": "evidence_candidate",
+      "original_text": "He applies human-centered design, Lean UX, and agile practices within product development environments.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "research_and_methods",
+        "uuid": "e7afd1cd-fb6b-5e75-a85f-c43cc617b7b4",
+        "slug": "applies-human-centered-design-lean-ux-and-agile-practices",
+        "version": 1,
+        "title": "Applies human-centered design Lean UX and agile practices"
+      }
+    },
+    {
+      "candidate_id": "BF-C-024",
+      "target_type": "credential_candidate",
+      "original_text": "Bachelor of Arts in Psychology from Yale University.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "education_and_certifications",
+        "uuid": "8921531d-285d-5cc1-aa13-ef0c89167bac",
+        "slug": "bachelor-of-arts-in-psychology-from-yale-university",
+        "version": 1,
+        "title": "Bachelor of Arts in Psychology from Yale University"
+      }
+    },
+    {
+      "candidate_id": "BF-C-025",
+      "target_type": "credential_candidate",
+      "original_text": "Certifications include Pragmatic Marketing (PMC-II), Simplexity Applied Creativity Facilitator (Basadur), and Design Leadership (Cooper).",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "education_and_certifications",
+        "uuid": "aa5c6b8a-f6b8-52aa-98c2-e108ef8513a1",
+        "slug": "professional-certifications",
+        "version": 1,
+        "title": "Professional certifications"
+      }
+    },
+    {
+      "candidate_id": "BF-C-026",
+      "target_type": "topic_candidate",
+      "original_text": "Design leadership and organizational scaling",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "1e86957f-5944-5db0-8159-2b4d6232b53e",
+        "slug": "design-leadership-and-organizational-scaling",
+        "version": 1,
+        "title": "Design leadership and organizational scaling"
+      }
+    },
+    {
+      "candidate_id": "BF-C-027",
+      "target_type": "topic_candidate",
+      "original_text": "Human-AI interaction and cognitive bias",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Current MTI-1 topic taxonomy does not fully represent this subject."
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "164a24e2-a995-5ccc-9d93-73dcd3b7146c",
+        "slug": "human-ai-interaction-and-cognitive-bias",
+        "version": 1,
+        "title": "Human-AI interaction and cognitive bias"
+      }
+    },
+    {
+      "candidate_id": "BF-C-028",
+      "target_type": "topic_candidate",
+      "original_text": "Enterprise UX for complex systems",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "07abb8ce-c19c-5634-ac9a-cf25df867480",
+        "slug": "enterprise-ux-for-complex-systems",
+        "version": 1,
+        "title": "Enterprise UX for complex systems"
+      }
+    },
+    {
+      "candidate_id": "BF-C-029",
+      "target_type": "topic_candidate",
+      "original_text": "DesignOps and systems thinking",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "T-001",
+          "T-002"
+        ],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "bffa7dfb-e03e-5d34-9676-885408285384",
+        "slug": "designops-and-systems-thinking",
+        "version": 1,
+        "title": "DesignOps and systems thinking"
+      }
+    },
+    {
+      "candidate_id": "BF-C-030",
+      "target_type": "policy_candidate",
+      "original_text": "This assistant may answer questions only using the facts listed above.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "4063e359-30fc-5ee4-84e3-f0db31a852bd",
+        "slug": "use-only-listed-facts",
+        "version": 1,
+        "title": "Use only listed facts"
+      }
+    },
+    {
+      "candidate_id": "BF-C-031",
+      "target_type": "policy_candidate",
+      "original_text": "If a question cannot be answered using these facts, the assistant must say it does not know.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "35841cf3-c371-5d5e-bdda-41b39b341c43",
+        "slug": "say-it-does-not-know-when-unsupported",
+        "version": 1,
+        "title": "Say it does not know when unsupported"
+      }
+    },
+    {
+      "candidate_id": "BF-C-032",
+      "target_type": "policy_candidate",
+      "original_text": "The assistant must not speculate, infer private details, or provide personal contact information.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "undetermined",
+      "attribution": "undetermined",
+      "source_refs": [
+        "SRC-BENFACTS-001"
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "c51f7032-1fa6-5ba1-81fa-7ce432813284",
+        "slug": "do-not-speculate-or-disclose-private-details",
+        "version": 1,
+        "title": "Do not speculate or disclose private details"
+      }
+    }
+  ]
+}
+

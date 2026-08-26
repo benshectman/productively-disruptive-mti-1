@@ -17,6 +17,10 @@ The first testable vertical slice of Ben Shectman’s generative professional po
 
 Knowledge-only source artifacts may ground server-side framing but their metadata and raw source contents are never returned to the browser. Client-visible evidence contains only the approved claim, evidence ID, attribution, and topic references.
 
+### BenFacts migration candidates
+
+The earlier Ben-GPT profile is preserved under `src/content/legacy/` and classified in `src/content/candidates/ben-facts-migration.v0.1.json`. These records are review candidates only: they are not part of the approved MTI-1 packet, are not loaded by the application, and are not sent to OpenAI. See `docs/ben-facts-migration-review.md` for the promotion process.
+
 ## Deterministic mode
 
 The complete experience works without an OpenAI key. Topic overlap and small transparent priority lists select approved evidence, which is assembled into the semantic narrative contract and rendered through Astryx Neutral.
