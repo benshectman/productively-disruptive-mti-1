@@ -15,7 +15,7 @@
   "dependencies": {
     "@astryxdesign/core": "^0.5.0",
     "@astryxdesign/theme-neutral": "^0.5.0",
-    "@stylexjs/stylex": "^0.16.0",
+    "@stylexjs/stylex": "^0.19.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^4.0.0"
