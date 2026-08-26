@@ -9,5 +9,11 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "netlify/functions/**/*.ts", "tests/**/*.ts"]
+  "include": [
+    "vite.config.ts",
+    "netlify/functions/**/*.ts",
+    "tests/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/content/**/*.json"
+  ]
 }
