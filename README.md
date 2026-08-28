@@ -46,6 +46,10 @@ The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `cand
 
 The browser never receives the candidate manifest, source references, filenames, hashes, internal excerpts, review notes, or evidence-strength rationale. Generated pages and evidence dialogs visibly identify the facts as unapproved validation candidates. The approved four-stage deep dive remains grounded in the approved MTI-1 packet.
 
+Candidate validation uses an editorial planner by default. It creates a stable audience-facing arc—About Ben → Recent Leadership → Proof in Practice → Career Throughline—then selects facts according to section fit, visitor-topic relevance, recency, portfolio salience, evidence strength, and non-repetition. Recent experience provides the center of gravity while earlier roles establish a longer career pattern. Provisional editorial guidance lives separately in the server-only `netlify/functions/candidate-editorial-metadata.ts`; it does not alter the candidate compendium or its approval status.
+
+The previous flat-selection planner remains available as a rollback path. Set the Functions runtime variable `NARRATIVE_PLANNER_MODE=legacy` and redeploy to restore its selection behavior. Set it to `editorial` (or omit it) to use the new planner. Both planners return the same validated semantic narrative contract, and neither gives the model control of evidence selection, section structure, visitor labels, or rendering.
+
 To end the experiment immediately, set `BENFACTS_VALIDATION_MODE=approved` for the Functions runtime in Netlify and redeploy. To end it in code, change the temporary default in `netlify/functions/candidate-validation.ts` from `candidates` to `approved`. The server then returns to the original approved deterministic and AI corpus.
 
 The implementation uses the Responses API `text.format` JSON-schema configuration with strict schema adherence, as described in the [official OpenAI API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create).
@@ -63,6 +67,7 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 - `OPENAI_API_KEY` — optional, server-side only.
 - `OPENAI_MODEL` — optional; defaults to `gpt-4.1-mini`.
 - `BENFACTS_VALIDATION_MODE` — temporary; set to `candidates` to use sanitized, unapproved candidate facts or omit/set to `approved` to use only the approved packet.
+- `NARRATIVE_PLANNER_MODE` — temporary candidate-mode planner switch; `editorial` is the default and `legacy` restores the previous selection behavior.
 - `ALLOWED_ORIGINS` — comma-separated exact browser origins.
 - `VITE_GENERATE_ENDPOINT` — optional client endpoint override.
 

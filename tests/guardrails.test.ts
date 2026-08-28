@@ -12,8 +12,8 @@ describe("bounded AI guardrails", () => {
     const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: `Framed: ${section.headline}`, summary: `Framed: ${section.summary}` })) };
     const result = applyAiFraming(framing, fallback)!;
     expect(result.mode).toBe("ai");
-    expect(result.sections.map(({ id, purpose, evidenceRefs, disclosure, detail }) => ({ id, purpose, evidenceRefs, disclosure, detail })))
-      .toEqual(fallback.sections.map(({ id, purpose, evidenceRefs, disclosure, detail }) => ({ id, purpose, evidenceRefs, disclosure, detail })));
+    expect(result.sections.map(({ id, purpose, eyebrow, evidenceRefs, disclosure, detail }) => ({ id, purpose, eyebrow, evidenceRefs, disclosure, detail })))
+      .toEqual(fallback.sections.map(({ id, purpose, eyebrow, evidenceRefs, disclosure, detail }) => ({ id, purpose, eyebrow, evidenceRefs, disclosure, detail })));
   });
   it.each([
     { sections: [] },

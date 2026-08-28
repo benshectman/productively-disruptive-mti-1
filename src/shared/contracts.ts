@@ -21,6 +21,7 @@ export const VisitorConfigurationSchema = z.object({
 export const NarrativeSectionSchema = z.object({
   id: z.string().min(1).max(80),
   purpose: z.enum(["proposition", "evidence", "transition", "story"]),
+  eyebrow: z.string().min(1).max(60),
   headline: z.string().min(1).max(140),
   summary: z.string().min(1).max(900),
   evidenceRefs: z.array(z.string().regex(/^(E-\d{3}|BF-C-\d{3})$/)).min(1).max(9),

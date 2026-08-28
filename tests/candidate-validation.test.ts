@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { generateNarrative } from "../netlify/functions/generate";
 import {
   assembleCandidateNarrative,
+  assembleEditorialCandidateNarrative,
+  assembleLegacyCandidateNarrative,
   candidateValidationIds,
   publicCandidateEvidence
 } from "../netlify/functions/candidate-validation";
@@ -11,6 +13,7 @@ import type { TopicId } from "../src/shared/contracts";
 afterEach(() => {
   delete process.env.BENFACTS_VALIDATION_MODE;
   delete process.env.OPENAI_API_KEY;
+  delete process.env.NARRATIVE_PLANNER_MODE;
 });
 
 describe("temporary candidate BenFacts validation mode", () => {
@@ -37,6 +40,42 @@ describe("temporary candidate BenFacts validation mode", () => {
     for (const [index, topic] of topics.entries()) {
       const selected = publicCandidateEvidence(selections[index]);
       expect(selected.filter((record) => record.topics.includes(topic)).length).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  it("preserves the previous planner as a stable legacy rollback path", () => {
+    const refs = assembleLegacyCandidateNarrative([]).sections.map((section) => section.evidenceRefs);
+    expect(refs).toEqual([
+      ["BF-C-073", "BF-C-076", "BF-C-033"],
+      ["BF-C-036", "BF-C-037", "BF-C-038", "BF-C-039"],
+      ["BF-C-053", "BF-C-055", "BF-C-057", "BF-C-062"],
+      ["BF-C-077", "BF-C-078", "BF-C-079"]
+    ]);
+    process.env.NARRATIVE_PLANNER_MODE = "legacy";
+    expect(assembleCandidateNarrative([])).toEqual(assembleLegacyCandidateNarrative([]));
+  });
+
+  it("plans a broad-to-specific editorial arc with recent experience as its center of gravity", () => {
+    const narrative = assembleEditorialCandidateNarrative(["T-001", "T-002"]);
+    expect(narrative.sections.map((section) => section.eyebrow)).toEqual([
+      "About Ben", "Recent leadership", "Proof in practice", "Career throughline"
+    ]);
+    expect(narrative.sections[0].evidenceRefs).toEqual(expect.arrayContaining(["BF-C-073", "BF-C-076"]));
+    expect(narrative.sections[3].evidenceRefs[0]).toBe("BF-C-075");
+    expect(narrative.sections[3].evidenceRefs.slice(1).every((id) => Number(id.slice(-3)) >= 77)).toBe(true);
+    const refs = narrative.sections.flatMap((section) => section.evidenceRefs);
+    expect(new Set(refs).size).toBe(refs.length);
+    const recentCount = refs.filter((id) => {
+      const number = Number(id.slice(-3));
+      return number >= 33 && number <= 75 && number !== 73;
+    }).length;
+    expect(recentCount / refs.length).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it("keeps internal semantic purposes out of visitor-facing labels", () => {
+    const internalLabels = new Set(["proposition", "evidence", "transition", "story"]);
+    for (const mode of ["legacy", "editorial"] as const) {
+      expect(assembleCandidateNarrative([], mode).sections.every((section) => !internalLabels.has(section.eyebrow.toLowerCase()))).toBe(true);
     }
   });
 
@@ -76,6 +115,10 @@ describe("temporary candidate BenFacts validation mode", () => {
     expect(visible.every((record: { id: string }) => record.id.startsWith("BF-C-"))).toBe(true);
     expect(JSON.stringify(visible)).not.toContain("source_refs");
     expect(JSON.stringify(requestBody?.instructions)).toContain("unapproved candidate BenFacts");
+    expect(JSON.stringify(requestBody?.instructions)).toContain("continuous professional narrative");
+    expect(input.sections.map((section: { audienceLabel: string }) => section.audienceLabel)).toEqual([
+      "About Ben", "Recent leadership", "Proof in practice", "Career throughline"
+    ]);
   });
 });
 

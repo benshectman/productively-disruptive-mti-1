@@ -77,8 +77,10 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1400,
         instructions: [
-          "Rewrite only the headline and summary framing for the four supplied portfolio sections.",
+          "Rewrite only the headline and summary framing for the four supplied portfolio sections as one continuous professional narrative.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
+          "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, show topic-relevant proof in practice, then connect it to the longer career throughline.",
+          "Make each section build on the one before it. Do not repeat the same opening, claim, or conclusion across sections.",
           useCandidates
             ? "This is an explicitly labeled validation run using unapproved candidate BenFacts. Use only the candidate facts assigned to each section; do not imply that they have been approved."
             : "Use only the approved proposition and evidence assigned to each section.",
@@ -94,7 +96,11 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
           approvedProposition: useCandidates ? undefined : contentPacket.propositions[0].statement,
           sections: fallback.sections.map((section) => ({
             id: section.id,
-            purpose: section.purpose,
+            audienceLabel: section.eyebrow,
+            narrativeRole: section.id === "system-behind-design" ? "career-wide orientation"
+              : section.id === "operating-model" ? "recent leadership and organizational scale"
+              : section.id === "proof-to-scale" ? "topic-relevant projects and outcomes"
+              : "connection to earlier career experience",
             evidence: evidence.filter((item) => section.evidenceRefs.includes(item.id))
           }))
         }),

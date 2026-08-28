@@ -40,23 +40,23 @@ export function assembleNarrative(topics: TopicId[]): Narrative {
   const topicLabels = topics.map((id) => contentPacket.topics.find((topic) => topic.id === id)?.label).filter(Boolean);
   const sections: NarrativeSection[] = [
     {
-      id: "system-behind-design", purpose: "proposition",
+      id: "system-behind-design", purpose: "proposition", eyebrow: "About Ben",
       headline: topics.includes("T-002") ? "Designing the system behind the design" : "Design at more than one level",
       summary: contentPacket.propositions[0].statement, evidenceRefs: propositionRefs, disclosure: "inline",
       detail: claims(propositionRefs)
     },
     {
-      id: "operating-model", purpose: "evidence",
+      id: "operating-model", purpose: "evidence", eyebrow: "Recent leadership",
       headline: topics.includes("T-001") ? "From temporary support to an embedded practice" : "A product-centered operating model",
       summary: claims(operatingRefs.slice(0, 2)), evidenceRefs: operatingRefs, disclosure: "none"
     },
     {
-      id: "proof-to-scale", purpose: "transition",
+      id: "proof-to-scale", purpose: "transition", eyebrow: "Proof in practice",
       headline: topicLabels.length ? `What ${topicLabels.join(" + ")} looks like at enterprise scale` : "Proving the model, then extending its reach",
       summary: claims(scaleRefs), evidenceRefs: scaleRefs, disclosure: "deep-dive"
     },
     {
-      id: "institutionalized-capability", purpose: "story",
+      id: "institutionalized-capability", purpose: "story", eyebrow: "Career throughline",
       headline: topics.includes("T-004") ? "Measurement became part of the operating system" : "What the model became",
       summary: claims(matureRefs), evidenceRefs: matureRefs, disclosure: "none"
     }
