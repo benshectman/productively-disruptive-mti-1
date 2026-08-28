@@ -8,6 +8,7 @@ import "@astryxdesign/theme-neutral/theme.css";
 import "./styles.css";
 import "./contrast-fix.css";
 import "./evidence-dialog.css";
+import "./validation-mode.css";
 import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(
@@ -17,3 +18,4 @@ createRoot(document.getElementById("root")!).render(
     </Theme>
   </StrictMode>
 );
+

@@ -4,6 +4,7 @@ import { contentPacket, publicEvidenceView, sourceById } from "../../src/content
 import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
 import { GenerateRequestSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
+import { assembleCandidateNarrative, candidateValidationEnabled, candidateValidationIds, publicCandidateEvidence } from "./candidate-validation";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 function allowedOrigin(origin = "") {
@@ -36,23 +37,25 @@ const FramingSectionSchema = z.object({
 }).strict();
 const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
 
-export function applyAiFraming(value: unknown, fallback: Narrative): Narrative | null {
+export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?: Set<string>): Narrative | null {
   const result = FramingSchema.safeParse(value);
   if (!result.success) return null;
   const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) return null;
   const narrative: Narrative = {
     mode: "ai",
+    grounding: fallback.grounding,
     sections: fallback.sections.map((section) => {
       const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
       return { ...section, headline: framing.headline, summary: framing.summary };
     })
   };
-  return validateNarrativeEvidence(narrative) ? narrative : null;
+  return validateNarrativeEvidence(narrative, allowedIds) ? narrative : null;
 }
 
 function constrainedEvidence(fallback: Narrative) {
   const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
+  if (fallback.grounding === "candidate_validation") return publicCandidateEvidence(relevantIds);
   return contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map((record) => ({
     ...publicEvidenceView(record),
     sourceAuthority: [...new Set(record.sources.map((id) => sourceById.get(id)?.authority).filter(Boolean))]
@@ -60,7 +63,9 @@ function constrainedEvidence(fallback: Narrative) {
 }
 
 export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch = fetch): Promise<Narrative> {
-  const fallback = assembleNarrative(topics);
+  const useCandidates = candidateValidationEnabled();
+  const fallback = useCandidates ? assembleCandidateNarrative(topics) : assembleNarrative(topics);
+  const allowedIds = useCandidates ? candidateValidationIds : undefined;
   if (!process.env.OPENAI_API_KEY) return fallback;
   const evidence = constrainedEvidence(fallback);
   const controller = new AbortController();
@@ -74,7 +79,9 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
         instructions: [
           "Rewrite only the headline and summary framing for the four supplied portfolio sections.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
-          "Use only the approved proposition and evidence assigned to each section.",
+          useCandidates
+            ? "This is an explicitly labeled validation run using unapproved candidate BenFacts. Use only the candidate facts assigned to each section; do not imply that they have been approved."
+            : "Use only the approved proposition and evidence assigned to each section.",
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Claims supported only by first_person_attestation must not be described as independently documented.",
@@ -83,7 +90,8 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
         ].join(" "),
         input: JSON.stringify({
           selectedTopics: topics,
-          approvedProposition: contentPacket.propositions[0].statement,
+          groundingMode: fallback.grounding,
+          approvedProposition: useCandidates ? undefined : contentPacket.propositions[0].statement,
           sections: fallback.sections.map((section) => ({
             id: section.id,
             purpose: section.purpose,
@@ -97,7 +105,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
     const result = await response.json() as { output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }> };
     const text = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
     if (!text) return fallback;
-    return applyAiFraming(JSON.parse(text), fallback) || fallback;
+    return applyAiFraming(JSON.parse(text), fallback, allowedIds) || fallback;
   } catch { return fallback; }
   finally { clearTimeout(timeout); }
 }
@@ -114,5 +122,10 @@ export const handler: Handler = async (event) => {
   const parsed = GenerateRequestSchema.safeParse(body);
   if (!parsed.success) return { statusCode: 400, headers: headersFor(corsOrigin), body: JSON.stringify({ error: "Invalid request", requestId }) };
   const narrative = await generateNarrative(parsed.data.topics);
-  return { statusCode: 200, headers: headersFor(corsOrigin), body: JSON.stringify({ narrative: { ...narrative, requestId }, requestId }) };
+  const relevantIds = new Set(narrative.sections.flatMap((section) => section.evidenceRefs));
+  const evidence = narrative.grounding === "candidate_validation"
+    ? publicCandidateEvidence(relevantIds)
+    : contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map(publicEvidenceView);
+  return { statusCode: 200, headers: headersFor(corsOrigin), body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, requestId }) };
 };
+

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { contentPacket } from "../src/content/content";
-import { approvedPointsLabel, buildEvidencePresentation } from "../src/shared/evidence-presentation";
+import { approvedPointsLabel, buildEvidencePresentation, evidencePointsLabel } from "../src/shared/evidence-presentation";
 
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const evidenceCss = readFileSync(new URL("../src/evidence-dialog.css", import.meta.url), "utf8");
@@ -32,6 +32,8 @@ describe("evidence presentation", () => {
   it("uses readable singular and plural labels", () => {
     expect(approvedPointsLabel(1)).toBe("1 approved point");
     expect(approvedPointsLabel(9)).toBe("9 approved points");
+    expect(evidencePointsLabel(1, "candidate_validation")).toBe("1 unapproved validation point");
+    expect(evidencePointsLabel(9, "candidate_validation")).toBe("9 unapproved validation points");
   });
 
   it("keeps Astryx dialog content inset from every edge", () => {
@@ -44,3 +46,4 @@ describe("evidence presentation", () => {
     expect(evidenceCss).toMatch(/html\s*\{\s*scroll-behavior:\s*auto;/);
   });
 });
+

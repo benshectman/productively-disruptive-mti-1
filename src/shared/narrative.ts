@@ -61,7 +61,7 @@ export function assembleNarrative(topics: TopicId[]): Narrative {
       summary: claims(matureRefs), evidenceRefs: matureRefs, disclosure: "none"
     }
   ];
-  return NarrativeSchema.parse({ sections, mode: "deterministic" });
+  return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
 }
 
 export function buildDeepDiveNarrative() {
@@ -72,7 +72,7 @@ export function buildDeepDiveNarrative() {
 }
 
 export function validateNarrativeEvidence(narrative: Narrative, allowedIds?: Set<string>) {
-  return narrative.sections.every((section) => section.evidenceRefs.every((id) => evidenceById.has(id) && (!allowedIds || allowedIds.has(id))));
+  return narrative.sections.every((section) => section.evidenceRefs.every((id) => allowedIds ? allowedIds.has(id) : evidenceById.has(id)));
 }
 export const deterministicFallback = assembleNarrative;
 

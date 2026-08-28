@@ -1,9 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { applyAiFraming, generateNarrative } from "../netlify/functions/generate";
 import { contentPacket } from "../src/content/content";
 import { assembleNarrative } from "../src/shared/narrative";
 
-afterEach(() => { delete process.env.OPENAI_API_KEY; });
+afterEach(() => { delete process.env.OPENAI_API_KEY; delete process.env.BENFACTS_VALIDATION_MODE; });
+beforeEach(() => { process.env.BENFACTS_VALIDATION_MODE = "approved"; });
 
 describe("bounded AI guardrails", () => {
   it("merges framing without allowing the model to change structure or evidence", () => {
@@ -53,3 +54,4 @@ describe("bounded AI guardrails", () => {
     expect(JSON.stringify(visibleEvidence)).not.toContain('"sources"');
   });
 });
+

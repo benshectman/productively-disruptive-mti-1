@@ -4,8 +4,8 @@ import { Carousel } from "@astryxdesign/core/Carousel";
 import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
 import { contentPacket } from "./content/content";
 import { assembleNarrative, buildDeepDiveNarrative } from "./shared/narrative";
-import { GenerateResponseSchema, type Narrative, type TopicId, type VisitorContext } from "./shared/contracts";
-import { approvedPointsLabel, buildEvidencePresentation, type EvidencePresentation } from "./shared/evidence-presentation";
+import { GenerateResponseSchema, type Narrative, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
+import { approvedEvidenceCatalog, buildEvidencePresentation, evidencePointsLabel, type EvidencePresentation } from "./shared/evidence-presentation";
 
 const endpoint = import.meta.env.VITE_GENERATE_ENDPOINT || "/.netlify/functions/generate";
 const activity = [
@@ -48,7 +48,7 @@ function Configurator({ context, onTopics, onGenerate }: {
           </div>
         </fieldset>
         <button className="generate" type="button" onClick={onGenerate}>Generate my experience <span aria-hidden="true">↗</span></button>
-        <p className="grounding-note">Built only from approved evidence. AI shapes the framing, never the facts.</p>
+        <p className="grounding-note">AI shapes the framing, never the underlying facts. Validation builds may use clearly labeled, unapproved candidate BenFacts.</p>
       </section>
     </main>
   );
@@ -62,8 +62,8 @@ function Generating({ step }: { step: number }) {
   </main>;
 }
 
-function Experience({ narrative, context, onContext, onDeepDive, onEvidence, onReset }: {
-  narrative: Narrative; context: VisitorContext; onContext: (value: VisitorContext) => void; onDeepDive: () => void; onEvidence: (refs: string[], contextLabel: string) => void; onReset: () => void;
+function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive, onEvidence, onReset }: {
+  narrative: Narrative; evidenceCatalog: PublicEvidence[]; context: VisitorContext; onContext: (value: VisitorContext) => void; onDeepDive: () => void; onEvidence: (refs: string[], contextLabel: string) => void; onReset: () => void;
 }) {
   const selectedLabels = context.topics.map((id) => contentPacket.topics.find((topic) => topic.id === id)?.label).filter(Boolean);
   return <main className="experience" id="main-content">
@@ -71,7 +71,8 @@ function Experience({ narrative, context, onContext, onDeepDive, onEvidence, onR
       <div><p className="kicker">Ben Shectman · Productively Disruptive</p><p>{selectedLabels.length ? `Framed around ${selectedLabels.join(" · ")}` : "A balanced view across leadership, systems, enterprise experience, and measurement"}</p></div>
       <button className="text-button" onClick={onReset}>Reshape experience</button>
     </header>
-    <section className="narrative-intro"><p className="section-number">Your generated experience</p><h1>Design leadership,<br/><em>assembled for you.</em></h1><p>{narrative.mode === "ai" ? "AI-framed from a bounded set of approved evidence." : "Assembled deterministically from approved evidence."}</p></section>
+    <section className="narrative-intro"><p className="section-number">Your generated experience</p><h1>Design leadership,<br/><em>assembled for you.</em></h1><p>{narrative.grounding === "candidate_validation" ? "Validation mode: framed from unapproved candidate BenFacts so the expanded corpus can be evaluated before approval." : narrative.mode === "ai" ? "AI-framed from a bounded set of approved evidence." : "Assembled deterministically from approved evidence."}</p></section>
+    {narrative.grounding === "candidate_validation" && <aside className="validation-notice" role="note"><strong>Temporary validation corpus</strong><span>Claims in this experience are candidates under review and must not be treated as approved portfolio content.</span></aside>}
     <div className="narrative">
       {narrative.sections.map((section, index) => {
         const expanded = context.inlineExpansionsOpened.includes(section.id);
@@ -84,30 +85,31 @@ function Experience({ narrative, context, onContext, onDeepDive, onEvidence, onR
               {expanded && <div className="inline-detail" id={`${section.id}-detail`}><p>{section.detail}</p></div>}
             </>}
             {section.disclosure === "deep-dive" && <button className="deep-link" onClick={onDeepDive}>Explore how the XD model evolved <span aria-hidden="true">→</span></button>}
-            <EvidenceSignal refs={section.evidenceRefs} contextLabel={section.headline} onOpen={onEvidence}/>
+            <EvidenceSignal refs={section.evidenceRefs} contextLabel={section.headline} catalog={evidenceCatalog} onOpen={onEvidence}/>
           </div>
         </article>;
       })}
     </div>
-    <footer><p>This experience is grounded in approved evidence and preserves the attribution of individual, shared, and organizational work.</p><button className="text-button" onClick={onReset}>Start again ↑</button></footer>
+    <footer><p>{narrative.grounding === "candidate_validation" ? "This validation experience uses unapproved candidate facts while preserving personal, leadership, team, shared, and organizational attribution." : "This experience is grounded in approved evidence and preserves the attribution of individual, shared, and organizational work."}</p><button className="text-button" onClick={onReset}>Start again ↑</button></footer>
   </main>;
 }
 
-function EvidenceSignal({ refs, contextLabel, onOpen }: { refs: string[]; contextLabel: string; onOpen: (refs: string[], contextLabel: string) => void }) {
-  const count = buildEvidencePresentation(refs, contextLabel).items.length;
-  return <p className="evidence-signal"><strong>Evidence behind this</strong><span aria-hidden="true">·</span><button type="button" onClick={() => onOpen(refs, contextLabel)} aria-label={`${approvedPointsLabel(count)} behind “${contextLabel}”`}>{approvedPointsLabel(count)}</button></p>;
+function EvidenceSignal({ refs, contextLabel, catalog = approvedEvidenceCatalog, onOpen }: { refs: string[]; contextLabel: string; catalog?: PublicEvidence[]; onOpen: (refs: string[], contextLabel: string) => void }) {
+  const presentation = buildEvidencePresentation(refs, contextLabel, catalog);
+  const label = evidencePointsLabel(presentation.items.length, presentation.grounding);
+  return <p className="evidence-signal"><strong>Evidence behind this</strong><span aria-hidden="true">·</span><button type="button" onClick={() => onOpen(refs, contextLabel)} aria-label={`${label} behind “${contextLabel}”`}>{label}</button></p>;
 }
 
 function EvidenceDialog({ presentation, onClose }: { presentation: EvidencePresentation | null; onClose: () => void }) {
   const count = presentation?.items.length ?? 0;
   return <Dialog className="evidence-dialog" isOpen={Boolean(presentation)} onOpenChange={(open) => { if (!open) onClose(); }} width="min(92vw, 80rem)" maxHeight="88dvh" padding={4} purpose="info">
     {presentation && <>
-      <DialogHeader title="Evidence behind this" subtitle={`${approvedPointsLabel(count)} supporting “${presentation.contextLabel}”`} onOpenChange={(open) => { if (!open) onClose(); }}/>
+      <DialogHeader title="Evidence behind this" subtitle={`${evidencePointsLabel(count, presentation.grounding)} supporting “${presentation.contextLabel}”`} onOpenChange={(open) => { if (!open) onClose(); }}/>
       <div className="evidence-dialog-body">
-        <p className="evidence-dialog-intro">These are the approved evidence points used to ground this part of the experience.</p>
-        <Carousel aria-label={`Approved evidence supporting ${presentation.contextLabel}`} gap={2} hasButtons={count > 1} hasEdgeFade={count > 1} hasSnap>
+        <p className="evidence-dialog-intro">{presentation.grounding === "candidate_validation" ? "These unapproved candidate facts are being used temporarily to test the adaptive portfolio. They remain subject to Ben’s review." : "These are the approved evidence points used to ground this part of the experience."}</p>
+        <Carousel aria-label={`Evidence supporting ${presentation.contextLabel}`} gap={2} hasButtons={count > 1} hasEdgeFade={count > 1} hasSnap>
           {presentation.items.map((item, index) => <Card key={item.id} className="evidence-card" width="var(--evidence-card-width)" minHeight={280} padding={4} variant="default">
-            <p className="evidence-card-position">Evidence {index + 1} of {count}</p>
+            <p className="evidence-card-position">{presentation.grounding === "candidate_validation" ? "Candidate" : "Evidence"} {index + 1} of {count}</p>
             <p className="evidence-card-id">{item.id}</p>
             <p className="evidence-card-claim">{item.claim}</p>
             <p className="evidence-card-attribution">Attribution: {item.attribution.replaceAll("_", " ")}</p>
@@ -135,20 +137,26 @@ export function App() {
   const [step, setStep] = useState(0);
   const [context, setContext] = useState<VisitorContext>({ designSystem: "astryx", theme: "neutral", topics: [], inlineExpansionsOpened: [], deepDivesOpened: [] });
   const [narrative, setNarrative] = useState<Narrative>(() => assembleNarrative([]));
+  const [evidenceCatalog, setEvidenceCatalog] = useState<PublicEvidence[]>(approvedEvidenceCatalog);
   const [evidencePresentation, setEvidencePresentation] = useState<EvidencePresentation | null>(null);
 
   async function generate() {
     const fallback = assembleNarrative(context.topics as TopicId[]);
-    setNarrative(fallback); setStep(0); setView("generating");
+    setNarrative(fallback); setEvidenceCatalog(approvedEvidenceCatalog); setStep(0); setView("generating");
     const timers = [350, 800, 1300].map((delay, index) => window.setTimeout(() => setStep(index + 1), delay));
     try {
       const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ designSystem: context.designSystem, theme: context.theme, topics: context.topics }) });
-      if (response.ok) setNarrative(GenerateResponseSchema.parse(await response.json()).narrative);
+      if (response.ok) {
+        const generated = GenerateResponseSchema.parse(await response.json());
+        setNarrative(generated.narrative);
+        setEvidenceCatalog(generated.evidence?.length ? generated.evidence : approvedEvidenceCatalog);
+      }
     } catch { setNarrative(fallback); }
     finally { timers.forEach(window.clearTimeout); setView("experience"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   }
   const openDeepDive = () => { setContext((current) => ({ ...current, deepDivesOpened: current.deepDivesOpened.includes("S-001") ? current.deepDivesOpened : [...current.deepDivesOpened, "S-001"] })); setView("deep-dive"); window.scrollTo(0, 0); };
-  const openEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel));
+  const openEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, evidenceCatalog));
+  const openApprovedEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, approvedEvidenceCatalog));
   return <>
     <a className="skip-link" href="#main-content">Skip to main content</a>
     {view === "configure" && (
@@ -158,11 +166,12 @@ export function App() {
       <Generating step={step}/>
     )}
     {view === "experience" && (
-      <Experience narrative={narrative} context={context} onContext={setContext} onDeepDive={openDeepDive} onEvidence={openEvidence} onReset={() => setView("configure")}/>
+      <Experience narrative={narrative} evidenceCatalog={evidenceCatalog} context={context} onContext={setContext} onDeepDive={openDeepDive} onEvidence={openEvidence} onReset={() => setView("configure")}/>
     )}
     {view === "deep-dive" && (
-      <DeepDive context={context} onEvidence={openEvidence} onBack={() => { setView("experience"); window.scrollTo(0, 0); }}/>
+      <DeepDive context={context} onEvidence={openApprovedEvidence} onBack={() => { setView("experience"); window.scrollTo(0, 0); }}/>
     )}
     <EvidenceDialog presentation={evidencePresentation} onClose={() => setEvidencePresentation(null)}/>
   </>;
 }
+

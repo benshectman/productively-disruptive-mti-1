@@ -1,6 +1,6 @@
 # Productively Disruptive — MTI-1
 
-The first testable vertical slice of Ben Shectman’s generative professional portfolio. Visitors choose the topics that matter to them and receive a sequenced portfolio narrative grounded exclusively in approved evidence.
+The first testable vertical slice of Ben Shectman’s generative professional portfolio. Visitors choose the topics that matter to them and receive a sequenced portfolio narrative grounded in a bounded evidence corpus.
 
 ## Experience
 
@@ -19,7 +19,7 @@ Knowledge-only source artifacts may ground server-side framing but their metadat
 
 ### BenFacts migration candidates
 
-The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The expanded review corpus is `src/content/candidates/ben-facts-migration.v0.2.json`: it preserves all 32 migrated records and adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews. Every record remains pending review; none is part of the approved MTI-1 packet, loaded by the application, or sent to OpenAI. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
+The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The expanded review corpus is `src/content/candidates/ben-facts-migration.v0.2.json`: it preserves all 32 migrated records and adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
 ## Deterministic mode
 
@@ -40,6 +40,14 @@ When `OPENAI_API_KEY` is configured, the existing Netlify function:
 
 AI may vary headings, summaries, transitions, and emphasis. It cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
 
+## Temporary candidate-validation mode
+
+The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `candidates`. In this explicit validation mode, deterministic topic selection and optional AI framing use only the sanitized wording, candidate ID, attribution, and topic tags from source-derived records `BF-C-033` through `BF-C-080`.
+
+The browser never receives the candidate manifest, source references, filenames, hashes, internal excerpts, review notes, or evidence-strength rationale. Generated pages and evidence dialogs visibly identify the facts as unapproved validation candidates. The approved four-stage deep dive remains grounded in the approved MTI-1 packet.
+
+To end the experiment immediately, set `BENFACTS_VALIDATION_MODE=approved` for the Functions runtime in Netlify and redeploy. To end it in code, change the temporary default in `netlify/functions/candidate-validation.ts` from `candidates` to `approved`. The server then returns to the original approved deterministic and AI corpus.
+
 The implementation uses the Responses API `text.format` JSON-schema configuration with strict schema adherence, as described in the [official OpenAI API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create).
 
 ## Local development
@@ -54,6 +62,7 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 
 - `OPENAI_API_KEY` — optional, server-side only.
 - `OPENAI_MODEL` — optional; defaults to `gpt-4.1-mini`.
+- `BENFACTS_VALIDATION_MODE` — temporary; set to `candidates` to use sanitized, unapproved candidate facts or omit/set to `approved` to use only the approved packet.
 - `ALLOWED_ORIGINS` — comma-separated exact browser origins.
 - `VITE_GENERATE_ENDPOINT` — optional client endpoint override.
 
