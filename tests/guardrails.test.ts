@@ -9,16 +9,18 @@ beforeEach(() => { process.env.BENFACTS_VALIDATION_MODE = "approved"; });
 describe("bounded AI guardrails", () => {
   it("merges framing without allowing the model to change structure or evidence", () => {
     const fallback = assembleNarrative(["T-001"]);
-    const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: `Framed: ${section.headline}`, summary: `Framed: ${section.summary}` })) };
+    const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: `Framed: ${section.headline}` })) };
     const result = applyAiFraming(framing, fallback)!;
     expect(result.mode).toBe("ai");
     expect(result.sections.map(({ id, purpose, eyebrow, evidenceRefs, disclosure, detail }) => ({ id, purpose, eyebrow, evidenceRefs, disclosure, detail })))
       .toEqual(fallback.sections.map(({ id, purpose, eyebrow, evidenceRefs, disclosure, detail }) => ({ id, purpose, eyebrow, evidenceRefs, disclosure, detail })));
+    expect(result.sections.map((section) => section.summary)).toEqual(fallback.sections.map((section) => section.summary));
   });
   it.each([
     { sections: [] },
-    { sections: assembleNarrative([]).sections.map((section) => ({ id: section.id, headline: section.headline, summary: section.summary, evidenceRefs: ["E-999"] })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline, summary: section.summary })) }
+    { sections: assembleNarrative([]).sections.map((section) => ({ id: section.id, headline: section.headline, evidenceRefs: ["E-999"] })) },
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline })) },
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "A 100% invented metric" })) }
   ])("rejects framing that changes the bounded contract", (candidate) => {
     expect(applyAiFraming(candidate, assembleNarrative([]))).toBeNull();
   });
@@ -38,7 +40,7 @@ describe("bounded AI guardrails", () => {
     let requestBody: Record<string, unknown> | undefined;
     const fakeFetch = async (_url: string | URL | Request, init?: RequestInit) => {
       requestBody = JSON.parse(String(init?.body));
-      const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: section.headline, summary: section.summary })) };
+      const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: section.headline })) };
       return new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
     };
     const result = await generateNarrative(["T-001", "T-002"], fakeFetch as typeof fetch);

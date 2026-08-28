@@ -19,11 +19,10 @@ const framingJsonSchema = {
       type: "array", minItems: 4, maxItems: 4,
       items: {
         type: "object", additionalProperties: false,
-        required: ["id", "headline", "summary"],
+        required: ["id", "headline"],
         properties: {
           id: { type: "string", enum: ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"] },
-          headline: { type: "string", minLength: 1, maxLength: 140 },
-          summary: { type: "string", minLength: 1, maxLength: 900 }
+          headline: { type: "string", minLength: 1, maxLength: 140 }
         }
       }
     }
@@ -32,8 +31,7 @@ const framingJsonSchema = {
 
 const FramingSectionSchema = z.object({
   id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
-  headline: z.string().min(1).max(140),
-  summary: z.string().min(1).max(900)
+  headline: z.string().min(1).max(140).refine((headline) => !/\d/.test(headline), "Generated headlines may not introduce numeric claims")
 }).strict();
 const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
 
@@ -47,7 +45,7 @@ export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?:
     grounding: fallback.grounding,
     sections: fallback.sections.map((section) => {
       const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
-      return { ...section, headline: framing.headline, summary: framing.summary };
+      return { ...section, headline: framing.headline };
     })
   };
   return validateNarrativeEvidence(narrative, allowedIds) ? narrative : null;
@@ -77,10 +75,10 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1400,
         instructions: [
-          "Rewrite only the headline and summary framing for the four supplied portfolio sections as one continuous professional narrative.",
+          "Rewrite only the headline framing for the four supplied portfolio sections as one continuous professional narrative.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
           "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, show topic-relevant proof in practice, then connect it to the longer career throughline.",
-          "Make each section build on the one before it. Do not repeat the same opening, claim, or conclusion across sections.",
+          "Make the sequence of headlines build from broad identity to recent leadership, proof, and career throughline. Do not repeat the same claim or construction.",
           useCandidates
             ? "This is an explicitly labeled validation run using unapproved candidate BenFacts. Use only the candidate facts assigned to each section; do not imply that they have been approved."
             : "Use only the approved proposition and evidence assigned to each section.",
@@ -88,7 +86,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Claims supported only by first_person_attestation must not be described as independently documented.",
           "Use plain external language. Experience Design Management Office (XDMO) is the approved expansion on first use.",
-          "Do not return HTML, Markdown, evidence IDs, attribution fields, disclosure choices, or design-system markup."
+          "Do not put metrics, dates, numbers, HTML, Markdown, evidence IDs, attribution fields, disclosure choices, or design-system markup in headlines."
         ].join(" "),
         input: JSON.stringify({
           selectedTopics: topics,

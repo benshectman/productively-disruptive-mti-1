@@ -34,11 +34,11 @@ When `OPENAI_API_KEY` is configured, the existing Netlify function:
 1. validates the locked design system, theme, and topic IDs;
 2. deterministically selects relevant approved evidence;
 3. assigns only relevant approved evidence to each predetermined narrative section;
-4. asks the OpenAI Responses API only for rewritten headlines and summaries using strict JSON-schema output;
+4. asks the OpenAI Responses API only for rewritten headlines using strict JSON-schema output;
 5. validates the framing with Zod and merges it onto immutable deterministic section IDs, purposes, disclosures, details, and evidence references;
 6. returns the bounded semantic narrative or the deterministic fallback.
 
-AI may vary headings, summaries, transitions, and emphasis. It cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
+AI may vary headings and emphasis. Evidence-grounded summaries and connective sentences remain deterministic so model-authored paraphrasing cannot alter dates, metrics, attribution, or the relationship between claims. AI cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
 
 ## Temporary candidate-validation mode
 
