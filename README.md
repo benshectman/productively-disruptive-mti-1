@@ -19,7 +19,7 @@ Knowledge-only source artifacts may ground server-side framing but their metadat
 
 ### BenFacts migration candidates
 
-The earlier Ben-GPT profile is preserved under `src/content/legacy/` and classified in `src/content/candidates/ben-facts-migration.v0.1.json`. These records are review candidates only: they are not part of the approved MTI-1 packet, are not loaded by the application, and are not sent to OpenAI. See `docs/ben-facts-migration-review.md` for the promotion process.
+The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The expanded review corpus is `src/content/candidates/ben-facts-migration.v0.2.json`: it preserves all 32 migrated records and adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews. Every record remains pending review; none is part of the approved MTI-1 packet, loaded by the application, or sent to OpenAI. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
 ## Deterministic mode
 
@@ -63,3 +63,4 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 - `npm run build` performs TypeScript and production Vite builds.
 
 MTI-1 is intentionally a learning prototype. It does not introduce persistence, authentication, analytics, freeform prompts, job-description uploads, embeddings, vector retrieval, a CMS, or additional renderers/themes.
+

@@ -1,41 +1,54 @@
-# BenFacts migration review
+# BenFacts candidate review
 
-The Ben-GPT profile is preserved at `src/content/legacy/ben-profile-v0.1-alpha.json`. Its GitHub blob SHA is recorded in the migration manifest so the source can be traced back to the earlier application.
+The review corpus is `src/content/candidates/ben-facts-migration.v0.2.json`. It contains the 32 records preserved from the earlier Ben-GPT profile plus 48 additional candidates derived from 22 supplied source files.
 
-`src/content/candidates/ben-facts-migration.v0.1.json` classifies all 29 profile entries and three chat-policy boundaries. It is deliberately outside the approved MTI-1 packet and is not loaded by the portfolio or sent to OpenAI.
+All 80 records remain candidates. They are outside the approved MTI-1 content packet, are not loaded by the portfolio, and are not sent to OpenAI.
 
-## Classification
+## Source boundary
+
+The résumé and AskGS case study are the only source assets marked shareable. The other 20 files are `knowledge_only`: they may substantiate an approved BenFact, but the application must never expose the file, a download link, internal metadata, raw source contents, or extended excerpts.
+
+A source asset's visibility is separate from a fact's proposed visibility. A private internal artifact can support a public professional claim after Ben approves the claim, its wording, its attribution, and the appropriate level of detail.
+
+## Candidate inventory
 
 | Proposed destination | Count | Intended use |
 | --- | ---: | --- |
-| Proposition candidates | 3 | About Me positioning that must be supported by approved evidence |
-| Evidence candidates | 11 | Atomic professional claims that may eventually receive `E-###` IDs |
-| Project candidates | 4 | Seeds for structured selected-work or case-study records |
+| Proposition candidates | 4 | About Me positioning grounded in reviewed evidence |
+| Evidence candidates | 37 | Professional claims that may eventually receive stable evidence IDs |
+| Project candidates | 25 | Structured selected-work or case-study records |
 | Career-record candidates | 5 | Canonical role and chronology records |
 | Credential candidates | 2 | Static education and certification content |
 | Topic candidates | 4 | Portfolio taxonomy rather than evidence |
 | Policy candidates | 3 | Generation and privacy rules rather than professional claims |
 
+## Evidence strength
+
+Evidence strength describes support for the proposed wording; it is not a rating of Ben's accomplishment.
+
+| Value | Meaning |
+| --- | --- |
+| `1 - Poor` | Legacy, ambiguous, inferred, or unsupported by the supplied documentary sources |
+| `2 - Fair` | Explicit in one source, but attribution, status, or outcome qualification is weak or ambiguous |
+| `3 - Good` | Explicit in a clear authoritative source or strong contemporaneous artifact, but not independently corroborated |
+| `4 - Strong` | Explicit and corroborated across relevant artifacts, or a direct primary record with unusually clear authority |
+
+Repeated copies of the same slide or derivative summaries do not automatically count as independent corroboration. Forecasts remain forecasts; directional targets remain targets; and metrics retain their stated baseline, sample, geography, and time-period qualifications.
+
 ## Required review
 
 For each candidate:
 
-1. Identify the authoritative source material.
-2. Confirm or correct the original wording.
-3. Split compound claims where facts need independent substantiation or reuse.
-4. Set attribution: personal, leadership, team, shared leadership, or organization.
-5. Set visibility: shareable or knowledge only.
-6. Reconcile overlaps with `E-001` through `E-015` and `P-001`.
-7. Confirm topic assignments and identify missing topic categories.
-8. Promote only reviewed records into the approved packet and then assign stable IDs.
+1. Approve, revise, merge, split, or reject the proposed wording.
+2. Confirm the subject and attribution: personal, leadership, team, shared leadership, or organization.
+3. Confirm whether the resulting fact may be visitor-visible.
+4. Check that every source reference actually supports the complete statement.
+5. Preserve qualifications on forecasts, targets, study samples, baselines, and dates.
+6. Reconcile overlaps with the current approved evidence and other candidates.
+7. Confirm topic assignments and identify missing portfolio topics.
+8. Promote only reviewed records into the approved content packet, assigning stable IDs at that point.
 
-The legacy BenFacts source is classified as `unverified_migration_source`. Prior approval for a chat experience does not by itself establish documentary authority or permission to expose a claim in the portfolio.
+Product work delivered by Ben's teams is intentionally written with leadership or team attribution. Directing a body of work does not imply that Ben personally performed every research, design, or implementation activity.
 
-## Notable compound candidates
+The earlier `v0.1` file remains unchanged as an auditable migration snapshot.
 
-- The design-services portfolio statement combines Ben's role, portfolio value, and engagement count.
-- The analytics statement combines two distinct initiatives.
-- The certification statement combines three credentials.
-- The Pfizer statement combines a named employer with unspecified other roles.
-
-These should be separated or modeled as structured career/project/credential records before approval.

@@ -1,0 +1,4740 @@
+{
+  "meta": {
+    "name": "BenFacts portfolio migration and source-derived candidates",
+    "version": "0.2",
+    "status": "review_required",
+    "generated_from": [
+      "benshectman/ben-gpt-backend:netlify/functions/ben-profile-v0.1-alpha.json",
+      "22 supplied project source files"
+    ],
+    "rule": "Nothing in this file is approved for generation. Candidates require wording, attribution, visibility, atomicity, overlap, and source review before promotion.",
+    "evidence_strength_scale": {
+      "1 - Poor": "Legacy, ambiguous, inferred, or otherwise unsupported by the supplied documentary sources.",
+      "2 - Fair": "Explicit in one source, but attribution, status, or outcome qualification is weak or ambiguous.",
+      "3 - Good": "Explicit in a clear authoritative source, or supported by a strong contemporaneous artifact, but not independently corroborated.",
+      "4 - Strong": "Explicit and corroborated across multiple relevant artifacts, or a direct primary record with unusually clear authority."
+    },
+    "source_visibility_rule": "Knowledge-only source files may support proposed shareable facts, but the files themselves, raw excerpts, internal links, and source contents must never be exposed to visitors."
+  },
+  "sources": [
+    {
+      "source_id": "SRC-BENFACTS-001",
+      "filename": "ben-profile-v0.1-alpha.json",
+      "file_type": "json",
+      "authority": "unverified_migration_source",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "bc6d4e67bade33a688b7ef0662b73075480b8d33"
+    },
+    {
+      "source_id": "SRC-BF-001",
+      "filename": "202310_SAGE UX Readout for TW.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "0adfec4602b742b85545bedb1a67870c73131bb0d2ea0703d101154cdfcf16d8"
+    },
+    {
+      "source_id": "SRC-BF-002",
+      "filename": "2023_SRS_CaseStudy.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "8a68cdd0f7afa516ca366e5fe3ba0d1baa80a7515f940ab4f394d9d17da47afb"
+    },
+    {
+      "source_id": "SRC-BF-003",
+      "filename": "2023_XD_Vital.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "4093a50aadbd24216bf36cc12bb1eecbdf567d2dbcd6383d9a648573988efc48"
+    },
+    {
+      "source_id": "SRC-BF-004",
+      "filename": "20240916_XD MT SC Engagement Overview.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "347fb7d8fdcd928e3ba9042887c8e580c7642f1ef6900175831a48303e8c5e2e"
+    },
+    {
+      "source_id": "SRC-BF-005",
+      "filename": "AskGS Future State Analysis and Recommendations Case Study.pdf",
+      "file_type": "pdf",
+      "authority": "public_case_study",
+      "visibility": "shareable",
+      "shareable_asset": true,
+      "sha256": "b2555848fe5427a406dabc9ba951fcbe8f009a0150dc9804f4e37e330ed926c8"
+    },
+    {
+      "source_id": "SRC-BF-006",
+      "filename": "BenShectman_resume_2026.pdf",
+      "file_type": "pdf",
+      "authority": "first_person_career_document",
+      "visibility": "shareable",
+      "shareable_asset": true,
+      "sha256": "909e4558d96f4e976732137fe2e50bae761a9038901adfc0e0ba04d935c4e0ff"
+    },
+    {
+      "source_id": "SRC-BF-007",
+      "filename": "CBT_XD_LAUNCH.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "f31b6ff4edbadc30c51832865c3fbe7cd14bd71f740a58cbac3cfebbdd8bca93"
+    },
+    {
+      "source_id": "SRC-BF-008",
+      "filename": "CBT_XDChapterQBR_Q1_2025.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "7cb1e610432ea8ca475745a8092f8bdcc0b8f9b666f0770922ff4cb1141cac7f"
+    },
+    {
+      "source_id": "SRC-BF-009",
+      "filename": "Comet Change Control 2023_Case Study.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "daf9a7f1bd2d84044796d020fa34f5c6ba48e62ee1a38df6ca9e7801c983bb61"
+    },
+    {
+      "source_id": "SRC-BF-010",
+      "filename": "FIRST-CaseStudy.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "e9441b9c9e6e19a7309a4ba28141e72cfdb4bcabafe712adf60dee1d670208e2"
+    },
+    {
+      "source_id": "SRC-BF-011",
+      "filename": "ISRM_XDChapterQBR_Q1_2025.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "2d7d45c9db41ef7957f17e90eaa4cfdef6aa57e6aff83c7b353cfca0500f041b"
+    },
+    {
+      "source_id": "SRC-BF-012",
+      "filename": "PQM360 2023_CaseStudy.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "750c0b5e931968cb54279d8033cc900b361741e7f4f80a8b5af656e5b9b813d7"
+    },
+    {
+      "source_id": "SRC-BF-013",
+      "filename": "RashaAbdou_org announcement.docx",
+      "file_type": "docx",
+      "authority": "contemporaneous_organization_announcement",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "f3304c733afc5682d198ac9daa2fc13d8f1da56b9ae1e6383b5632439d1ac36d"
+    },
+    {
+      "source_id": "SRC-BF-014",
+      "filename": "SPR Research Report v1.3.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "a786c63ec26ee5d964c0b53504fc9f5016dd763f0c80dccb306c78eb61dbf937"
+    },
+    {
+      "source_id": "SRC-BF-015",
+      "filename": "SPR_Spotlight-Q3_CBT_Town_Hall.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "0010fb6f914cb288c3fcb9c59fcb01dff8b46a98b96ca885a2de83d9a014acfa"
+    },
+    {
+      "source_id": "SRC-BF-016",
+      "filename": "TS_XDChapterQBR_Q1_2025.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "ee525483bc4ffc40b9ad7543326637752560ab7562d9259052a030e913400e51"
+    },
+    {
+      "source_id": "SRC-BF-017",
+      "filename": "Vital 2023_CaseStudy.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "75ad8d98ce189a3602a48cdc74c43ff7905d651b73c3961464ab9bf49fcb20ee"
+    },
+    {
+      "source_id": "SRC-BF-018",
+      "filename": "Walking Deck 2022_v4.0.pdf",
+      "file_type": "pdf",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "29644233ae9443ae4cfbbeab98ef7957c6744bbaa1736571bacce9b288365c8f"
+    },
+    {
+      "source_id": "SRC-BF-019",
+      "filename": "WOW UX Recommended Strategy.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "ed52127a42e8b8f6976884fe9cb5a4714d8d6135570924840aadcd0763e6803c"
+    },
+    {
+      "source_id": "SRC-BF-020",
+      "filename": "XD eMP - Case Study CBT Town Hall.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "887f50a047a5b7eee28a681ea8484a49dfb252c4a551e8e04cf96d19b94c526d"
+    },
+    {
+      "source_id": "SRC-BF-021",
+      "filename": "XDChapterQBR_Q1_2025.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "fe9a6829fbfdbe25654ff1638768c50fce69a80a83f2e082306678769ec3d1a0"
+    },
+    {
+      "source_id": "SRC-BF-022",
+      "filename": "xIAM.pptx",
+      "file_type": "pptx",
+      "authority": "contemporaneous_internal_artifact",
+      "visibility": "knowledge_only",
+      "shareable_asset": false,
+      "sha256": "d15bff6ca9b79176204c46c645936847b21c74aaac8529e36c417714294ecd90"
+    }
+  ],
+  "summary": {
+    "total_candidates": 80,
+    "legacy_candidates": 32,
+    "source_derived_candidates": 48,
+    "by_target_type": {
+      "career_record_candidate": 5,
+      "credential_candidate": 2,
+      "evidence_candidate": 37,
+      "policy_candidate": 3,
+      "project_candidate": 25,
+      "proposition_candidate": 4,
+      "topic_candidate": 4
+    },
+    "by_evidence_strength": {
+      "1 - Poor": 2,
+      "2 - Fair": 0,
+      "3 - Good": 28,
+      "4 - Strong": 50
+    },
+    "supplied_sources": 22,
+    "shareable_source_assets": 2,
+    "knowledge_only_source_assets": 20
+  },
+  "candidates": [
+    {
+      "candidate_id": "BF-C-001",
+      "target_type": "proposition_candidate",
+      "original_text": "Ben Shectman is an executive UX and product design leader with more than 20 years of professional experience.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "P-001"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "30e2fe2d-10a4-5eba-a80c-181ec9c9a533",
+        "slug": "executive-ux-and-product-design-leader",
+        "version": 1,
+        "title": "Executive UX and product design leader"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type."
+    },
+    {
+      "candidate_id": "BF-C-002",
+      "target_type": "proposition_candidate",
+      "original_text": "His work focuses on building and scaling design organizations and delivering enterprise-grade digital products.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "P-001"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "304b5fc2-0214-570b-87d0-0722e0b202df",
+        "slug": "focus-on-design-organizations-and-enterprise-grade-products",
+        "version": 1,
+        "title": "Focus on design organizations and enterprise-grade products"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-003",
+      "target_type": "proposition_candidate",
+      "original_text": "He specializes in complex, regulated, and multi-stakeholder enterprise environments.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "identity",
+        "uuid": "5e5fd753-3663-5209-8297-fe7b2ed86284",
+        "slug": "complex-regulated-multi-stakeholder-enterprise-environments",
+        "version": 1,
+        "title": "Complex regulated multi-stakeholder enterprise environments"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-004",
+      "target_type": "evidence_candidate",
+      "original_text": "From 2019 to 2025, Ben served as Experience Design Chapter Leader at Johnson & Johnson.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-013"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "d6e9f732-e04d-5d8d-8567-9114aaf5658a",
+        "slug": "experience-design-chapter-leader-at-johnson-johnson",
+        "version": 1,
+        "title": "Experience Design Chapter Leader at Johnson & Johnson"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-005",
+      "target_type": "evidence_candidate",
+      "original_text": "He established and scaled an Experience Design center of excellence supporting corporate, finance, supply chain, technology services, and information security organizations.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 22
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 50
+            },
+            {
+              "kind": "slide",
+              "number": 52
+            },
+            {
+              "kind": "slide",
+              "number": 53
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-003",
+          "E-011",
+          "E-012",
+          "E-013"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "21dbab04-0184-541f-ada2-0c37c941c5c9",
+        "slug": "established-and-scaled-experience-design-center-of-excellence",
+        "version": 1,
+        "title": "Established and scaled Experience Design center of excellence"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-006",
+      "target_type": "evidence_candidate",
+      "original_text": "He was accountable for UX leadership across more than 40 workforce-facing enterprise platforms.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 23
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "a423c783-e13f-5f64-a3d1-948794d915c6",
+        "slug": "ux-leadership-across-more-than-40-enterprise-platforms",
+        "version": 1,
+        "title": "UX leadership across more than 40 enterprise platforms"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-007",
+      "target_type": "evidence_candidate",
+      "original_text": "He built and led a design team that grew from one designer to more than twenty.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-001",
+          "E-009",
+          "E-013"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "5a987ef4-368d-57a0-a67e-1b0188febfdd",
+        "slug": "built-and-led-design-team-from-one-to-more-than-twenty",
+        "version": 1,
+        "title": "Built and led design team from one to more than twenty"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-008",
+      "target_type": "evidence_candidate",
+      "original_text": "He directed a design services portfolio exceeding $6M across more than 45 engagements.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "recent_role",
+        "uuid": "4e6f4d3d-bc65-5f74-82d2-268812071422",
+        "slug": "directed-design-services-portfolio-exceeding-six-million-dollars",
+        "version": 1,
+        "title": "Directed design services portfolio exceeding six million dollars"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-009",
+      "target_type": "project_candidate",
+      "original_text": "Ben led design for SigniFi, a multi-year global transformation of finance operations.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 43
+            },
+            {
+              "kind": "page",
+              "number": 44
+            },
+            {
+              "kind": "page",
+              "number": 45
+            },
+            {
+              "kind": "page",
+              "number": 46
+            },
+            {
+              "kind": "page",
+              "number": 47
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "73f84c6d-8201-592d-a651-f1487058846c",
+        "slug": "led-design-for-signifi-finance-transformation",
+        "version": 1,
+        "title": "Led design for SigniFi finance transformation"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-010",
+      "target_type": "project_candidate",
+      "original_text": "He oversaw UX for SupplierHub, a multi-sided platform connecting internal corporate functions with external suppliers.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        }
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "No supplied documentary corroboration found."
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "f3914bd6-f234-5371-af8c-2da141ffaaac",
+        "slug": "oversaw-ux-for-supplierhub",
+        "version": 1,
+        "title": "Oversaw UX for SupplierHub"
+      },
+      "evidence_strength": "1 - Poor",
+      "evidence_strength_rationale": "Retained from the legacy profile but not corroborated by the supplied source set."
+    },
+    {
+      "candidate_id": "BF-C-011",
+      "target_type": "project_candidate",
+      "original_text": "He directed analytics-driven initiatives including Service Operations Performance Analytics and a Supply Chain Digital Twin.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "e2a88a81-604d-5c7d-86fe-3ac794aa6759",
+        "slug": "directed-analytics-driven-initiatives",
+        "version": 1,
+        "title": "Directed analytics-driven initiatives"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-012",
+      "target_type": "project_candidate",
+      "original_text": "He championed exploration of GenAI-enabled rapid prototyping tools to accelerate design discovery.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 135
+            },
+            {
+              "kind": "slide",
+              "number": 136
+            },
+            {
+              "kind": "slide",
+              "number": 137
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Current MTI-1 topic taxonomy does not fully represent this subject."
+      },
+      "legacy": {
+        "section": "key_initiatives",
+        "uuid": "c9c5f643-1d8b-5b72-9758-a1f4318d6fbd",
+        "slug": "champion-of-genai-enabled-rapid-prototyping-exploration",
+        "version": 1,
+        "title": "Champion of GenAI-enabled rapid prototyping exploration"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-013",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben has established DesignOps practices, design systems, and governance models to support scaling teams.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-007",
+          "E-013",
+          "E-015"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "565cd6f4-a50d-53f7-b049-1af97192224a",
+        "slug": "established-designops-practices-design-systems-and-governance-models",
+        "version": 1,
+        "title": "Established DesignOps practices design systems and governance models"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-014",
+      "target_type": "evidence_candidate",
+      "original_text": "He has created component libraries and prototyping systems in collaboration with global brand organizations.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "22efe3f3-c04e-5228-99ff-eeee7b10b879",
+        "slug": "created-component-libraries-and-prototyping-systems",
+        "version": 1,
+        "title": "Created component libraries and prototyping systems"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-015",
+      "target_type": "evidence_candidate",
+      "original_text": "He has standardized UX practices across product delivery lifecycles and cross-functional product squads.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 23
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-004",
+          "E-006",
+          "E-015"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "13cdc678-53ff-5d5b-9827-1e340149523c",
+        "slug": "standardized-ux-practices-across-delivery-lifecycles-and-product-squads",
+        "version": 1,
+        "title": "Standardized UX practices across delivery lifecycles and product squads"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-016",
+      "target_type": "evidence_candidate",
+      "original_text": "He has mentored and coached designers, supporting skills development and career progression.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 113
+            },
+            {
+              "kind": "slide",
+              "number": 114
+            },
+            {
+              "kind": "slide",
+              "number": 129
+            },
+            {
+              "kind": "slide",
+              "number": 130
+            },
+            {
+              "kind": "slide",
+              "number": 131
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "design_practice_and_leadership",
+        "uuid": "ba57f231-44d2-5904-aac9-4023541a29b9",
+        "slug": "mentored-and-coached-designers",
+        "version": 1,
+        "title": "Mentored and coached designers"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-017",
+      "target_type": "career_record_candidate",
+      "original_text": "Director of User Experience at Crestron Electronics (2016-2018), leading UX across residential and enterprise control systems.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "0ff37638-c1a0-590d-b142-1b1288ffde73",
+        "slug": "director-of-user-experience-at-crestron-electronics",
+        "version": 1,
+        "title": "Director of User Experience at Crestron Electronics"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-018",
+      "target_type": "career_record_candidate",
+      "original_text": "Head of User Experience at REDI Global Technologies (2015), supporting institutional trading platform development.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "7b93168e-4a9f-5a6c-a4b9-acd95bf9bf6f",
+        "slug": "head-of-user-experience-at-redi-global-technologies",
+        "version": 1,
+        "title": "Head of User Experience at REDI Global Technologies"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-019",
+      "target_type": "career_record_candidate",
+      "original_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "23697c83-ad41-5d29-9983-ff7695bd4ba8",
+        "slug": "director-of-user-experience-at-sparta-systems",
+        "version": 1,
+        "title": "Director of User Experience at Sparta Systems"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-020",
+      "target_type": "career_record_candidate",
+      "original_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "a29a23dd-374e-5adf-b207-bb953a29194d",
+        "slug": "practice-lead-digital-strategy-at-emc2-global-consulting",
+        "version": 1,
+        "title": "Practice Lead Digital Strategy at EMC2 Global Consulting"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-021",
+      "target_type": "career_record_candidate",
+      "original_text": "Senior UX leadership roles at Pfizer and other digital and consulting organizations.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "prior_leadership_roles",
+        "uuid": "28793e14-8337-5335-815d-cf4f34b5b392",
+        "slug": "senior-ux-leadership-roles-at-pfizer-and-other-organizations",
+        "version": 1,
+        "title": "Senior UX leadership roles at Pfizer and other organizations"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-022",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben has led qualitative and quantitative user research programs, including usability testing, contextual inquiry, and behavioral analysis.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "E-007",
+          "E-013"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "research_and_methods",
+        "uuid": "ee4a333a-be7a-5a27-b17a-b66be948a0b4",
+        "slug": "led-qualitative-and-quantitative-user-research-programs",
+        "version": 1,
+        "title": "Led qualitative and quantitative user research programs"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-023",
+      "target_type": "evidence_candidate",
+      "original_text": "He applies human-centered design, Lean UX, and agile practices within product development environments.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "research_and_methods",
+        "uuid": "e7afd1cd-fb6b-5e75-a85f-c43cc617b7b4",
+        "slug": "applies-human-centered-design-lean-ux-and-agile-practices",
+        "version": 1,
+        "title": "Applies human-centered design Lean UX and agile practices"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-024",
+      "target_type": "credential_candidate",
+      "original_text": "Bachelor of Arts in Psychology from Yale University.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "education_and_certifications",
+        "uuid": "8921531d-285d-5cc1-aa13-ef0c89167bac",
+        "slug": "bachelor-of-arts-in-psychology-from-yale-university",
+        "version": 1,
+        "title": "Bachelor of Arts in Psychology from Yale University"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-025",
+      "target_type": "credential_candidate",
+      "original_text": "Certifications include Pragmatic Marketing (PMC-II), Simplexity Applied Creativity Facilitator (Basadur), and Design Leadership (Cooper).",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "split_required",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "education_and_certifications",
+        "uuid": "aa5c6b8a-f6b8-52aa-98c2-e108ef8513a1",
+        "slug": "professional-certifications",
+        "version": 1,
+        "title": "Professional certifications"
+      },
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set."
+    },
+    {
+      "candidate_id": "BF-C-026",
+      "target_type": "topic_candidate",
+      "original_text": "Design leadership and organizational scaling",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "1e86957f-5944-5db0-8159-2b4d6232b53e",
+        "slug": "design-leadership-and-organizational-scaling",
+        "version": 1,
+        "title": "Design leadership and organizational scaling"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-027",
+      "target_type": "topic_candidate",
+      "original_text": "Human-AI interaction and cognitive bias",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        }
+      ],
+      "review": {
+        "source_corroboration_required": true,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Current MTI-1 topic taxonomy does not fully represent this subject."
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "164a24e2-a995-5ccc-9d93-73dcd3b7146c",
+        "slug": "human-ai-interaction-and-cognitive-bias",
+        "version": 1,
+        "title": "Human-AI interaction and cognitive bias"
+      },
+      "evidence_strength": "1 - Poor",
+      "evidence_strength_rationale": "Retained from the legacy profile but not corroborated by the supplied source set."
+    },
+    {
+      "candidate_id": "BF-C-028",
+      "target_type": "topic_candidate",
+      "original_text": "Enterprise UX for complex systems",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 18
+            },
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 23
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "07abb8ce-c19c-5634-ac9a-cf25df867480",
+        "slug": "enterprise-ux-for-complex-systems",
+        "version": 1,
+        "title": "Enterprise UX for complex systems"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-029",
+      "target_type": "topic_candidate",
+      "original_text": "DesignOps and systems thinking",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "undetermined",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            }
+          ]
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [
+          "T-001",
+          "T-002"
+        ],
+        "notes": "Documentary sources added; wording, attribution, and visibility still require approval."
+      },
+      "legacy": {
+        "section": "topics_ben_writes_and_speaks_about",
+        "uuid": "bffa7dfb-e03e-5d34-9676-885408285384",
+        "slug": "designops-and-systems-thinking",
+        "version": 1,
+        "title": "DesignOps and systems thinking"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts."
+    },
+    {
+      "candidate_id": "BF-C-030",
+      "target_type": "policy_candidate",
+      "original_text": "This assistant may answer questions only using the facts listed above.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "knowledge_only",
+      "attribution": "policy",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "No supplied documentary corroboration found."
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "4063e359-30fc-5ee4-84e3-f0db31a852bd",
+        "slug": "use-only-listed-facts",
+        "version": 1,
+        "title": "Use only listed facts"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type."
+    },
+    {
+      "candidate_id": "BF-C-031",
+      "target_type": "policy_candidate",
+      "original_text": "If a question cannot be answered using these facts, the assistant must say it does not know.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "knowledge_only",
+      "attribution": "policy",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "No supplied documentary corroboration found."
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "35841cf3-c371-5d5e-bdda-41b39b341c43",
+        "slug": "say-it-does-not-know-when-unsupported",
+        "version": 1,
+        "title": "Say it does not know when unsupported"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type."
+    },
+    {
+      "candidate_id": "BF-C-032",
+      "target_type": "policy_candidate",
+      "original_text": "The assistant must not speculate, infer private details, or provide personal contact information.",
+      "proposed_topics": [],
+      "status": "pending_review",
+      "visibility": "knowledge_only",
+      "attribution": "policy",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        }
+      ],
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "No supplied documentary corroboration found."
+      },
+      "legacy": {
+        "section": "boundaries",
+        "uuid": "c51f7032-1fa6-5ba1-81fa-7ce432813284",
+        "slug": "do-not-speculate-or-disclose-private-details",
+        "version": 1,
+        "title": "Do not speculate or disclose private details"
+      },
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type."
+    },
+    {
+      "candidate_id": "BF-C-033",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben joined Johnson & Johnson in winter 2019 as the sole member of a newly defined UX/Human-Centered Design Center of Excellence within Corporate Business Technology.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-034",
+      "target_type": "evidence_candidate",
+      "original_text": "By April–May 2020, Corporate Business Technology had formally established and launched its Experience Design Management Office to support product squads.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-035",
+      "target_type": "evidence_candidate",
+      "original_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities—summarized as ‘build the right things’ and ‘build those things right.’",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-036",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s organization advocated for Experience Design to be a persistent, embedded capability in product domains rather than project-based support that appears only at isolated moments.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 23
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-037",
+      "target_type": "evidence_candidate",
+      "original_text": "The Experience Design service model spanned strategy, research, ideation, prototyping, implementation support, and continuous improvement through a six-stage framework: Immersion, Insights, Ideate, Iterate, Implement, Improve.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-038",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 25
+            },
+            {
+              "kind": "slide",
+              "number": 26
+            },
+            {
+              "kind": "slide",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-039",
+      "target_type": "evidence_candidate",
+      "original_text": "The practice established ongoing experience-quality measurement as part of product management, defining, baselining, and repeatedly measuring experience outcomes to guide roadmaps.",
+      "proposed_topics": [
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 28
+            },
+            {
+              "kind": "slide",
+              "number": 31
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 26
+            },
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 57
+            },
+            {
+              "kind": "slide",
+              "number": 92
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-040",
+      "target_type": "evidence_candidate",
+      "original_text": "By mid-2022, the Corporate Business Technology Experience Design team had expanded into a multidisciplinary organization with domain-aligned design leaders, designers, researchers, and external delivery partners.",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-041",
+      "target_type": "evidence_candidate",
+      "original_text": "The organization embedded Dual-Track Agile practices so discovery, prototyping, testing, and validation could run alongside delivery.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-042",
+      "target_type": "evidence_candidate",
+      "original_text": "By early 2025, the broader J&J Experience Design chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "organization",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 45
+            },
+            {
+              "kind": "slide",
+              "number": 50
+            },
+            {
+              "kind": "slide",
+              "number": 52
+            },
+            {
+              "kind": "slide",
+              "number": 53
+            },
+            {
+              "kind": "slide",
+              "number": 61
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "This describes the broader chapter context, not a claim that all 24 people reported directly to Ben."
+      }
+    },
+    {
+      "candidate_id": "BF-C-043",
+      "target_type": "evidence_candidate",
+      "original_text": "At Johnson & Johnson, Ben was accountable to four divisional CIOs for experience design strategy, delivery, and portfolio alignment across a design-services portfolio exceeding $6 million.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-044",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s Johnson & Johnson team grew by 200% year over year while managing more than 45 UX design engagements.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "The résumé is explicit, but the precise period behind the year-over-year figure should be confirmed before approval."
+      }
+    },
+    {
+      "candidate_id": "BF-C-045",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben led experience strategy and design direction across workforce-facing platforms spanning human resources, finance, procurement, global services, cybersecurity, supplier, and compliance workflows.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 23
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 26
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 51
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-046",
+      "target_type": "evidence_candidate",
+      "original_text": "The organization’s later operating model shifted attention from isolated product and organizational silos toward end-to-end journeys across people, products, processes, and environments.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 30
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 54
+            },
+            {
+              "kind": "slide",
+              "number": 55
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-047",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 chapter model promoted reusable assets—personas, journey maps or blueprints, research readouts, and experience metrics—to standardize user-centered practice, reduce rework, and increase consistency and velocity.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 19
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 28
+            },
+            {
+              "kind": "slide",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 27
+            },
+            {
+              "kind": "slide",
+              "number": 28
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 41
+            },
+            {
+              "kind": "slide",
+              "number": 44
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            },
+            {
+              "kind": "slide",
+              "number": 128
+            },
+            {
+              "kind": "slide",
+              "number": 134
+            },
+            {
+              "kind": "slide",
+              "number": 143
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-048",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s teams used design systems, shared component libraries, and pattern-based interfaces to reduce redundant UI work and improve consistency across enterprise products.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 68
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-049",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben recruited, coached, and mentored designers and design managers and helped establish a skills-development approach for the Experience Design chapter.",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 113
+            },
+            {
+              "kind": "slide",
+              "number": 114
+            },
+            {
+              "kind": "slide",
+              "number": 129
+            },
+            {
+              "kind": "slide",
+              "number": 130
+            },
+            {
+              "kind": "slide",
+              "number": 131
+            },
+            {
+              "kind": "slide",
+              "number": 132
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-050",
+      "target_type": "evidence_candidate",
+      "original_text": "In July 2020, Ben hired a Product Experience Design Lead to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-051",
+      "target_type": "project_candidate",
+      "original_text": "The AskGS team used a mixed-method research program—knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents—to triangulate user frustrations in a colleague support portal.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            },
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-052",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research identified seven core frustration themes and informed 43 specific improvement recommendations illustrated through a future-state vision prototype.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            },
+            {
+              "kind": "page",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-053",
+      "target_type": "project_candidate",
+      "original_text": "The AskGS future-state vision helped the organization decide to re-platform the portal; its target capabilities informed vendor and implementation-partner selection, and Experience Design led detailed design specification work.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 7
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-054",
+      "target_type": "project_candidate",
+      "original_text": "For Service Performance Reporting, the Experience Design team researched 14 participants across four regions, four service areas, and three user roles to shape a future reporting experience.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-055",
+      "target_type": "project_candidate",
+      "original_text": "Service Performance Reporting embedded Experience Design in the squad, conducted primary research before major phases, prototyped visualizations before development, paired usability studies with releases, and surveyed users quarterly.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 31
+            },
+            {
+              "kind": "page",
+              "number": 32
+            },
+            {
+              "kind": "page",
+              "number": 33
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-056",
+      "target_type": "project_candidate",
+      "original_text": "Compared with the prior Service Performance Reporting solution, the redesigned product reported a 114% increase in speed to insight, an 85% increase in ease of use, a 122% increase in usefulness, and a 104-point increase in Net Promoter Score.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 31
+            },
+            {
+              "kind": "page",
+              "number": 32
+            },
+            {
+              "kind": "page",
+              "number": 33
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Retain the source’s baseline framing and avoid attributing the outcomes solely to design."
+      }
+    },
+    {
+      "candidate_id": "BF-C-057",
+      "target_type": "project_candidate",
+      "original_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 people over a twelve-month period.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 43
+            },
+            {
+              "kind": "page",
+              "number": 44
+            },
+            {
+              "kind": "page",
+              "number": 45
+            },
+            {
+              "kind": "page",
+              "number": 46
+            },
+            {
+              "kind": "page",
+              "number": 47
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-058",
+      "target_type": "project_candidate",
+      "original_text": "Vital’s research program reported five quarterly surveys, 98 survey responses, nine rounds of qualitative interviews, 51 hour-long interviews, and more than 110 product recommendations.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-059",
+      "target_type": "project_candidate",
+      "original_text": "Vital’s 2023 North America results reported ease-of-use and usefulness scores above the cited industry benchmark, with 78/100 for ease of use and 72/100 for usefulness versus a benchmark of 68.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Approve only with the stated geography, time period, and confidence caveat preserved."
+      }
+    },
+    {
+      "candidate_id": "BF-C-060",
+      "target_type": "project_candidate",
+      "original_text": "For the enterprise purchasing experience, Ben’s organization directed research and redesign work across purchase-request, purchase-order, invoice-status, email, and self-service touchpoints.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-061",
+      "target_type": "project_candidate",
+      "original_text": "The purchasing-experience team estimated that redesigned email and status-page experiences could save approximately $475,000 annually through call deflection and reduced buyer effort.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "This is a forecast, not a realized outcome; preserve that distinction."
+      }
+    },
+    {
+      "candidate_id": "BF-C-062",
+      "target_type": "project_candidate",
+      "original_text": "From late 2022 through 2024, Experience Design worked continuously with MedTech Supply Chain to launch a family of control-tower products across multiple franchises.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-063",
+      "target_type": "project_candidate",
+      "original_text": "In 2023, the SAGE partnership supported design of seven supply-chain products intended to reduce backorder, improve service, and improve the efficiency and experience of supply-chain users.",
+      "proposed_topics": [
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-064",
+      "target_type": "project_candidate",
+      "original_text": "SAGE control-tower design was grounded in repeated user engagement, including more than 30 feedback sessions for SWIFT, about 70 sessions for Integrate across 2023–2024, and roughly a dozen sessions for the ORC control tower.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-065",
+      "target_type": "project_candidate",
+      "original_text": "The SAGE work reused modular patterns and existing React components across multiple control towers instead of repeatedly creating bespoke interface designs.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-066",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s organization extended capacity through design partners operating under the Experience Design team’s authority and quality oversight, with regular performance and leadership reviews.",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-067",
+      "target_type": "project_candidate",
+      "original_text": "The Supplier Risk Sensing team used cross-functional workshops and more than ten user-feedback sessions over eight weeks to produce development-ready interface designs and a future-release backlog.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-068",
+      "target_type": "project_candidate",
+      "original_text": "For the Comet Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Preserve the source’s methodology and baseline qualifications when reviewing the numeric claims."
+      }
+    },
+    {
+      "candidate_id": "BF-C-069",
+      "target_type": "project_candidate",
+      "original_text": "For the FIRST third-party due-diligence platform serving approximately 28,000 users across 57 countries and 24 languages, the Experience Design team used collaborative workshops, iterative prototyping, and repeated usability studies to redesign a complex global workflow.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-070",
+      "target_type": "project_candidate",
+      "original_text": "FIRST usability results rose from an initial 25% usefulness and 33% usability to later study results as high as 82.5% usefulness and 90% usability before settling at 75% usefulness and 73% usability in a 173-participant baseline survey.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "The sequence, study sizes, and differing participant groups must remain visible; do not present this as a single before/after experiment."
+      }
+    },
+    {
+      "candidate_id": "BF-C-071",
+      "target_type": "project_candidate",
+      "original_text": "For PQM360, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-072",
+      "target_type": "project_candidate",
+      "original_text": "For external identity and access management, the Experience Design team worked with product and development partners to refine a partially built portal, align it with the enterprise brand, and plan research, testing, and iterative design.",
+      "proposed_topics": [
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-073",
+      "target_type": "proposition_candidate",
+      "original_text": "Ben designs at multiple levels of the system: he shapes individual product experiences while also designing the operating structures, practices, measures, reusable assets, and governance that enable design quality at scale.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-074",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s practice treated product outcomes as behavioral choices and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
+      "proposed_topics": [
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 67
+            },
+            {
+              "kind": "slide",
+              "number": 68
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-075",
+      "target_type": "evidence_candidate",
+      "original_text": "By 2025, the chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-076",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s career includes building or leading internal UX functions in regulated enterprise software, institutional trading technology, integrated hardware-software ecosystems, consulting, and global life-sciences technology.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-077",
+      "target_type": "evidence_candidate",
+      "original_text": "At Crestron, Ben introduced formal usability testing, established design standards and pattern libraries, and led work that resulted in a patent for interface innovation.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-078",
+      "target_type": "evidence_candidate",
+      "original_text": "At REDI Global Technologies, Ben established the company’s first qualitative and quantitative user-research programs for an institutional trading platform and developed a next-generation experience strategy.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-079",
+      "target_type": "evidence_candidate",
+      "original_text": "At Sparta Systems, Ben established an internal UX function, introduced user-centered practices into product management and Agile delivery, and created the company’s first formal usability-testing program for regulated enterprise software.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    },
+    {
+      "candidate_id": "BF-C-080",
+      "target_type": "evidence_candidate",
+      "original_text": "Ben’s earlier roles include Practice Lead for Digital Strategy at EMC Global Consulting, Senior Manager of User Experience at Pfizer, Senior Information Architect at BusinessEdge Solutions, Chief Experience Architect at OmniModis Design/OX Interactive, and Manager of Customer Experience at Mainspring, an IBM company.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      }
+    }
+  ]
+}
+
