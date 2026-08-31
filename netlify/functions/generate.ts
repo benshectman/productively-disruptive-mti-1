@@ -5,6 +5,7 @@ import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/n
 import { z } from "zod";
 import { GenerateRequestSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
 import { assembleCandidateNarrative, candidateValidationEnabled, candidateValidationIds, publicCandidateEvidence } from "./candidate-validation";
+import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 function allowedOrigin(origin = "") {
@@ -22,16 +23,26 @@ const framingJsonSchema = {
         required: ["id", "headline"],
         properties: {
           id: { type: "string", enum: ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"] },
-          headline: { type: "string", minLength: 1, maxLength: 140 }
+          headline: { type: "string", minLength: 8, maxLength: HEADLINE_MAX_CHARACTERS, pattern: "^[A-Za-z][A-Za-z &’',:–—-]*[A-Za-z]$" }
         }
       }
     }
   }
 };
 
+const danglingHeadlineWords = new Set(["a", "an", "and", "at", "by", "for", "from", "in", "of", "on", "the", "to", "with"]);
+const GeneratedHeadlineSchema = z.string().min(8).max(HEADLINE_MAX_CHARACTERS)
+  .regex(/^[A-Za-z][A-Za-z &’',:–—-]*[A-Za-z]$/, "Generated headlines must use plain English text")
+  .refine((headline) => {
+    const words = headline.trim().split(/\s+/);
+    return words.length >= HEADLINE_MIN_WORDS && words.length <= HEADLINE_MAX_WORDS
+      && !danglingHeadlineWords.has(words.at(-1)!.toLowerCase())
+      && !/^(He|She)\b/i.test(headline);
+  }, "Generated headlines must be concise and complete");
+
 const FramingSectionSchema = z.object({
   id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
-  headline: z.string().min(1).max(140).refine((headline) => !/\d/.test(headline), "Generated headlines may not introduce numeric claims")
+  headline: GeneratedHeadlineSchema
 }).strict();
 const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
 
@@ -40,6 +51,9 @@ export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?:
   if (!result.success) return null;
   const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) return null;
+  if (fallback.sections.some((section) => !headlineAcronymsAreExplained(
+    framingById.get(section.id as typeof result.data.sections[number]["id"])!.headline, section.summary
+  ))) return null;
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
@@ -75,7 +89,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1400,
         instructions: [
-          "Rewrite only the headline framing for the four supplied portfolio sections as one continuous professional narrative.",
+          "Write short portfolio section titles that introduce one continuous professional narrative. A title is not an introductory paragraph or a biographical sentence.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
           "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, show topic-relevant proof in practice, then connect it to the longer career throughline.",
           "Make the sequence of headlines build from broad identity to recent leadership, proof, and career throughline. Do not repeat the same claim or construction.",
@@ -85,7 +99,10 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Claims supported only by first_person_attestation must not be described as independently documented.",
-          "Use plain external language. Experience Design Management Office (XDMO) is the approved expansion on first use.",
+          "Name the main idea of the supplied lead paragraph. Do not try to summarize every supporting evidence point in the title. Do not begin with He, She, or Ben.",
+          "Target four to eight words, with a hard limit of three to nine words and sixty-four characters. Use a complete plain-English phrase; do not end with a preposition, conjunction, or article.",
+          "Acronyms are welcome only when listed in that section's allowedAcronyms. Their supported expansions already appear in its visible lead paragraph. Do not expand them in the title or invent other abbreviations.",
+          "Style example only, not a claim to reuse: Establishing and scaling J&J's XD organization.",
           "Do not put metrics, dates, numbers, HTML, Markdown, evidence IDs, attribution fields, disclosure choices, or design-system markup in headlines."
         ].join(" "),
         input: JSON.stringify({
@@ -95,6 +112,8 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
           sections: fallback.sections.map((section) => ({
             id: section.id,
             audienceLabel: section.eyebrow,
+            lead: section.summary,
+            allowedAcronyms: allowedHeadlineAcronyms(section.summary),
             narrativeRole: section.id === "system-behind-design" ? "career-wide orientation"
               : section.id === "operating-model" ? "recent leadership and organizational scale"
               : section.id === "proof-to-scale" ? "topic-relevant projects and outcomes"

@@ -40,6 +40,15 @@ When `OPENAI_API_KEY` is configured, the existing Netlify function:
 
 AI may vary headings and emphasis. Evidence-grounded summaries and connective sentences remain deterministic so model-authored paraphrasing cannot alter dates, metrics, attribution, or the relationship between claims. AI cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
 
+### Reading hierarchy
+
+- **Headline:** a section title, targeting 4–8 words; generated titles are limited to 3–9 words and 64 characters. Paragraph-like, malformed, or unexplained-acronym titles fall back rather than being visually clipped.
+- **Lead:** one intact evidence-backed point with brief orientation where needed. The editorial planner's lead paragraphs are tested across all topic combinations to stay within 75 words.
+- **Tell me more:** remaining selected context, displayed as readable paragraphs on demand. Every editorial and approved-fallback block supports inline depth, including blocks that also link to the focused deep dive.
+- **Evidence behind this:** the separate source-fact inspection dialog; it is not the narrative expansion.
+
+Headlines may use supported abbreviations such as J&J or XD only when the visible lead spells out Johnson & Johnson or Experience Design. The server supplies the eligible abbreviations to the model and checks its output against the same list. Unknown product acronyms are never expanded by guesswork. The source facts themselves remain unchanged.
+
 ## Temporary candidate-validation mode
 
 The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `candidates`. In this explicit validation mode, deterministic topic selection and optional AI framing use only the sanitized wording, candidate ID, attribution, and topic tags from source-derived records `BF-C-033` through `BF-C-080`.
@@ -66,7 +75,7 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 
 - `OPENAI_API_KEY` — optional, server-side only.
 - `OPENAI_MODEL` — optional; defaults to `gpt-4.1-mini`.
-- `BENFACTS_VALIDATION_MODE` — temporary; set to `candidates` to use sanitized, unapproved candidate facts or omit/set to `approved` to use only the approved packet.
+- `BENFACTS_VALIDATION_MODE` — temporary; defaults to `candidates` (sanitized, unapproved candidate facts). Set explicitly to `approved` to use only the approved packet.
 - `NARRATIVE_PLANNER_MODE` — temporary candidate-mode planner switch; `editorial` is the default and `legacy` restores the previous selection behavior.
 - `ALLOWED_ORIGINS` — comma-separated exact browser origins.
 - `VITE_GENERATE_ENDPOINT` — optional client endpoint override.

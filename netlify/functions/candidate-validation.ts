@@ -1,6 +1,7 @@
 import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.2.json";
 import { NarrativeSchema, type Attribution, type Narrative, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
 import { candidateEditorialMetadata, type NarrativeRole } from "./candidate-editorial-metadata";
+import { expandPresentationAcronyms } from "../../src/shared/narrative-presentation";
 
 type CandidateRecord = {
   candidate_id: string;
@@ -79,12 +80,14 @@ function boundedText(records: CandidateRecord[], max: number) {
   return `${shortened.slice(0, shortened.lastIndexOf(" "))}…`;
 }
 
-function boundedNarrative(lead: string, records: CandidateRecord[], max = 900) {
-  const body = records.map((record) => record.original_text).join(" ");
-  const text = `${lead} ${body}`.trim();
-  if (text.length <= max) return text;
-  const shortened = text.slice(0, max - 1);
-  return `${shortened.slice(0, shortened.lastIndexOf(" "))}…`;
+function editorialCopy(records: CandidateRecord[], bridge = "", leadRecord = records[0]) {
+  // One intact fact introduces the section; other selected facts provide depth.
+  // Do not shorten claims by cutting sentences, metrics, or attribution.
+  return {
+    summary: expandPresentationAcronyms(`${bridge} ${leadRecord.original_text}`.trim()),
+    detail: records.filter((record) => record !== leadRecord)
+      .map((record) => expandPresentationAcronyms(record.original_text)).join("\n\n")
+  };
 }
 
 export function publicCandidateEvidence(ids?: Iterable<string>): PublicEvidence[] {
@@ -188,8 +191,6 @@ function recordsFor(ids: string[], used: Set<string>) {
 
 export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrative {
   const used = new Set<string>();
-  const labels = topics.map((topic) => TOPIC_LABELS[topic]);
-  const emphasis = labels.length ? labels.join(" + ") : "leadership, systems, enterprise experience, and measurement";
 
   const aboutAnchors = recordsFor(["BF-C-073", "BF-C-076"], used);
   aboutAnchors.forEach((candidate) => used.add(candidate.candidate_id));
@@ -214,27 +215,32 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
   const sections = [
     {
       id: "system-behind-design", purpose: "proposition" as const, eyebrow: "About Ben",
-      headline: labels.length ? `A career viewed through ${emphasis}` : "Designing products—and the systems behind them",
-      summary: boundedNarrative("", about, 900), evidenceRefs: about.map((item) => item.candidate_id), disclosure: "inline" as const,
-      detail: boundedNarrative("The broader context:", about, 1600)
+      headline: "Designing products and the systems behind them",
+      ...editorialCopy(about),
+      evidenceRefs: about.map((item) => item.candidate_id), disclosure: "inline" as const
     },
     {
       id: "operating-model", purpose: "evidence" as const, eyebrow: "Recent leadership",
-      headline: topics.includes("T-004") ? "Making measurement part of the practice" : topics.includes("T-002") ? "Designing the conditions for good design" : "Building design into the way the organization works",
-      summary: boundedNarrative("Most recently, that approach took organizational form at Johnson & Johnson.", recentLeadership),
-      evidenceRefs: recentLeadership.map((item) => item.candidate_id), disclosure: "none" as const
+      headline: topics.includes("T-004") ? "Making measurement part of the practice" : topics.includes("T-002") ? "Designing the conditions for good design" : "Building design into the organization",
+      ...editorialCopy(recentLeadership, "Most recently, that approach took organizational form at Johnson & Johnson."),
+      evidenceRefs: recentLeadership.map((item) => item.candidate_id), disclosure: "inline" as const
     },
     {
       id: "proof-to-scale", purpose: "transition" as const, eyebrow: "Proof in practice",
-      headline: labels.length ? `${emphasis} made concrete` : "The operating model, visible in the work",
-      summary: boundedNarrative("That operating approach is visible in specific products and outcomes.", proof),
+      headline: topics.includes("T-004") ? "Measuring the impact of design"
+        : topics.includes("T-002") ? "Putting systems thinking into practice"
+        : topics.includes("T-001") ? "Design leadership made concrete"
+        : topics.includes("T-003") ? "Making complex enterprise products usable"
+        : "The operating model in practice",
+      ...editorialCopy(proof),
       evidenceRefs: proof.map((item) => item.candidate_id), disclosure: "deep-dive" as const
     },
     {
       id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
-      headline: "A pattern built across roles and industries",
-      summary: boundedNarrative("The recent work extends a longer career pattern.", throughline),
-      evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "none" as const
+      headline: "A pattern across roles and industries",
+      ...editorialCopy(throughline, "The recent work extends a longer career pattern.",
+        throughline.find((record) => candidateEditorialMetadata[record.candidate_id].careerPeriod === "earlier")),
+      evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "inline" as const
     }
   ];
   return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });

@@ -80,9 +80,9 @@ function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive
           <div className="block-index">0{index + 1}</div>
           <div className="block-content">
             <p className="purpose">{section.eyebrow}</p><h2>{section.headline}</h2><p className="summary">{section.summary}</p>
-            {section.disclosure === "inline" && <>
-              <button className="disclosure" aria-expanded={expanded} aria-controls={`${section.id}-detail`} onClick={() => onContext({ ...context, inlineExpansionsOpened: expanded ? context.inlineExpansionsOpened.filter((id) => id !== section.id) : [...context.inlineExpansionsOpened, section.id] })}>{expanded ? "Show less" : "Tell me more"} <span aria-hidden="true">{expanded ? "−" : "+"}</span></button>
-              {expanded && <div className="inline-detail" id={`${section.id}-detail`}><p>{section.detail}</p></div>}
+            {section.detail && <>
+              <button className="disclosure" aria-label={`${expanded ? "Show less" : "Tell me more"} about ${section.headline}`} aria-expanded={expanded} aria-controls={`${section.id}-detail`} onClick={() => onContext({ ...context, inlineExpansionsOpened: expanded ? context.inlineExpansionsOpened.filter((id) => id !== section.id) : [...context.inlineExpansionsOpened, section.id] })}>{expanded ? "Show less" : "Tell me more"} <span aria-hidden="true">{expanded ? "−" : "+"}</span></button>
+              {expanded && <div className="inline-detail" id={`${section.id}-detail`}>{section.detail.split(/\n\n+/).map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}</div>}
             </>}
             {section.disclosure === "deep-dive" && <button className="deep-link" onClick={onDeepDive}>Explore how the XD model evolved <span aria-hidden="true">→</span></button>}
             <EvidenceSignal refs={section.evidenceRefs} contextLabel={section.headline} catalog={evidenceCatalog} onOpen={onEvidence}/>

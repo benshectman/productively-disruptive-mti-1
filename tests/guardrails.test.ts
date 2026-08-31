@@ -20,7 +20,9 @@ describe("bounded AI guardrails", () => {
     { sections: [] },
     { sections: assembleNarrative([]).sections.map((section) => ({ id: section.id, headline: section.headline, evidenceRefs: ["E-999"] })) },
     { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "A 100% invented metric" })) }
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "A 100 percent invented metric" })) },
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "Design leadership across technology领域" })) },
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "Design leadership grounded in" })) }
   ])("rejects framing that changes the bounded contract", (candidate) => {
     expect(applyAiFraming(candidate, assembleNarrative([]))).toBeNull();
   });
@@ -38,9 +40,10 @@ describe("bounded AI guardrails", () => {
     process.env.OPENAI_API_KEY = "test-only";
     const fallback = assembleNarrative(["T-001", "T-002"]);
     let requestBody: Record<string, unknown> | undefined;
+    const safeHeadlines = ["Designing systems behind excellent product experiences", "Embedding design leadership across the organization", "Making enterprise design impact visible", "Building a durable career throughline"];
     const fakeFetch = async (_url: string | URL | Request, init?: RequestInit) => {
       requestBody = JSON.parse(String(init?.body));
-      const framing = { sections: fallback.sections.map((section) => ({ id: section.id, headline: section.headline })) };
+      const framing = { sections: fallback.sections.map((section, index) => ({ id: section.id, headline: safeHeadlines[index] })) };
       return new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
     };
     const result = await generateNarrative(["T-001", "T-002"], fakeFetch as typeof fetch);

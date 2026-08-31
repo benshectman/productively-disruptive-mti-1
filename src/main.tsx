@@ -9,6 +9,7 @@ import "./styles.css";
 import "./contrast-fix.css";
 import "./evidence-dialog.css";
 import "./validation-mode.css";
+import "./narrative-hierarchy.css";
 import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(

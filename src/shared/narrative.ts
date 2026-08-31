@@ -1,5 +1,6 @@
 import { contentPacket, evidenceById, publicEvidenceView, type EvidenceRecord } from "../content/content";
 import { NarrativeSchema, type Narrative, type NarrativeSection, type TopicId } from "./contracts";
+import { expandPresentationAcronyms } from "./narrative-presentation";
 
 const BALANCED_IDS = ["E-001", "E-004", "E-006", "E-008", "E-010", "E-013", "E-014", "E-015"];
 const PRIORITY: Record<TopicId, string[]> = {
@@ -28,7 +29,7 @@ function refs(selected: EvidenceRecord[], preferred: string[], count: number) {
   return [...preferred.filter((id) => selectedIds.has(id)), ...preferred.filter((id) => !selectedIds.has(id))].slice(0, count);
 }
 function claims(ids: string[]) {
-  return ids.map((id) => evidenceById.get(id)?.claim).filter(Boolean).join(" ");
+  return ids.map((id) => evidenceById.get(id)?.claim).filter(Boolean).map((claim) => expandPresentationAcronyms(claim!)).join("\n\n");
 }
 
 export function assembleNarrative(topics: TopicId[]): Narrative {
@@ -37,7 +38,6 @@ export function assembleNarrative(topics: TopicId[]): Narrative {
   const operatingRefs = refs(selected, ["E-003", "E-005", "E-006", "E-007", "E-008"], 4);
   const scaleRefs = refs(selected, ["E-010", "E-011", "E-012"], 3);
   const matureRefs = refs(selected, ["E-013", "E-014", "E-015"], 3);
-  const topicLabels = topics.map((id) => contentPacket.topics.find((topic) => topic.id === id)?.label).filter(Boolean);
   const sections: NarrativeSection[] = [
     {
       id: "system-behind-design", purpose: "proposition", eyebrow: "About Ben",
@@ -48,17 +48,20 @@ export function assembleNarrative(topics: TopicId[]): Narrative {
     {
       id: "operating-model", purpose: "evidence", eyebrow: "Recent leadership",
       headline: topics.includes("T-001") ? "From temporary support to an embedded practice" : "A product-centered operating model",
-      summary: claims(operatingRefs.slice(0, 2)), evidenceRefs: operatingRefs, disclosure: "none"
+      summary: claims(operatingRefs.slice(0, 1)), detail: claims(operatingRefs.slice(1)),
+      evidenceRefs: operatingRefs, disclosure: "inline"
     },
     {
       id: "proof-to-scale", purpose: "transition", eyebrow: "Proof in practice",
-      headline: topicLabels.length ? `What ${topicLabels.join(" + ")} looks like at enterprise scale` : "Proving the model, then extending its reach",
-      summary: claims(scaleRefs), evidenceRefs: scaleRefs, disclosure: "deep-dive"
+      headline: topics.includes("T-004") ? "Making design impact measurable" : "Proving the model and extending its reach",
+      summary: claims(scaleRefs.slice(0, 1)), detail: claims(scaleRefs.slice(1)),
+      evidenceRefs: scaleRefs, disclosure: "deep-dive"
     },
     {
       id: "institutionalized-capability", purpose: "story", eyebrow: "Career throughline",
       headline: topics.includes("T-004") ? "Measurement became part of the operating system" : "What the model became",
-      summary: claims(matureRefs), evidenceRefs: matureRefs, disclosure: "none"
+      summary: claims(matureRefs.slice(0, 1)), detail: claims(matureRefs.slice(1)),
+      evidenceRefs: matureRefs, disclosure: "inline"
     }
   ];
   return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
