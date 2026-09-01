@@ -103,7 +103,9 @@ describe("temporary candidate BenFacts validation mode", () => {
       requestBody = JSON.parse(String(init?.body));
       return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map((section) => ({
         id: section.id,
-        headline: section.headline
+        headline: section.headline,
+        summary: section.summary,
+        detail: section.detail
       })) }) }), { status: 200 });
     };
     const result = await generateNarrative(["T-003"], fakeFetch as typeof fetch);
