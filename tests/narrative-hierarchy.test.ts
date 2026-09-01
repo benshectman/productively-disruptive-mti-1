@@ -10,7 +10,7 @@ const topics: TopicId[] = ["T-001", "T-002", "T-003", "T-004"];
 const configurations = Array.from({ length: 16 }, (_, mask) => topics.filter((_, index) => mask & (1 << index)));
 const wordCount = (text: string) => text.trim().split(/\s+/).length;
 const framingFor = (narrative: ReturnType<typeof assembleNarrative>) => ({
-  sections: narrative.sections.map(({ id, headline }) => ({ id, headline }))
+  sections: narrative.sections.map(({ id, headline, summary, detail }) => ({ id, headline, summary, detail }))
 });
 
 describe("headline, lead, and progressive depth", () => {

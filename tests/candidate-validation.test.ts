@@ -103,7 +103,9 @@ describe("temporary candidate BenFacts validation mode", () => {
       requestBody = JSON.parse(String(init?.body));
       return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map((section) => ({
         id: section.id,
-        headline: section.headline
+        headline: section.headline,
+        summary: section.summary,
+        detail: section.detail
       })) }) }), { status: 200 });
     };
     const result = await generateNarrative(["T-003"], fakeFetch as typeof fetch);
@@ -114,7 +116,7 @@ describe("temporary candidate BenFacts validation mode", () => {
     expect(visible.every((record: { id: string }) => record.id.startsWith("BF-C-"))).toBe(true);
     expect(JSON.stringify(visible)).not.toContain("source_refs");
     expect(JSON.stringify(requestBody?.instructions)).toContain("unapproved candidate BenFacts");
-    expect(JSON.stringify(requestBody?.instructions)).toContain("continuous professional narrative");
+    expect(JSON.stringify(requestBody?.instructions)).toContain("continuous professional portfolio narrative");
     expect(input.sections.map((section: { audienceLabel: string }) => section.audienceLabel)).toEqual([
       "About Ben", "Recent leadership", "Proof in practice", "Career throughline"
     ]);
