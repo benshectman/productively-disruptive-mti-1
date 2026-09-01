@@ -9,9 +9,15 @@ import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, H
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
-function allowedOrigin(origin = "") {
+export function allowedOrigin(origin = "", requestHost = "") {
   const allowlist = (process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
-  return allowlist.includes(origin) ? origin : "";
+  if (allowlist.includes(origin)) return origin;
+  if (!origin || !requestHost) return "";
+  try {
+    return new URL(origin).host.toLowerCase() === requestHost.toLowerCase() ? origin : "";
+  } catch {
+    return "";
+  }
 }
 
 const generatedNarrativeJsonSchema = {
@@ -180,7 +186,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
 export const handler: Handler = async (event) => {
   const requestId = crypto.randomUUID();
   const origin = event.headers.origin || "";
-  const corsOrigin = allowedOrigin(origin);
+  const corsOrigin = allowedOrigin(origin, event.headers.host || "");
   if (event.httpMethod === "OPTIONS") return { statusCode: corsOrigin ? 204 : 403, headers: { ...headersFor(corsOrigin), "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Max-Age": "86400" } };
   if (origin && !corsOrigin) return { statusCode: 403, body: JSON.stringify({ error: "Origin not allowed", requestId }) };
   if (event.httpMethod !== "POST") return { statusCode: 405, headers: headersFor(corsOrigin), body: JSON.stringify({ error: "Use POST", requestId }) };
