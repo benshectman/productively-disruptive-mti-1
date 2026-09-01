@@ -62,12 +62,16 @@ describe("headline, lead, and progressive depth", () => {
     expect(applyAiFraming(framing, narrative, candidateValidationIds)).toBeNull();
   });
 
-  it("rejects unexplained headline acronyms even if hidden detail explains them", () => {
+  it("replaces an unexplained headline acronym without discarding safe generated prose", () => {
     const narrative = assembleEditorialCandidateNarrative([]);
     const framing = framingFor(narrative);
     framing.sections[0].headline = "Building the XDMO operating model";
     narrative.sections[0].detail = "Experience Design Management Office";
-    expect(applyAiFraming(framing, narrative, candidateValidationIds)).toBeNull();
+    const result = applyAiFraming(framing, narrative, candidateValidationIds);
+    expect(result?.mode).toBe("ai");
+    expect(result?.sections[0].headline).toBe(narrative.sections[0].headline);
+    expect(result?.sections[0].summary).toBe(framing.sections[0].summary);
+    expect(result?.sections[0].detail).toBe(framing.sections[0].detail);
     expect(headlineAcronymsAreExplained("Building the ABC operating model", "ABC")).toBe(false);
   });
 

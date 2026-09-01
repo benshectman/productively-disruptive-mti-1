@@ -97,10 +97,6 @@ export function applyAiFraming(
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) {
     onReject?.("section-ids"); return null;
   }
-  if (fallback.sections.some((section) => !headlineAcronymsAreExplained(
-    framingById.get(section.id as typeof result.data.sections[number]["id"])!.headline,
-    framingById.get(section.id as typeof result.data.sections[number]["id"])!.summary
-  ))) { onReject?.("headline-acronym"); return null; }
   if (evidenceTextBySection && fallback.sections.some((section) => !generatedProseIsGrounded(
     framingById.get(section.id as typeof result.data.sections[number]["id"])!, evidenceTextBySection.get(section.id) || ""
   ))) { onReject?.("numeric-grounding"); return null; }
@@ -109,7 +105,10 @@ export function applyAiFraming(
     grounding: fallback.grounding,
     sections: fallback.sections.map((section) => {
       const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
-      return { ...section, headline: framing.headline, summary: framing.summary, detail: framing.detail };
+      const headline = headlineAcronymsAreExplained(framing.headline, framing.summary)
+        ? framing.headline
+        : section.headline;
+      return { ...section, headline, summary: framing.summary, detail: framing.detail };
     })
   };
   if (!validateNarrativeEvidence(narrative, allowedIds)) { onReject?.("narrative-evidence"); return null; }
