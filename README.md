@@ -27,6 +27,8 @@ The complete experience works without an OpenAI key. Topic overlap and small tra
 
 If the generation function is unavailable, unconfigured, times out, encounters a network error, or returns invalid structured output, the client keeps this deterministic narrative without displaying a technical error.
 
+The model-call timeout is temporarily set to 30 seconds to distinguish timeout-driven fallbacks from structured-output validation failures. The sub-10-second experience target is intentionally deferred during this diagnostic period.
+
 ## AI-framed mode
 
 When `OPENAI_API_KEY` is configured, the existing Netlify function:
