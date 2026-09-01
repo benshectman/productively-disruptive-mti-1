@@ -8,6 +8,7 @@ import { assembleCandidateNarrative, candidateValidationEnabled, candidateValida
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
+export const GENERATION_TIMEOUT_MS = 30_000;
 function allowedOrigin(origin = "") {
   const allowlist = (process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
   return allowlist.includes(origin) ? origin : "";
@@ -118,7 +119,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
     evidence.filter((item) => section.evidenceRefs.includes(item.id)).map((item) => item.claim).join(" ")
   ]));
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8500);
+  const timeout = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
   try {
     const response = await fetcher("https://api.openai.com/v1/responses", {
       method: "POST", signal: controller.signal,

@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { applyAiFraming, generateNarrative } from "../netlify/functions/generate";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { applyAiFraming, generateNarrative, GENERATION_TIMEOUT_MS } from "../netlify/functions/generate";
 import { contentPacket } from "../src/content/content";
 import { assembleNarrative } from "../src/shared/narrative";
 
-afterEach(() => { delete process.env.OPENAI_API_KEY; delete process.env.BENFACTS_VALIDATION_MODE; });
+afterEach(() => { delete process.env.OPENAI_API_KEY; delete process.env.BENFACTS_VALIDATION_MODE; vi.useRealTimers(); });
 beforeEach(() => { process.env.BENFACTS_VALIDATION_MODE = "approved"; });
 
 describe("bounded AI guardrails", () => {
@@ -36,6 +36,23 @@ describe("bounded AI guardrails", () => {
   });
   it("falls back when OpenAI is unconfigured", async () => {
     expect(await generateNarrative(["T-002"])).toEqual(assembleNarrative(["T-002"]));
+  });
+  it("uses the temporary thirty-second diagnostic timeout before falling back", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    vi.useFakeTimers();
+    let aborted = false;
+    const fakeFetch = (_url: string | URL | Request, init?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => {
+        aborted = true;
+        reject(new DOMException("Aborted", "AbortError"));
+      });
+    });
+    const resultPromise = generateNarrative([], fakeFetch as typeof fetch);
+    await vi.advanceTimersByTimeAsync(GENERATION_TIMEOUT_MS - 1);
+    expect(aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(aborted).toBe(true);
+    expect((await resultPromise).mode).toBe("deterministic");
   });
   it("sends only section-relevant approved evidence and requests strict structured framing", async () => {
     process.env.OPENAI_API_KEY = "test-only";
