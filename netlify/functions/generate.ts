@@ -10,6 +10,7 @@ import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, H
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
 export type GenerationStatus = "ai" | "missing-api-key" | "upstream-error" | "empty-output" | "invalid-output" | "timeout" | "network-error";
+export type ValidationStatus = "schema" | "section-ids" | "headline-acronym" | "numeric-grounding" | "narrative-evidence";
 export function allowedOrigin(origin = "", requestHost = "") {
   const allowlist = (process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
   if (allowlist.includes(origin)) return origin;
@@ -83,18 +84,26 @@ function generatedProseIsGrounded(generated: { summary: string; detail: string }
   return !unsupportedAggregate.test(`${generated.summary} ${generated.detail}`);
 }
 
-export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?: Set<string>, evidenceTextBySection?: Map<string, string>): Narrative | null {
+export function applyAiFraming(
+  value: unknown,
+  fallback: Narrative,
+  allowedIds?: Set<string>,
+  evidenceTextBySection?: Map<string, string>,
+  onReject?: (status: ValidationStatus) => void,
+): Narrative | null {
   const result = FramingSchema.safeParse(value);
-  if (!result.success) return null;
+  if (!result.success) { onReject?.("schema"); return null; }
   const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
-  if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) return null;
+  if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) {
+    onReject?.("section-ids"); return null;
+  }
   if (fallback.sections.some((section) => !headlineAcronymsAreExplained(
     framingById.get(section.id as typeof result.data.sections[number]["id"])!.headline,
     framingById.get(section.id as typeof result.data.sections[number]["id"])!.summary
-  ))) return null;
+  ))) { onReject?.("headline-acronym"); return null; }
   if (evidenceTextBySection && fallback.sections.some((section) => !generatedProseIsGrounded(
     framingById.get(section.id as typeof result.data.sections[number]["id"])!, evidenceTextBySection.get(section.id) || ""
-  ))) return null;
+  ))) { onReject?.("numeric-grounding"); return null; }
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
@@ -103,7 +112,8 @@ export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?:
       return { ...section, headline: framing.headline, summary: framing.summary, detail: framing.detail };
     })
   };
-  return validateNarrativeEvidence(narrative, allowedIds) ? narrative : null;
+  if (!validateNarrativeEvidence(narrative, allowedIds)) { onReject?.("narrative-evidence"); return null; }
+  return narrative;
 }
 
 function constrainedEvidence(fallback: Narrative) {
@@ -116,7 +126,7 @@ function constrainedEvidence(fallback: Narrative) {
 }
 
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
-Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: number }> {
+Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
   const useCandidates = candidateValidationEnabled();
   const fallback = useCandidates ? assembleCandidateNarrative(topics) : assembleNarrative(topics);
   const allowedIds = useCandidates ? candidateValidationIds : undefined;
@@ -192,10 +202,11 @@ Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: numbe
       console.warn(`[generation:${requestId}] empty-output response_status=${result.status || "unknown"} error=${result.error?.code || "none"} incomplete=${result.incomplete_details?.reason || "none"}`);
       return { narrative: fallback, status: "empty-output" };
     }
-    const framed = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection);
+    let validationStatus: ValidationStatus | undefined;
+    const framed = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection, (status) => { validationStatus = status; });
     if (!framed) {
-      console.warn(`[generation:${requestId}] invalid-output`);
-      return { narrative: fallback, status: "invalid-output" };
+      console.warn(`[generation:${requestId}] invalid-output validation=${validationStatus || "unknown"}`);
+      return { narrative: fallback, status: "invalid-output", validationStatus };
     }
     return { narrative: framed, status: "ai" };
   } catch (error) {
@@ -232,7 +243,8 @@ export const handler: Handler = async (event) => {
     headers: {
       ...headersFor(corsOrigin),
       "X-Portfolio-Generation-Status": generation.status,
-      ...(generation.upstreamStatus ? { "X-Portfolio-Upstream-Status": String(generation.upstreamStatus) } : {})
+      ...(generation.upstreamStatus ? { "X-Portfolio-Upstream-Status": String(generation.upstreamStatus) } : {}),
+      ...(generation.validationStatus ? { "X-Portfolio-Validation-Status": generation.validationStatus } : {})
     },
     body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, requestId })
   };
