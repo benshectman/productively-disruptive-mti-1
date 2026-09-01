@@ -2,13 +2,38 @@ name: Verify
 
 on:
   push:
-    branches: [main]
+    branches: [develop, main]
   pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  release-policy:
+    name: Release policy
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require an explicit release from develop
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+          PULL_REQUEST_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [ "$HEAD_BRANCH" != "develop" ]; then
+            echo "Production releases must come from develop."
+            exit 1
+          fi
+
+          case "$PULL_REQUEST_TITLE" in
+            "[release] "*) ;;
+            *)
+              echo "Production pull request titles must begin with [release]."
+              exit 1
+              ;;
+          esac
+
   test-and-build:
     runs-on: ubuntu-latest
     steps:

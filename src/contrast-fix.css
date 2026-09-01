@@ -1,0 +1,7 @@
+/* Astryx assigns text colors directly in its reset layer. Custom inverse
+   surfaces must therefore override descendants rather than rely on inheritance
+   from the surface container. */
+:where(.deep-title, .generating, .purpose-transition)
+  :where(h1, h2, h3, h4, h5, h6, p, small, a, button, summary) {
+  color: inherit;
+}

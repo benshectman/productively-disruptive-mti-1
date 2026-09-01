@@ -1,0 +1,15 @@
+/* Titles introduce; leads orient; disclosures carry the supporting context.
+   No clamping or hidden overflow: all factual text stays readable. */
+.block-content h2 {
+  font-size: clamp(2rem, 4.5vw, 4.5rem);
+  max-width: 22ch;
+  line-height: 1.06;
+}
+
+.block-content .summary {
+  max-width: 48rem;
+}
+
+.inline-detail p + p {
+  margin-top: 1rem;
+}

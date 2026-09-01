@@ -1,0 +1,29 @@
+.validation-notice {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 1rem clamp(1rem, 4vw, 4rem);
+  color: #302500;
+  background: #fff2b8;
+  border-block: 1px solid #8a6a00;
+}
+
+.validation-notice strong {
+  white-space: nowrap;
+}
+
+.validation-notice span {
+  max-width: 54rem;
+}
+
+@media (max-width: 760px) {
+  .validation-notice {
+    flex-direction: column;
+    gap: .35rem;
+  }
+
+  .validation-notice strong {
+    white-space: normal;
+  }
+}
