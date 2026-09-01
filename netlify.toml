@@ -3,6 +3,18 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# A push to Netlify's production branch is not sufficient authorization to
+# spend production-deploy credits. The commit must also carry [release].
+# Deploy Previews and branch deploys do not use this production-only gate.
+[context.production]
+  ignore = "node ./scripts/netlify-ignore-production.mjs"
+
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.develop]
+  command = "npm run build"
+
 [dev]
   command = "npm run dev"
   targetPort = 5173

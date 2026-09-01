@@ -87,5 +87,9 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 - `npm test` validates content integrity, reference resolution, selection behavior, contracts, attribution, knowledge-only isolation, and fallback behavior.
 - `npm run build` performs TypeScript and production Vite builds.
 
+## Deployment
+
+Routine work targets the persistent `develop` branch and uses Netlify Deploy Previews or its stable branch deploy. `main` is reserved for deliberate production releases, and production builds require a `[release]` marker in the final commit message. See [the deployment workflow](docs/deployment-workflow.md) for setup, testing, and release steps.
+
 MTI-1 is intentionally a learning prototype. It does not introduce persistence, authentication, analytics, freeform prompts, job-description uploads, embeddings, vector retrieval, a CMS, or additional renderers/themes.
 
