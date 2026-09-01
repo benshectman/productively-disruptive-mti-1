@@ -9,6 +9,7 @@ import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, H
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
+export type GenerationStatus = "ai" | "missing-api-key" | "upstream-error" | "empty-output" | "invalid-output" | "timeout" | "network-error";
 export function allowedOrigin(origin = "", requestHost = "") {
   const allowlist = (process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
   if (allowlist.includes(origin)) return origin;
@@ -114,11 +115,12 @@ function constrainedEvidence(fallback: Narrative) {
   }));
 }
 
-export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch = fetch): Promise<Narrative> {
+export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
+Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: number }> {
   const useCandidates = candidateValidationEnabled();
   const fallback = useCandidates ? assembleCandidateNarrative(topics) : assembleNarrative(topics);
   const allowedIds = useCandidates ? candidateValidationIds : undefined;
-  if (!process.env.OPENAI_API_KEY) return fallback;
+  if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key" };
   const evidence = constrainedEvidence(fallback);
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
     section.id,
@@ -174,13 +176,38 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
         text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema } }
       })
     });
-    if (!response.ok) return fallback;
-    const result = await response.json() as { output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }> };
+    if (!response.ok) {
+      console.warn(`[generation:${requestId}] upstream-error status=${response.status}`);
+      return { narrative: fallback, status: "upstream-error", upstreamStatus: response.status };
+    }
+    const result = await response.json() as {
+      output_text?: string;
+      output?: Array<{ content?: Array<{ text?: string }> }>;
+      status?: string;
+      error?: { code?: string } | null;
+      incomplete_details?: { reason?: string } | null;
+    };
     const text = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
-    if (!text) return fallback;
-    return applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection) || fallback;
-  } catch { return fallback; }
+    if (!text) {
+      console.warn(`[generation:${requestId}] empty-output response_status=${result.status || "unknown"} error=${result.error?.code || "none"} incomplete=${result.incomplete_details?.reason || "none"}`);
+      return { narrative: fallback, status: "empty-output" };
+    }
+    const framed = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection);
+    if (!framed) {
+      console.warn(`[generation:${requestId}] invalid-output`);
+      return { narrative: fallback, status: "invalid-output" };
+    }
+    return { narrative: framed, status: "ai" };
+  } catch (error) {
+    const status = error instanceof Error && error.name === "AbortError" ? "timeout" : "network-error";
+    console.warn(`[generation:${requestId}] ${status}`);
+    return { narrative: fallback, status };
+  }
   finally { clearTimeout(timeout); }
+}
+
+export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch = fetch): Promise<Narrative> {
+  return (await generateNarrativeWithStatus(topics, fetcher)).narrative;
 }
 
 export const handler: Handler = async (event) => {
@@ -194,11 +221,20 @@ export const handler: Handler = async (event) => {
   try { body = JSON.parse(event.body || "{}"); } catch { body = null; }
   const parsed = GenerateRequestSchema.safeParse(body);
   if (!parsed.success) return { statusCode: 400, headers: headersFor(corsOrigin), body: JSON.stringify({ error: "Invalid request", requestId }) };
-  const narrative = await generateNarrative(parsed.data.topics);
+  const generation = await generateNarrativeWithStatus(parsed.data.topics, fetch, requestId);
+  const narrative = generation.narrative;
   const relevantIds = new Set(narrative.sections.flatMap((section) => section.evidenceRefs));
   const evidence = narrative.grounding === "candidate_validation"
     ? publicCandidateEvidence(relevantIds)
     : contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map(publicEvidenceView);
-  return { statusCode: 200, headers: headersFor(corsOrigin), body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, requestId }) };
+  return {
+    statusCode: 200,
+    headers: {
+      ...headersFor(corsOrigin),
+      "X-Portfolio-Generation-Status": generation.status,
+      ...(generation.upstreamStatus ? { "X-Portfolio-Upstream-Status": String(generation.upstreamStatus) } : {})
+    },
+    body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, requestId })
+  };
 };
 
