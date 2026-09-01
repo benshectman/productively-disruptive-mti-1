@@ -78,3 +78,4 @@ export function validateNarrativeEvidence(narrative: Narrative, allowedIds?: Set
   return narrative.sections.every((section) => section.evidenceRefs.every((id) => allowedIds ? allowedIds.has(id) : evidenceById.has(id)));
 }
 export const deterministicFallback = assembleNarrative;
+

@@ -51,3 +51,4 @@ For each candidate:
 Product work delivered by Ben's teams is intentionally written with leadership or team attribution. Directing a body of work does not imply that Ben personally performed every research, design, or implementation activity.
 
 The earlier `v0.1` file remains unchanged as an auditable migration snapshot.
+

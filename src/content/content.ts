@@ -40,3 +40,4 @@ export function validateContentReferences(packet: ContentPacket = contentPacket)
 export function publicEvidenceView(record: EvidenceRecord) {
   return { id: record.id, claim: record.claim, attribution: record.attribution, topics: record.topics };
 }
+

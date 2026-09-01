@@ -23,3 +23,4 @@ describe("deterministic topic selection", () => {
     expect(validateNarrativeEvidence(narrative)).toBe(true);
   });
 });
+

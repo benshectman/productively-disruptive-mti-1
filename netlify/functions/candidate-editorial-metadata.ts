@@ -72,3 +72,4 @@ export const candidateEditorialMetadata: Record<string, CandidateEditorialMetada
   "BF-C-079": { careerPeriod: "earlier", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["throughline"] },
   "BF-C-080": { careerPeriod: "earlier", portfolioSalience: "supporting", scope: "career_wide", narrativeRoles: ["throughline"] }
 };
+

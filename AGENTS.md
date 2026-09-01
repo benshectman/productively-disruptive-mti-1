@@ -8,3 +8,4 @@
 - Never expose `OPENAI_API_KEY` or other server secrets to client code.
 - Run `npm test` and `npm run build` before proposing deployment.
 - Do not deploy or change production environment variables without explicit approval.
+

@@ -24,3 +24,4 @@ describe("approved content integrity", () => {
     for (const record of contentPacket.evidence) expect(publicEvidenceView(record).attribution).toBe(record.attribution);
   });
 });
+

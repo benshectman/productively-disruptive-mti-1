@@ -174,3 +174,4 @@ export function App() {
     <EvidenceDialog presentation={evidencePresentation} onClose={() => setEvidencePresentation(null)}/>
   </>;
 }
+

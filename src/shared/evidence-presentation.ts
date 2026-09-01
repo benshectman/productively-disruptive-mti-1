@@ -29,3 +29,4 @@ export function evidencePointsLabel(count: number, grounding: GroundingMode): st
   if (grounding === "candidate_validation") return `${count} unapproved validation ${count === 1 ? "point" : "points"}`;
   return approvedPointsLabel(count);
 }
+

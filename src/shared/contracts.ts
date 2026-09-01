@@ -56,3 +56,4 @@ export type VisitorContext = VisitorConfiguration & {
   inlineExpansionsOpened: string[];
   deepDivesOpened: string[];
 };
+

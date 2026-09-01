@@ -34,3 +34,4 @@ export function headlineAcronymsAreExplained(headline: string, lead: string): bo
   const acronyms = headline.match(/\b[A-Z][A-Z&]+\b/g) || [];
   return acronyms.every((acronym) => allowed.has(acronym));
 }
+

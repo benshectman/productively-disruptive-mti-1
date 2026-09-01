@@ -249,3 +249,4 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
 export function assembleCandidateNarrative(topics: TopicId[], mode: CandidatePlannerMode = candidateNarrativePlannerMode()): Narrative {
   return mode === "legacy" ? assembleLegacyCandidateNarrative(topics) : assembleEditorialCandidateNarrative(topics);
 }
+

@@ -8,3 +8,4 @@ dist
 *.tsbuildinfo
 .npm-cache
 .DS_Store
+

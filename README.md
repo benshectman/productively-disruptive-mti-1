@@ -27,6 +27,8 @@ The complete experience works without an OpenAI key. Topic overlap and small tra
 
 If the generation function is unavailable, unconfigured, times out, encounters a network error, or returns invalid structured output, the client keeps this deterministic narrative without displaying a technical error.
 
+The model-call timeout is temporarily set to 30 seconds to distinguish timeout-driven fallbacks from structured-output validation failures. The sub-10-second experience target is intentionally deferred during this diagnostic period.
+
 ## AI-framed mode
 
 When `OPENAI_API_KEY` is configured, the existing Netlify function:
@@ -34,11 +36,11 @@ When `OPENAI_API_KEY` is configured, the existing Netlify function:
 1. validates the locked design system, theme, and topic IDs;
 2. deterministically selects relevant approved evidence;
 3. assigns only relevant approved evidence to each predetermined narrative section;
-4. asks the OpenAI Responses API only for rewritten headlines using strict JSON-schema output;
-5. validates the framing with Zod and merges it onto immutable deterministic section IDs, purposes, disclosures, details, and evidence references;
+4. asks the OpenAI Responses API for a short headline, concise lead, and fuller narrative detail using strict JSON-schema output;
+5. validates all generated fields with Zod and targeted grounding checks, then merges them onto immutable deterministic section IDs, purposes, disclosures, and evidence references;
 6. returns the bounded semantic narrative or the deterministic fallback.
 
-AI may vary headings and emphasis. Evidence-grounded summaries and connective sentences remain deterministic so model-authored paraphrasing cannot alter dates, metrics, attribution, or the relationship between claims. AI cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
+AI may generate headings, lead paragraphs, narrative detail, emphasis, and connective tissue using only the facts assigned to each section. The server rejects unsupported numbers and aggregated quantitative threshold claims, including the known regression that incorrectly described 114%, 85%, 122%, and a 104-point increase as all exceeding 100%. AI cannot choose section structure, evidence references, disclosure behavior, arbitrary markup, source artifacts, or unvalidated output.
 
 ### Reading hierarchy
 
@@ -90,3 +92,4 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 Routine work targets the persistent `develop` branch and uses Netlify Deploy Previews or its stable branch deploy. `main` is reserved for deliberate production releases, and production builds require a `[release]` marker in the final commit message. See [the deployment workflow](docs/deployment-workflow.md) for setup, testing, and release steps.
 
 MTI-1 is intentionally a learning prototype. It does not introduce persistence, authentication, analytics, freeform prompts, job-description uploads, embeddings, vector retrieval, a CMS, or additional renderers/themes.
+

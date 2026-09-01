@@ -17,3 +17,4 @@ describe("configuration and narrative contracts", () => {
     expect(NarrativeSchema.safeParse({ sections: [{ html: "<h1>unsafe</h1>" }] }).success).toBe(false);
   });
 });
+
