@@ -19,7 +19,7 @@ Knowledge-only source artifacts may ground server-side framing but their metadat
 
 ### BenFacts migration candidates
 
-The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The expanded review corpus is `src/content/candidates/ben-facts-migration.v0.2.json`: it preserves all 32 migrated records and adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
+The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The runtime review corpus is `src/content/candidates/ben-facts-migration.v0.3.json`: it preserves all 32 migrated records, adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews, and assigns `project_id` only to cleanly single-project facts. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
 ## Deterministic mode
 
@@ -57,7 +57,7 @@ The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `cand
 
 The browser never receives the candidate manifest, source references, filenames, hashes, internal excerpts, review notes, or evidence-strength rationale. Generated pages and evidence dialogs visibly identify the facts as unapproved validation candidates. The approved four-stage deep dive remains grounded in the approved MTI-1 packet.
 
-Candidate validation uses an editorial planner by default. It creates a stable audience-facing arc—About Ben → Recent Leadership → Proof in Practice → Career Throughline—then selects facts according to section fit, visitor-topic relevance, recency, portfolio salience, evidence strength, and non-repetition. Recent experience provides the center of gravity while earlier roles establish a longer career pattern. Provisional editorial guidance lives separately in the server-only `netlify/functions/candidate-editorial-metadata.ts`; it does not alter the candidate compendium or its approval status.
+Candidate validation uses an editorial planner by default. It creates a stable audience-facing arc—About Ben → Recent Leadership → Career Throughline → Proof in Practice—then selects facts according to section fit, visitor-topic relevance, recency, portfolio salience, evidence strength, and non-repetition. Recent experience provides the center of gravity while earlier roles establish a longer career pattern. Proof projects are selected before their facts are retrieved, and every mini-STAR proof item is validated against one `project_id` before its 25–45 word summary is rendered. Provisional editorial guidance lives separately in the server-only `netlify/functions/candidate-editorial-metadata.ts`; it does not alter the candidate compendium or its approval status.
 
 The previous flat-selection planner remains available as a rollback path. Set the Functions runtime variable `NARRATIVE_PLANNER_MODE=legacy` and redeploy to restore its selection behavior. Set it to `editorial` (or omit it) to use the new planner. Both planners return the same validated semantic narrative contract, and neither gives the model control of evidence selection, section structure, visitor labels, or rendering.
 
