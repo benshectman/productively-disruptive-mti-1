@@ -27,8 +27,8 @@ describe("headline, lead, and progressive depth", () => {
       expect(section.detail).not.toContain(section.summary);
       expect(headlineAcronymsAreExplained(section.headline, section.summary)).toBe(true);
     }
-    expect(narrative.sections[2].disclosure).toBe("deep-dive");
-    expect(narrative.sections[2].detail).toBeTruthy();
+    expect(narrative.sections[3].disclosure).toBe("deep-dive");
+    expect(narrative.sections[3].proof_items).toHaveLength(3);
   });
 
   it("also gives the approved fallback a lead and details on every block", () => {
@@ -86,6 +86,10 @@ describe("headline, lead, and progressive depth", () => {
     expect(app).toContain('aria-controls={`${section.id}-detail`}');
     expect(app).toContain('about ${section.headline}');
     expect(app).toContain("section.detail.split");
+    expect(app).toContain("section.proof_items.map");
+    expect(app).toContain("item.summary.narrative");
+    expect(app).not.toContain("item.situation.narrative");
+    expect(app).not.toContain("item.task.narrative");
   });
 });
 
