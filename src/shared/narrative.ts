@@ -52,16 +52,16 @@ export function assembleNarrative(topics: TopicId[]): Narrative {
       evidenceRefs: operatingRefs, disclosure: "inline"
     },
     {
-      id: "proof-to-scale", purpose: "transition", eyebrow: "Proof in practice",
-      headline: topics.includes("T-004") ? "Making design impact measurable" : "Proving the model and extending its reach",
-      summary: claims(scaleRefs.slice(0, 1)), detail: claims(scaleRefs.slice(1)),
-      evidenceRefs: scaleRefs, disclosure: "deep-dive"
-    },
-    {
       id: "institutionalized-capability", purpose: "story", eyebrow: "Career throughline",
       headline: topics.includes("T-004") ? "Measurement became part of the operating system" : "What the model became",
       summary: claims(matureRefs.slice(0, 1)), detail: claims(matureRefs.slice(1)),
       evidenceRefs: matureRefs, disclosure: "inline"
+    },
+    {
+      id: "proof-to-scale", purpose: "transition", eyebrow: "Proof in practice",
+      headline: topics.includes("T-004") ? "Making design impact measurable" : "Proving the model and extending its reach",
+      summary: claims(scaleRefs.slice(0, 1)), detail: claims(scaleRefs.slice(1)),
+      evidenceRefs: scaleRefs, disclosure: "deep-dive"
     }
   ];
   return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
