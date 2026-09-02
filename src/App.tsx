@@ -4,7 +4,8 @@ import { Carousel } from "@astryxdesign/core/Carousel";
 import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
 import { contentPacket } from "./content/content";
 import { assembleNarrative, buildDeepDiveNarrative } from "./shared/narrative";
-import { GenerateResponseSchema, type Narrative, type ProofItem, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
+import { GenerateResponseSchema, type GenerationDiagnostics, type Narrative, type ProofItem, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
+import { deterministicGenerationDiagnostics } from "./shared/generation-diagnostics";
 import { approvedEvidenceCatalog, buildEvidencePresentation, evidencePointsLabel, type EvidencePresentation } from "./shared/evidence-presentation";
 
 const endpoint = import.meta.env.VITE_GENERATE_ENDPOINT || "/.netlify/functions/generate";
@@ -72,8 +73,8 @@ function proofEvidenceRefs(item: ProofItem) {
   ])];
 }
 
-function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive, onEvidence, onReset }: {
-  narrative: Narrative; evidenceCatalog: PublicEvidence[]; context: VisitorContext; onContext: (value: VisitorContext) => void; onDeepDive: () => void; onEvidence: (refs: string[], contextLabel: string) => void; onReset: () => void;
+function Experience({ narrative, generationDiagnostics, diagnosticsEnabled, evidenceCatalog, context, onContext, onDeepDive, onEvidence, onReset }: {
+  narrative: Narrative; generationDiagnostics: GenerationDiagnostics; diagnosticsEnabled: boolean; evidenceCatalog: PublicEvidence[]; context: VisitorContext; onContext: (value: VisitorContext) => void; onDeepDive: () => void; onEvidence: (refs: string[], contextLabel: string) => void; onReset: () => void;
 }) {
   const selectedLabels = context.topics.map((id) => contentPacket.topics.find((topic) => topic.id === id)?.label).filter(Boolean);
   return <main className="experience" id="main-content">
@@ -82,7 +83,18 @@ function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive
       <button className="text-button" onClick={onReset}>Reshape experience</button>
     </header>
     <section className="narrative-intro"><p className="section-number">Your generated experience</p><h1>Design leadership,<br/><em>assembled for you.</em></h1><p>{narrative.grounding === "candidate_validation" ? "Validation mode: framed from unapproved candidate BenFacts so the expanded corpus can be evaluated before approval." : narrative.mode === "ai" ? "AI-framed from a bounded set of approved evidence." : "Assembled deterministically from approved evidence."}</p></section>
-    {narrative.grounding === "candidate_validation" && <aside className="validation-notice" role="note"><strong>Temporary validation corpus</strong><span>Claims in this experience are candidates under review and must not be treated as approved portfolio content.</span></aside>}
+    {(narrative.grounding === "candidate_validation" || diagnosticsEnabled) && <aside className={`validation-notice${diagnosticsEnabled ? " has-generation-diagnostics" : ""}`} role="note">
+      {narrative.grounding === "candidate_validation" && <><strong>Temporary validation corpus</strong><span>Claims in this experience are candidates under review and must not be treated as approved portfolio content.</span></>}
+      {diagnosticsEnabled && <div className="generation-diagnostics" data-generation-status={generationDiagnostics.status}>
+        <strong>Generation diagnostics</strong>
+        <span>{generationDiagnostics.generatedFields} of {generationDiagnostics.totalFields} fields generated · {generationDiagnostics.fallbackFields} fallback</span>
+        <span>{generationDiagnostics.aiSections} AI sections · {generationDiagnostics.mixedSections} mixed · {generationDiagnostics.fallbackSections} fallback</span>
+        <ul>{generationDiagnostics.sections.map((section) => <li key={section.id}>
+          <b>{narrative.sections.find((item) => item.id === section.id)?.eyebrow || section.id}</b>
+          <span>{section.status} · headline {section.fields.headline} · lead {section.fields.summary} · detail {section.fields.detail}</span>
+        </li>)}</ul>
+      </div>}
+    </aside>}
     <div className="narrative">
       {narrative.sections.map((section, index) => {
         const expanded = context.inlineExpansionsOpened.includes(section.id);
@@ -157,24 +169,27 @@ export function App() {
   const [step, setStep] = useState(0);
   const [context, setContext] = useState<VisitorContext>({ designSystem: "astryx", theme: "neutral", topics: [], inlineExpansionsOpened: [], deepDivesOpened: [] });
   const [narrative, setNarrative] = useState<Narrative>(() => assembleNarrative([]));
+  const [generationDiagnostics, setGenerationDiagnostics] = useState<GenerationDiagnostics>(() => deterministicGenerationDiagnostics(assembleNarrative([])));
   const [evidenceCatalog, setEvidenceCatalog] = useState<PublicEvidence[]>(approvedEvidenceCatalog);
   const [evidencePresentation, setEvidencePresentation] = useState<EvidencePresentation | null>(null);
 
   async function generate() {
     const fallback = assembleNarrative(context.topics as TopicId[]);
-    setNarrative(fallback); setEvidenceCatalog(approvedEvidenceCatalog); setStep(0); setView("generating");
+    setNarrative(fallback); setGenerationDiagnostics(deterministicGenerationDiagnostics(fallback)); setEvidenceCatalog(approvedEvidenceCatalog); setStep(0); setView("generating");
     const timers = [350, 800, 1300].map((delay, index) => window.setTimeout(() => setStep(index + 1), delay));
     try {
       const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ designSystem: context.designSystem, theme: context.theme, topics: context.topics }) });
       if (response.ok) {
         const generated = GenerateResponseSchema.parse(await response.json());
         setNarrative(generated.narrative);
+        setGenerationDiagnostics(generated.generation || deterministicGenerationDiagnostics(generated.narrative));
         setEvidenceCatalog(generated.evidence?.length ? generated.evidence : approvedEvidenceCatalog);
       }
     } catch { setNarrative(fallback); }
     finally { timers.forEach(window.clearTimeout); setView("experience"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   }
   const openDeepDive = () => { setContext((current) => ({ ...current, deepDivesOpened: current.deepDivesOpened.includes("S-001") ? current.deepDivesOpened : [...current.deepDivesOpened, "S-001"] })); setView("deep-dive"); window.scrollTo(0, 0); };
+  const diagnosticsEnabled = useMemo(() => new URLSearchParams(window.location.search).get("diagnostics") === "1", []);
   const openEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, evidenceCatalog));
   const openApprovedEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, approvedEvidenceCatalog));
   return <>
@@ -186,7 +201,7 @@ export function App() {
       <Generating step={step}/>
     )}
     {view === "experience" && (
-      <Experience narrative={narrative} evidenceCatalog={evidenceCatalog} context={context} onContext={setContext} onDeepDive={openDeepDive} onEvidence={openEvidence} onReset={() => setView("configure")}/>
+      <Experience narrative={narrative} generationDiagnostics={generationDiagnostics} diagnosticsEnabled={diagnosticsEnabled} evidenceCatalog={evidenceCatalog} context={context} onContext={setContext} onDeepDive={openDeepDive} onEvidence={openEvidence} onReset={() => setView("configure")}/>
     )}
     {view === "deep-dive" && (
       <DeepDive context={context} onEvidence={openApprovedEvidence} onBack={() => { setView("experience"); window.scrollTo(0, 0); }}/>
