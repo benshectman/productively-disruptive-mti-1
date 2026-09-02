@@ -14,3 +14,31 @@
   margin-top: 1rem;
 }
 
+.proof-items {
+  display: grid;
+  gap: 0;
+  max-width: 54rem;
+  border-top: 1px solid currentColor;
+}
+
+.proof-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid currentColor;
+}
+
+.proof-project {
+  margin: 0 0 .5rem;
+  font-size: .72rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.proof-item .summary {
+  margin: 0;
+}
+
+.proof-item .evidence-signal {
+  margin-bottom: 0;
+}
+
