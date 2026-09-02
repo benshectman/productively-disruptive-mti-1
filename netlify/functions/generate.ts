@@ -3,7 +3,8 @@ import crypto from "node:crypto";
 import { contentPacket, publicEvidenceView, sourceById } from "../../src/content/content";
 import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
-import { GenerateRequestSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
+import { GenerateRequestSchema, type GenerationDiagnostics, type GenerationSectionDiagnostics, type Narrative, type TopicId } from "../../src/shared/contracts";
+import { deterministicGenerationDiagnostics, summarizeGenerationDiagnostics } from "../../src/shared/generation-diagnostics";
 import { assembleCandidateNarrative, candidateValidationEnabled, candidateValidationIds, publicCandidateEvidence } from "./candidate-validation";
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
 
@@ -93,6 +94,7 @@ export function applyAiFraming(
   allowedIds?: Set<string>,
   evidenceTextBySection?: Map<string, string>,
   onReject?: (status: ValidationStatus) => void,
+  onProvenance?: (diagnostics: GenerationDiagnostics) => void,
 ): Narrative | null {
   const result = WireFramingSchema.safeParse(value);
   if (!result.success) { onReject?.("schema"); return null; }
@@ -100,6 +102,7 @@ export function applyAiFraming(
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) {
     onReject?.("section-ids"); return null;
   }
+  const provenance: Array<{ id: string; fields: GenerationSectionDiagnostics["fields"] }> = [];
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
@@ -110,9 +113,15 @@ export function applyAiFraming(
       const summary = summaryResult.success ? summaryResult.data : section.summary;
       const detail = detailResult.success ? detailResult.data : section.detail;
       const headlineResult = GeneratedHeadlineSchema.safeParse(framing.headline);
-      const headline = headlineResult.success && headlineAcronymsAreExplained(headlineResult.data, summary)
+      const headlineIsAi = headlineResult.success && headlineAcronymsAreExplained(headlineResult.data, summary);
+      const headline = headlineIsAi
         ? framing.headline
         : section.headline;
+      provenance.push({ id: section.id, fields: {
+        headline: headlineIsAi ? "ai" : "fallback",
+        summary: summaryResult.success ? "ai" : "fallback",
+        detail: detailResult.success ? "ai" : "fallback"
+      } });
       return { ...section, headline, summary, detail };
     })
   };
@@ -120,6 +129,7 @@ export function applyAiFraming(
     { summary: section.summary, detail: section.detail || "" }, evidenceTextBySection.get(section.id) || ""
   ))) { onReject?.("numeric-grounding"); return null; }
   if (!validateNarrativeEvidence(narrative, allowedIds)) { onReject?.("narrative-evidence"); return null; }
+  onProvenance?.(summarizeGenerationDiagnostics(provenance));
   return narrative;
 }
 
@@ -133,11 +143,12 @@ function constrainedEvidence(fallback: Narrative) {
 }
 
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
-Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
+Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
   const useCandidates = candidateValidationEnabled();
   const fallback = useCandidates ? assembleCandidateNarrative(topics) : assembleNarrative(topics);
+  const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
   const allowedIds = useCandidates ? candidateValidationIds : undefined;
-  if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key" };
+  if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key", diagnostics: fallbackDiagnostics };
   const evidence = constrainedEvidence(fallback);
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
     section.id,
@@ -195,7 +206,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: numbe
     });
     if (!response.ok) {
       console.warn(`[generation:${requestId}] upstream-error status=${response.status}`);
-      return { narrative: fallback, status: "upstream-error", upstreamStatus: response.status };
+      return { narrative: fallback, status: "upstream-error", diagnostics: fallbackDiagnostics, upstreamStatus: response.status };
     }
     const result = await response.json() as {
       output_text?: string;
@@ -207,19 +218,22 @@ Promise<{ narrative: Narrative; status: GenerationStatus; upstreamStatus?: numbe
     const text = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
     if (!text) {
       console.warn(`[generation:${requestId}] empty-output response_status=${result.status || "unknown"} error=${result.error?.code || "none"} incomplete=${result.incomplete_details?.reason || "none"}`);
-      return { narrative: fallback, status: "empty-output" };
+      return { narrative: fallback, status: "empty-output", diagnostics: fallbackDiagnostics };
     }
     let validationStatus: ValidationStatus | undefined;
-    const framed = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection, (status) => { validationStatus = status; });
+    let diagnostics = fallbackDiagnostics;
+    const framed = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection,
+      (status) => { validationStatus = status; },
+      (value) => { diagnostics = value; });
     if (!framed) {
       console.warn(`[generation:${requestId}] invalid-output validation=${validationStatus || "unknown"}`);
-      return { narrative: fallback, status: "invalid-output", validationStatus };
+      return { narrative: fallback, status: "invalid-output", diagnostics: fallbackDiagnostics, validationStatus };
     }
-    return { narrative: framed, status: "ai" };
+    return { narrative: framed, status: "ai", diagnostics };
   } catch (error) {
     const status = error instanceof Error && error.name === "AbortError" ? "timeout" : "network-error";
     console.warn(`[generation:${requestId}] ${status}`);
-    return { narrative: fallback, status };
+    return { narrative: fallback, status, diagnostics: fallbackDiagnostics };
   }
   finally { clearTimeout(timeout); }
 }
@@ -253,7 +267,7 @@ export const handler: Handler = async (event) => {
       ...(generation.upstreamStatus ? { "X-Portfolio-Upstream-Status": String(generation.upstreamStatus) } : {}),
       ...(generation.validationStatus ? { "X-Portfolio-Validation-Status": generation.validationStatus } : {})
     },
-    body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, requestId })
+    body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, generation: generation.diagnostics, requestId })
   };
 };
 

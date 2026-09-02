@@ -36,10 +36,34 @@ export const NarrativeSchema = z.object({
   requestId: z.string().optional()
 });
 
+export const GenerationFieldProvenanceSchema = z.enum(["ai", "fallback"]);
+export const GenerationOutcomeSchema = z.enum(["ai", "mixed", "fallback"]);
+export const GenerationSectionDiagnosticsSchema = z.object({
+  id: z.string().min(1).max(80),
+  status: GenerationOutcomeSchema,
+  fields: z.object({
+    headline: GenerationFieldProvenanceSchema,
+    summary: GenerationFieldProvenanceSchema,
+    detail: GenerationFieldProvenanceSchema
+  })
+});
+export const GenerationDiagnosticsSchema = z.object({
+  status: GenerationOutcomeSchema,
+  generatedFields: z.number().int().min(0).max(12),
+  fallbackFields: z.number().int().min(0).max(12),
+  totalFields: z.literal(12),
+  aiSections: z.number().int().min(0).max(4),
+  mixedSections: z.number().int().min(0).max(4),
+  fallbackSections: z.number().int().min(0).max(4),
+  totalSections: z.literal(4),
+  sections: z.array(GenerationSectionDiagnosticsSchema).length(4)
+});
+
 export const GenerateRequestSchema = VisitorConfigurationSchema;
 export const GenerateResponseSchema = z.object({
   narrative: NarrativeSchema,
   evidence: z.array(PublicEvidenceSchema).max(36).optional(),
+  generation: GenerationDiagnosticsSchema.optional(),
   requestId: z.string()
 });
 
@@ -50,6 +74,9 @@ export type Narrative = z.infer<typeof NarrativeSchema>;
 export type PublicEvidence = z.infer<typeof PublicEvidenceSchema>;
 export type Attribution = PublicEvidence["attribution"];
 export type GroundingMode = z.infer<typeof GroundingModeSchema>;
+export type GenerationFieldProvenance = z.infer<typeof GenerationFieldProvenanceSchema>;
+export type GenerationSectionDiagnostics = z.infer<typeof GenerationSectionDiagnosticsSchema>;
+export type GenerationDiagnostics = z.infer<typeof GenerationDiagnosticsSchema>;
 export type GenerateResponse = z.infer<typeof GenerateResponseSchema>;
 
 export type VisitorContext = VisitorConfiguration & {
