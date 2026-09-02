@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import legacy from "../src/content/legacy/ben-profile-v0.1-alpha.json";
 import migrationV01 from "../src/content/candidates/ben-facts-migration.v0.1.json";
-import migration from "../src/content/candidates/ben-facts-migration.v0.2.json";
+import migration from "../src/content/candidates/ben-facts-migration.v0.3.json";
 
 describe("BenFacts migration boundary", () => {
   const legacyProfileEntries = Object.values(legacy.profile).flat();
@@ -68,6 +68,14 @@ describe("BenFacts migration boundary", () => {
     expect(migration.candidates.every((candidate) => validStrengths.includes(candidate.evidence_strength))).toBe(true);
     expect(migration.candidates.every((candidate) => candidate.evidence_strength_rationale.length > 20)).toBe(true);
     expect(migration.candidates.some((candidate) => candidate.source_refs.length > 2)).toBe(true);
+  });
+
+  it("scopes only cleanly single-project facts with stable project ids", () => {
+    const projectFacts = migration.candidates.filter((candidate) => "project_id" in candidate);
+    expect(projectFacts).toHaveLength(19);
+    expect(projectFacts.every((candidate) => candidate.target_type === "project_candidate")).toBe(true);
+    expect(projectFacts.every((candidate) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(candidate.project_id!))).toBe(true);
+    expect(migration.candidates.find((candidate) => candidate.candidate_id === "BF-C-062")).not.toHaveProperty("project_id");
   });
 
   it("preserves leadership and team attribution for directed product work", () => {
