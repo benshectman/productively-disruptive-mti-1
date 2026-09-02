@@ -55,11 +55,14 @@ describe("headline, lead, and progressive depth", () => {
       .toEqual(narrative.sections.map(({ summary, detail }) => ({ summary, detail })));
   });
 
-  it("rejects a paragraph masquerading as a headline instead of clipping it", () => {
+  it("replaces a paragraph masquerading as a headline instead of clipping it", () => {
     const narrative = assembleEditorialCandidateNarrative([]);
     const framing = framingFor(narrative);
     framing.sections[1].headline = "He recently spearheaded the establishment and growth of a dedicated Experience Design Management Office within Johnson & Johnson to embed UX";
-    expect(applyAiFraming(framing, narrative, candidateValidationIds)).toBeNull();
+    const result = applyAiFraming(framing, narrative, candidateValidationIds);
+    expect(result?.mode).toBe("ai");
+    expect(result?.sections[1].headline).toBe(narrative.sections[1].headline);
+    expect(result?.sections[1].summary).toBe(framing.sections[1].summary);
   });
 
   it("replaces an unexplained headline acronym without discarding safe generated prose", () => {

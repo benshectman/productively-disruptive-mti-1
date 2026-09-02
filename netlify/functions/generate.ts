@@ -54,13 +54,16 @@ const generatedProseSchema = (minimum: number, maximum: number) => z.string().mi
   .refine((value) => !/<\/?[A-Za-z][^>]*>|(?:^|\s)(?:#{1,6}|[-*+]\s|```)|\b(?:E-\d{3}|BF-C-\d{3})\b/.test(value),
     "Generated prose must not contain markup or evidence IDs");
 
-const FramingSectionSchema = z.object({
+const WireFramingSectionSchema = z.object({
   id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
-  headline: GeneratedHeadlineSchema,
-  summary: generatedProseSchema(40, 900).refine((value) => value.trim().split(/\s+/).length <= 75, "Generated leads must stay concise"),
-  detail: generatedProseSchema(80, 1600)
+  headline: z.string(),
+  summary: z.string(),
+  detail: z.string()
 }).strict();
-const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
+const WireFramingSchema = z.object({ sections: z.array(WireFramingSectionSchema).length(4) }).strict();
+const GeneratedSummarySchema = generatedProseSchema(40, 900)
+  .refine((value) => value.trim().split(/\s+/).length <= 75, "Generated leads must stay concise");
+const GeneratedDetailSchema = generatedProseSchema(80, 1600);
 
 function numericTokens(text: string): string[] {
   return text.match(/(?<![A-Za-z])\$?\d[\d,]*(?:\.\d+)?(?:%|\s*percent(?:age points?)?|\s*(?:-| )?points?)?/gi) || [];
@@ -91,26 +94,31 @@ export function applyAiFraming(
   evidenceTextBySection?: Map<string, string>,
   onReject?: (status: ValidationStatus) => void,
 ): Narrative | null {
-  const result = FramingSchema.safeParse(value);
+  const result = WireFramingSchema.safeParse(value);
   if (!result.success) { onReject?.("schema"); return null; }
   const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) {
     onReject?.("section-ids"); return null;
   }
-  if (evidenceTextBySection && fallback.sections.some((section) => !generatedProseIsGrounded(
-    framingById.get(section.id as typeof result.data.sections[number]["id"])!, evidenceTextBySection.get(section.id) || ""
-  ))) { onReject?.("numeric-grounding"); return null; }
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
     sections: fallback.sections.map((section) => {
       const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
-      const headline = headlineAcronymsAreExplained(framing.headline, framing.summary)
+      const summaryResult = GeneratedSummarySchema.safeParse(framing.summary);
+      const detailResult = GeneratedDetailSchema.safeParse(framing.detail);
+      const summary = summaryResult.success ? summaryResult.data : section.summary;
+      const detail = detailResult.success ? detailResult.data : section.detail;
+      const headlineResult = GeneratedHeadlineSchema.safeParse(framing.headline);
+      const headline = headlineResult.success && headlineAcronymsAreExplained(headlineResult.data, summary)
         ? framing.headline
         : section.headline;
-      return { ...section, headline, summary: framing.summary, detail: framing.detail };
+      return { ...section, headline, summary, detail };
     })
   };
+  if (evidenceTextBySection && narrative.sections.some((section) => !generatedProseIsGrounded(
+    { summary: section.summary, detail: section.detail || "" }, evidenceTextBySection.get(section.id) || ""
+  ))) { onReject?.("numeric-grounding"); return null; }
   if (!validateNarrativeEvidence(narrative, allowedIds)) { onReject?.("narrative-evidence"); return null; }
   return narrative;
 }
