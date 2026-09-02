@@ -3,8 +3,16 @@ import crypto from "node:crypto";
 import { contentPacket, publicEvidenceView, sourceById } from "../../src/content/content";
 import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
-import { GenerateRequestSchema, type Narrative, type TopicId } from "../../src/shared/contracts";
-import { assembleCandidateNarrative, candidateValidationEnabled, candidateValidationIds, publicCandidateEvidence } from "./candidate-validation";
+import { GenerateRequestSchema, ProofItemSchema, type Narrative, type ProofItem, type TopicId } from "../../src/shared/contracts";
+import {
+  assembleCandidateNarrative,
+  candidateValidationEnabled,
+  candidateValidationIds,
+  proofItemEvidenceIds,
+  publicCandidateEvidence,
+  validateNarrativeProofProjects,
+  validateProofItemProjectEvidence
+} from "./candidate-validation";
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
@@ -54,6 +62,90 @@ const FramingSectionSchema = z.object({
 }).strict();
 const FramingSchema = z.object({ sections: z.array(FramingSectionSchema).length(4) }).strict();
 
+const generatedProofTextSchema = generatedProseSchema(1, 1200);
+const GeneratedProofItemSchema = ProofItemSchema.extend({
+  relevance: generatedProseSchema(1, 240),
+  situation: z.object({
+    narrative: generatedProofTextSchema,
+    evidence_fact_ids: z.array(z.string()).min(1).max(9)
+  }).strict(),
+  task: z.object({
+    narrative: generatedProofTextSchema,
+    evidence_fact_ids: z.array(z.string()).min(1).max(9)
+  }).strict(),
+  actions: z.array(z.object({
+    action: generatedProofTextSchema,
+    evidence_fact_ids: z.array(z.string()).min(1).max(9)
+  }).strict()).min(1).max(6),
+  results: z.array(z.object({
+    result: generatedProofTextSchema,
+    result_type: z.enum(["business_decision", "financial_impact", "experience_measurement", "delivery_output", "research_output", "adoption_or_reach", "other_documented_outcome"]),
+    evidence_fact_ids: z.array(z.string()).min(1).max(9)
+  }).strict()).min(1).max(6),
+  summary: z.object({
+    narrative: generatedProseSchema(1, 600).refine((value) => !/[.!?]\s+\S/.test(value), "Proof summaries must be one sentence")
+      .refine((value) => {
+        const words = value.trim().split(/\s+/).filter(Boolean).length;
+        return words >= 25 && words <= 45;
+      }, "Proof summaries must contain 25 to 45 words"),
+    evidence_fact_ids: z.array(z.string()).min(1).max(9)
+  }).strict()
+}).omit({ case_study_asset_id: true }).strict();
+
+function generatedProofItemJsonSchema(fallback: ProofItem) {
+  const allowedIds = proofItemEvidenceIds(fallback);
+  const evidenceIds = {
+    type: "array", minItems: 1, maxItems: 9,
+    items: { type: "string", enum: allowedIds }
+  };
+  const narrativeEvidence = {
+    type: "object", additionalProperties: false, required: ["narrative", "evidence_fact_ids"],
+    properties: {
+      narrative: { type: "string", minLength: 1, maxLength: 1200 },
+      evidence_fact_ids: evidenceIds
+    }
+  };
+  return {
+    type: "object", additionalProperties: false,
+    required: ["project_id", "project_name", "relevance", "situation", "task", "actions", "results", "summary"],
+    properties: {
+      project_id: { type: "string", enum: [fallback.project_id] },
+      project_name: { type: "string", enum: [fallback.project_name] },
+      relevance: { type: "string", minLength: 1, maxLength: 240 },
+      situation: narrativeEvidence,
+      task: narrativeEvidence,
+      actions: {
+        type: "array", minItems: 1, maxItems: 6,
+        items: {
+          type: "object", additionalProperties: false, required: ["action", "evidence_fact_ids"],
+          properties: {
+            action: { type: "string", minLength: 1, maxLength: 1200 },
+            evidence_fact_ids: evidenceIds
+          }
+        }
+      },
+      results: {
+        type: "array", minItems: 1, maxItems: 6,
+        items: {
+          type: "object", additionalProperties: false, required: ["result", "result_type", "evidence_fact_ids"],
+          properties: {
+            result: { type: "string", minLength: 1, maxLength: 1200 },
+            result_type: { type: "string", enum: ["business_decision", "financial_impact", "experience_measurement", "delivery_output", "research_output", "adoption_or_reach", "other_documented_outcome"] },
+            evidence_fact_ids: evidenceIds
+          }
+        }
+      },
+      summary: {
+        type: "object", additionalProperties: false, required: ["narrative", "evidence_fact_ids"],
+        properties: {
+          narrative: { type: "string", minLength: 40, maxLength: 600 },
+          evidence_fact_ids: evidenceIds
+        }
+      }
+    }
+  };
+}
+
 function numericTokens(text: string): string[] {
   return text.match(/(?<![A-Za-z])\$?\d[\d,]*(?:\.\d+)?(?:%|\s*percent(?:age points?)?|\s*(?:-| )?points?)?/gi) || [];
 }
@@ -63,9 +155,9 @@ function normalizedNumericToken(token: string): string {
     .replace(/percentagepoints?$/, "point").replace(/points?$/, "point").replace(/percent$/, "%");
 }
 
-function generatedProseIsGrounded(generated: { summary: string; detail: string }, evidenceText: string): boolean {
+function generatedTextIsGrounded(generatedText: string, evidenceText: string): boolean {
   const evidenceNumbers = new Set(numericTokens(evidenceText).map(normalizedNumericToken));
-  const numbersAreGrounded = numericTokens(`${generated.summary} ${generated.detail}`)
+  const numbersAreGrounded = numericTokens(generatedText)
     .every((token) => evidenceNumbers.has(normalizedNumericToken(token)));
   if (!numbersAreGrounded) return false;
 
@@ -73,7 +165,33 @@ function generatedProseIsGrounded(generated: { summary: string; detail: string }
   // distortion (114%, 85%, 122%, and 104 NPS points became "all over 100%").
   // Require quantitative comparisons to remain attached to individual measures.
   const unsupportedAggregate = /\b(all|each|every|both)\b[^.!?]{0,120}\b(over|above|exceed(?:ed|ing)?|more than|greater than|at least)\b[^.!?]{0,30}\d/i;
-  return !unsupportedAggregate.test(`${generated.summary} ${generated.detail}`);
+  return !unsupportedAggregate.test(generatedText);
+}
+
+function generatedProseIsGrounded(generated: { summary: string; detail: string }, evidenceText: string): boolean {
+  return generatedTextIsGrounded(`${generated.summary} ${generated.detail}`, evidenceText);
+}
+
+function proofItemText(item: ProofItem): string {
+  return [
+    item.relevance,
+    item.situation.narrative,
+    item.task.narrative,
+    ...item.actions.map((action) => action.action),
+    ...item.results.map((result) => result.result),
+    item.summary.narrative
+  ].join(" ");
+}
+
+export function applyAiProofItem(value: unknown, fallback: ProofItem, evidenceText: string): ProofItem | null {
+  const result = GeneratedProofItemSchema.safeParse(value);
+  if (!result.success) return null;
+  const generated = { ...result.data, relevance: fallback.relevance };
+  if (generated.project_id !== fallback.project_id || generated.project_name !== fallback.project_name) return null;
+  const allowedIds = new Set(proofItemEvidenceIds(fallback));
+  if (proofItemEvidenceIds(generated).some((id) => !allowedIds.has(id))) return null;
+  if (!validateProofItemProjectEvidence(generated) || !generatedTextIsGrounded(proofItemText(generated), evidenceText)) return null;
+  return ProofItemSchema.parse(generated);
 }
 
 export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?: Set<string>, evidenceTextBySection?: Map<string, string>): Narrative | null {
@@ -99,6 +217,22 @@ export function applyAiFraming(value: unknown, fallback: Narrative, allowedIds?:
   return validateNarrativeEvidence(narrative, allowedIds) ? narrative : null;
 }
 
+async function requestStructured(fetcher: typeof fetch, signal: AbortSignal, body: Record<string, unknown>): Promise<unknown | null> {
+  try {
+    const response = await fetcher("https://api.openai.com/v1/responses", {
+      method: "POST", signal,
+      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) return null;
+    const result = await response.json() as { output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }> };
+    const output = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
+    return output ? JSON.parse(output) : null;
+  } catch {
+    return null;
+  }
+}
+
 function constrainedEvidence(fallback: Narrative) {
   const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
   if (fallback.grounding === "candidate_validation") return publicCandidateEvidence(relevantIds);
@@ -121,16 +255,13 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
   try {
-    const response = await fetcher("https://api.openai.com/v1/responses", {
-      method: "POST", signal: controller.signal,
-      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const framingRequest = requestStructured(fetcher, controller.signal, {
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 2800,
         instructions: [
           "Write the headline, concise lead, and fuller detail for four sections of one continuous professional portfolio narrative.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
-          "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, show topic-relevant proof in practice, then connect it to the longer career throughline.",
-          "Make the sequence of headlines build from broad identity to recent leadership, proof, and career throughline. Do not repeat the same claim or construction.",
+          "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, connect it to the longer career throughline, then introduce topic-relevant proof in practice.",
+          "Make the sequence of headlines build from broad identity to recent leadership, career continuity, and proof. Do not repeat the same claim or construction.",
           useCandidates
             ? "This is an explicitly labeled validation run using unapproved candidate BenFacts. Use only the candidate facts assigned to each section; do not imply that they have been approved."
             : "Use only the approved proposition and evidence assigned to each section.",
@@ -142,6 +273,7 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
           "Claims supported only by first_person_attestation must not be described as independently documented.",
           "Make each lead a connected introduction of no more than 75 words. Make each detail add context and supporting examples rather than repeating the lead or concatenating facts.",
           "Make transitions across sections feel intentional, but do not add facts from one section to another.",
+          "For Proof in practice, write only general section framing. Do not mention, combine, or summarize any project-specific work, actions, outcomes, or metrics; separate project-scoped proof items are generated independently.",
           "Name the section's main idea in the headline. Do not try to summarize every supporting point in the title. Do not begin with He, She, or Ben.",
           "Target four to eight words, with a hard limit of three to nine words and sixty-four characters. Use a complete plain-English phrase; do not end with a preposition, conjunction, or article.",
           "Acronyms are welcome only when listed in that section's allowedAcronyms. Their supported expansions already appear in its visible lead paragraph. Do not expand them in the title or invent other abbreviations.",
@@ -162,17 +294,67 @@ export async function generateNarrative(topics: TopicId[], fetcher: typeof fetch
               : section.id === "operating-model" ? "recent leadership and organizational scale"
               : section.id === "proof-to-scale" ? "topic-relevant projects and outcomes"
               : "connection to earlier career experience",
-            evidence: evidence.filter((item) => section.evidenceRefs.includes(item.id))
+            evidence: section.id === "proof-to-scale" ? [] : evidence.filter((item) => section.evidenceRefs.includes(item.id))
           }))
         }),
         text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema } }
-      })
     });
-    if (!response.ok) return fallback;
-    const result = await response.json() as { output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }> };
-    const text = result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim();
-    if (!text) return fallback;
-    return applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection) || fallback;
+
+    const fallbackProofItems = fallback.sections.find((section) => section.id === "proof-to-scale")?.proof_items || [];
+    const proofRequests = useCandidates ? fallbackProofItems.map((item) => {
+      const projectEvidence = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id));
+      return requestStructured(fetcher, controller.signal, {
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1800,
+        instructions: [
+          "Generate one mini-STAR evidence model for exactly one professional project.",
+          "Use only the supplied evidence, which has already been restricted to one project_id. Do not use knowledge from any other project.",
+          "Return the supplied project_id and project_name unchanged. Preserve the supplied relevance unless a shorter equivalent is needed.",
+          "Every narrative, action, result, and summary must cite one or more supplied evidence_fact_ids. A fact may support more than one STAR field when the source is compact.",
+          "Preserve attribution exactly. Never turn team, shared-leadership, or organizational work into Ben's personal execution.",
+          "Do not invent accomplishments, actions, outcomes, metrics, dates, product descriptions, acronym expansions, causation, or corroboration.",
+          "Do not add a number unless that exact number appears in the supplied evidence. Preserve its unit and the measure it describes.",
+          "Never combine unlike measurements into one threshold or range. State each metric with its own measure.",
+          "Classify each result independently with the closest allowed result_type.",
+          "Write summary.narrative as one concise sentence of 25 to 45 words that compresses the supported situation, action, and result.",
+          "Do not return HTML, Markdown, evidence IDs inside prose, source metadata, or a case-study asset."
+        ].join(" "),
+        input: JSON.stringify({
+          selectedTopics: topics,
+          project_id: item.project_id,
+          project_name: item.project_name,
+          relevance: item.relevance,
+          evidence: projectEvidence
+        }),
+        text: {
+          format: {
+            type: "json_schema",
+            name: `proof_item_${item.project_id.replaceAll("-", "_")}`,
+            strict: true,
+            schema: generatedProofItemJsonSchema(item)
+          }
+        }
+      });
+    }) : [];
+
+    const [framingValue, ...proofValues] = await Promise.all([framingRequest, ...proofRequests]);
+    const framedNarrative = framingValue ? applyAiFraming(framingValue, fallback, allowedIds, evidenceTextBySection) : null;
+    const baseNarrative = framedNarrative || fallback;
+    let generatedProofCount = 0;
+    const proofItems = fallbackProofItems.map((item, index) => {
+      const evidenceText = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id)).map((record) => record.claim).join(" ");
+      const generated = proofValues[index] ? applyAiProofItem(proofValues[index], item, evidenceText) : null;
+      if (generated) generatedProofCount += 1;
+      return generated || item;
+    });
+    const narrative: Narrative = {
+      ...baseNarrative,
+      mode: framedNarrative || generatedProofCount ? "ai" : "deterministic",
+      sections: baseNarrative.sections.map((section) => section.id === "proof-to-scale" && proofItems.length
+        ? { ...section, proof_items: proofItems }
+        : section)
+    };
+    if (!validateNarrativeEvidence(narrative, allowedIds) || !validateNarrativeProofProjects(narrative)) return fallback;
+    return narrative;
   } catch { return fallback; }
   finally { clearTimeout(timeout); }
 }
