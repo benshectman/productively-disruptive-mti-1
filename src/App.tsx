@@ -4,7 +4,7 @@ import { Carousel } from "@astryxdesign/core/Carousel";
 import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
 import { contentPacket } from "./content/content";
 import { assembleNarrative, buildDeepDiveNarrative } from "./shared/narrative";
-import { GenerateResponseSchema, type Narrative, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
+import { GenerateResponseSchema, type Narrative, type ProofItem, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
 import { approvedEvidenceCatalog, buildEvidencePresentation, evidencePointsLabel, type EvidencePresentation } from "./shared/evidence-presentation";
 
 const endpoint = import.meta.env.VITE_GENERATE_ENDPOINT || "/.netlify/functions/generate";
@@ -62,6 +62,16 @@ function Generating({ step }: { step: number }) {
   </main>;
 }
 
+function proofEvidenceRefs(item: ProofItem) {
+  return [...new Set([
+    ...item.situation.evidence_fact_ids,
+    ...item.task.evidence_fact_ids,
+    ...item.actions.flatMap((action) => action.evidence_fact_ids),
+    ...item.results.flatMap((result) => result.evidence_fact_ids),
+    ...item.summary.evidence_fact_ids
+  ])];
+}
+
 function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive, onEvidence, onReset }: {
   narrative: Narrative; evidenceCatalog: PublicEvidence[]; context: VisitorContext; onContext: (value: VisitorContext) => void; onDeepDive: () => void; onEvidence: (refs: string[], contextLabel: string) => void; onReset: () => void;
 }) {
@@ -79,13 +89,23 @@ function Experience({ narrative, evidenceCatalog, context, onContext, onDeepDive
         return <article className={`narrative-block purpose-${section.purpose}`} key={section.id}>
           <div className="block-index">0{index + 1}</div>
           <div className="block-content">
-            <p className="purpose">{section.eyebrow}</p><h2>{section.headline}</h2><p className="summary">{section.summary}</p>
-            {section.detail && <>
+            <p className="purpose">{section.eyebrow}</p><h2>{section.headline}</h2>
+            {section.proof_items ? <div className="proof-items" aria-label="Selected project proof points">
+              {section.proof_items.map((item) => {
+                const refs = proofEvidenceRefs(item);
+                return <section className="proof-item" key={item.project_id}>
+                  <p className="proof-project">{item.project_name}</p>
+                  <p className="summary">{item.summary.narrative}</p>
+                  <EvidenceSignal refs={refs} contextLabel={item.project_name} catalog={evidenceCatalog} onOpen={onEvidence}/>
+                </section>;
+              })}
+            </div> : <p className="summary">{section.summary}</p>}
+            {section.detail && !section.proof_items && <>
               <button className="disclosure" aria-label={`${expanded ? "Show less" : "Tell me more"} about ${section.headline}`} aria-expanded={expanded} aria-controls={`${section.id}-detail`} onClick={() => onContext({ ...context, inlineExpansionsOpened: expanded ? context.inlineExpansionsOpened.filter((id) => id !== section.id) : [...context.inlineExpansionsOpened, section.id] })}>{expanded ? "Show less" : "Tell me more"} <span aria-hidden="true">{expanded ? "−" : "+"}</span></button>
               {expanded && <div className="inline-detail" id={`${section.id}-detail`}>{section.detail.split(/\n\n+/).map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}</div>}
             </>}
             {section.disclosure === "deep-dive" && <button className="deep-link" onClick={onDeepDive}>Explore how the XD model evolved <span aria-hidden="true">→</span></button>}
-            <EvidenceSignal refs={section.evidenceRefs} contextLabel={section.headline} catalog={evidenceCatalog} onOpen={onEvidence}/>
+            {!section.proof_items && <EvidenceSignal refs={section.evidenceRefs} contextLabel={section.headline} catalog={evidenceCatalog} onOpen={onEvidence}/>}
           </div>
         </article>;
       })}
