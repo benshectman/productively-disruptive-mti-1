@@ -3218,7 +3218,7 @@
     {
       "candidate_id": "BF-C-057",
       "original_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 people over a twelve-month period.",
-      "reviewed_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 people over a twelve-month period.",
+      "reviewed_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 global finance colleagues over a twelve-month period.",
       "attribution": "leadership",
       "topics": [
         "T-003",
@@ -3226,10 +3226,6 @@
       ],
       "project_id": "vital",
       "career_context_id": "jnj-2019-2025",
-      "period": {
-        "start_year": 2023,
-        "end_year": 2023
-      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3289,8 +3285,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:28:26.282Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3298,6 +3295,10 @@
         "atomicity_review": "review",
         "possible_overlap_refs": [],
         "notes": ""
+      },
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
       }
     },
     {
