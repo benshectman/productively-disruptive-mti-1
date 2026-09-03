@@ -2597,7 +2597,7 @@
     {
       "candidate_id": "BF-C-047",
       "original_text": "The 2025 chapter model promoted reusable assets—personas, journey maps or blueprints, research readouts, and experience metrics—to standardize user-centered practice, reduce rework, and increase consistency and velocity.",
-      "reviewed_text": "The 2025 chapter model promoted reusable assets—personas, journey maps or blueprints, research readouts, and experience metrics—to standardize user-centered practice, reduce rework, and increase consistency and velocity.",
+      "reviewed_text": "To standardize user-centered practices, reduce rework, and increase consistency and velocity, the 2025 chapter model promoted reusable assets such as personas, journey maps, service design blueprints, research readouts, and experience metrics.",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
@@ -2605,6 +2605,10 @@
         "T-004"
       ],
       "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2682,8 +2686,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:08:37.042Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
