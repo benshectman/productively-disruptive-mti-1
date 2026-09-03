@@ -9,11 +9,20 @@
 [context.production]
   ignore = "node ./scripts/netlify-ignore-production.mjs"
 
+[context.production.environment]
+  VITE_ENABLE_BENFACTS_EDITOR = "false"
+
 [context.deploy-preview]
   command = "npm run build"
 
+[context.deploy-preview.environment]
+  VITE_ENABLE_BENFACTS_EDITOR = "true"
+
 [context.develop]
   command = "npm run build"
+
+[context.develop.environment]
+  VITE_ENABLE_BENFACTS_EDITOR = "true"
 
 [dev]
   command = "npm run dev"

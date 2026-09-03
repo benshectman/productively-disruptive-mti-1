@@ -8,6 +8,8 @@
     "dev:netlify": "netlify dev",
     "build": "tsc -b && vite build --configLoader runner",
     "preview": "vite preview",
+    "benfacts:normalize": "node scripts/normalize-benfacts-review.mjs",
+    "benfacts:promote": "node scripts/promote-benfacts.mjs",
     "test": "vitest run --configLoader runner",
     "test:watch": "vitest --configLoader runner",
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs"
