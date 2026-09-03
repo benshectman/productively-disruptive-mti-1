@@ -3761,7 +3761,7 @@
     {
       "candidate_id": "BF-C-068",
       "original_text": "For the Comet Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
-      "reviewed_text": "For the Comet Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
+      "reviewed_text": "For the Quality Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
       "attribution": "leadership",
       "topics": [
         "T-003",
@@ -3803,9 +3803,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Preserve the source’s methodology and baseline qualifications when reviewing the numeric claims.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:31:53.120Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
