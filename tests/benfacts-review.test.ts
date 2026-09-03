@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import reviewJson from "../src/content/review/ben-facts-review.v1.json";
 import { BenFactsReviewCorpusSchema } from "../src/shared/benfacts-review";
+import { filterBenFacts, reconcileCurrentFactId, type BenFactsFilters } from "../src/shared/benfacts-navigation";
 import { promoteApprovedFacts } from "../src/shared/benfacts-promotion";
 import { similarFacts, similarityScore } from "../src/shared/benfacts-similarity";
 
 const corpus = BenFactsReviewCorpusSchema.parse(reviewJson);
+const allFilters: BenFactsFilters = { status: "all", topic: "all", project: "all", attribution: "all", origin: "all" };
 
 describe("BenFacts review corpus", () => {
   it("contains 147 unique candidates and none begin approved", () => {
@@ -48,3 +50,24 @@ describe("similar items", () => {
   });
 });
 
+describe("filtered navigation", () => {
+  it("keeps the current fact when it belongs to the filtered result set", () => {
+    const current = corpus.candidates[0];
+    const filtered = filterBenFacts(corpus.candidates, { ...allFilters, origin: current.origin });
+    expect(reconcileCurrentFactId(current.candidate_id, filtered)).toBe(current.candidate_id);
+  });
+
+  it("moves to the first match when the current fact is outside the filtered result set", () => {
+    const baseline = corpus.candidates.find((item) => item.origin === "baseline")!;
+    const filtered = filterBenFacts(corpus.candidates, { ...allFilters, origin: "expansion" });
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(reconcileCurrentFactId(baseline.candidate_id, filtered)).toBe(filtered[0].candidate_id);
+  });
+
+  it("keeps the current fact when no facts match", () => {
+    const current = corpus.candidates[0];
+    const filtered = filterBenFacts(corpus.candidates, { ...allFilters, project: "missing-project" });
+    expect(filtered).toHaveLength(0);
+    expect(reconcileCurrentFactId(current.candidate_id, filtered)).toBe(current.candidate_id);
+  });
+});

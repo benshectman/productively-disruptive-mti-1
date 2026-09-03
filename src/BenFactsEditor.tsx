@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import reviewJson from "./content/review/ben-facts-review.v1.json";
 import { BenFactsReviewCorpusSchema, type BenFactReview, type BenFactsReviewCorpus, type ReviewStatus } from "./shared/benfacts-review";
+import { filterBenFacts, reconcileCurrentFactId, type BenFactsFilters } from "./shared/benfacts-navigation";
 import { similarFacts } from "./shared/benfacts-similarity";
 import type { TopicId } from "./shared/contracts";
 
@@ -20,7 +21,7 @@ const attributionLabels = {
   organization: "Organization"
 } as const;
 type EditableFact = Pick<BenFactReview, "reviewed_text" | "attribution" | "topics" | "project_id" | "visibility">;
-type Filters = { status: ReviewStatus | "all"; topic: TopicId | "all"; project: string; attribution: BenFactReview["attribution"] | "all"; origin: BenFactReview["origin"] | "all" };
+type Filters = BenFactsFilters;
 const defaultFilters: Filters = { status: "unreviewed", topic: "all", project: "all", attribution: "all", origin: "all" };
 
 function editableFrom(record: BenFactReview): EditableFact {
@@ -54,13 +55,7 @@ export function BenFactsEditor() {
 
   const current = corpus.candidates.find((item) => item.candidate_id === currentId) ?? corpus.candidates[0];
   const projects = useMemo(() => [...new Set(corpus.candidates.map((item) => item.project_id).filter((value): value is string => Boolean(value)))].sort(), [corpus]);
-  const filtered = useMemo(() => corpus.candidates.filter((item) =>
-    (filters.status === "all" || item.review_status === filters.status) &&
-    (filters.topic === "all" || item.topics.includes(filters.topic)) &&
-    (filters.project === "all" || (filters.project === "none" ? !item.project_id : item.project_id === filters.project)) &&
-    (filters.attribution === "all" || item.attribution === filters.attribution) &&
-    (filters.origin === "all" || item.origin === filters.origin)
-  ), [corpus, filters]);
+  const filtered = useMemo(() => filterBenFacts(corpus.candidates, filters), [corpus, filters]);
   const currentIndex = filtered.findIndex((item) => item.candidate_id === currentId);
   const counts = useMemo(() => corpus.candidates.reduce((totals, item) => ({ ...totals, [item.review_status]: totals[item.review_status] + 1 }), { unreviewed: 0, approved: 0, hold: 0, rejected: 0 }), [corpus]);
   const reviewedCount = corpus.candidates.length - counts.unreviewed;
@@ -82,6 +77,14 @@ export function BenFactsEditor() {
   }, []);
 
   useEffect(() => { setDraft(readDraft(current)); }, [currentId, current]);
+  useEffect(() => {
+    const reconciledId = reconcileCurrentFactId(currentId, filtered);
+    if (reconciledId === currentId) return;
+    if (changed) localStorage.setItem(draftKey(current.candidate_id), JSON.stringify(draft));
+    setCurrentId(reconciledId);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.setTimeout(() => titleRef.current?.focus(), 0);
+  }, [changed, current.candidate_id, currentId, draft, filtered]);
   useEffect(() => {
     const timer = window.setTimeout(() => {
       if (changed) localStorage.setItem(draftKey(current.candidate_id), JSON.stringify(draft));
