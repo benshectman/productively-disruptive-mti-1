@@ -2890,11 +2890,12 @@
     {
       "candidate_id": "BF-C-051",
       "original_text": "The AskGS team used a mixed-method research program—knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents—to triangulate user frustrations in a colleague support portal.",
-      "reviewed_text": "The AskGS team used a mixed-method research program—knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents—to triangulate user frustrations in a colleague support portal.",
+      "reviewed_text": "For the AskGS product owner, the XD team used a mixed-method research program that spanned knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents to triangulate user frustrations in a colleague support portal.",
       "attribution": "leadership",
       "topics": [
         "T-003",
-        "T-004"
+        "T-004",
+        "T-002"
       ],
       "project_id": "askgs",
       "career_context_id": "jnj-2019-2025",
@@ -2920,8 +2921,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:11:53.580Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
