@@ -3458,8 +3458,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:22.495Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
