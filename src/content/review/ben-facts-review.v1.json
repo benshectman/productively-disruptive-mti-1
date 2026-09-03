@@ -2011,7 +2011,7 @@
     {
       "candidate_id": "BF-C-038",
       "original_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics.",
-      "reviewed_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics.",
+      "reviewed_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics and OKRs.",
       "attribution": "leadership",
       "topics": [
         "T-002",
@@ -2087,8 +2087,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:04.993Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
