@@ -2841,7 +2841,7 @@
     {
       "candidate_id": "BF-C-050",
       "original_text": "In July 2020, Ben hired a Product Experience Design Lead to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
-      "reviewed_text": "In July 2020, Ben hired a Product Experience Design Lead to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
+      "reviewed_text": "In July 2020, Ben hired a Product Experience Design Lead, his first of many full-time direct reports, to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -2875,8 +2875,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:10:39.413Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
