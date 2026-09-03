@@ -1783,7 +1783,7 @@
     {
       "candidate_id": "BF-C-035",
       "original_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities—summarized as ‘build the right things’ and ‘build those things right.’",
-      "reviewed_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities—summarized as ‘build the right things’ and ‘build those things right.’",
+      "reviewed_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities, focused on ‘build the right things’ and ‘build those things right.’",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
@@ -1843,8 +1843,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:03:08.960Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
