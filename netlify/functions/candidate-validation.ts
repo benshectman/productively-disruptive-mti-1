@@ -1,5 +1,5 @@
-import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.2.json";
-import { NarrativeSchema, type Attribution, type Narrative, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
+import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.3.json";
+import { NarrativeSchema, ProofItemSchema, type Attribution, type Narrative, type ProofItem, type ProofResultType, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
 import { candidateEditorialMetadata, type NarrativeRole } from "./candidate-editorial-metadata";
 import { expandPresentationAcronyms } from "../../src/shared/narrative-presentation";
 
@@ -12,6 +12,7 @@ type CandidateRecord = {
   visibility: string;
   attribution: Attribution | "undetermined" | "policy";
   evidence_strength: "1 - Poor" | "2 - Fair" | "3 - Good" | "4 - Strong";
+  project_id?: string;
 };
 
 const candidateManifest = candidateManifestJson as unknown as { candidates: CandidateRecord[] };
@@ -26,6 +27,18 @@ const candidates = candidateManifest.candidates.filter((candidate) =>
 );
 const candidateById = new Map(candidates.map((candidate) => [candidate.candidate_id, candidate]));
 export const candidateValidationIds = new Set(candidateById.keys());
+
+const PROJECT_NAMES: Record<string, string> = {
+  askgs: "AskGS",
+  spr: "Service Performance Reporting",
+  vital: "Vital",
+  "emarketplace-purchasing": "Enterprise purchasing experience",
+  "supplier-risk-sensing": "Supplier Risk Sensing",
+  "comet-change-control": "Comet Change Control",
+  "first-tpi-due-diligence": "FIRST third-party due diligence",
+  pqm360: "PQM360",
+  xiam: "External identity and access management"
+};
 
 const TOPIC_LABELS: Record<TopicId, string> = {
   "T-001": "Design Leadership",
@@ -47,6 +60,152 @@ const PROJECT_ANCHORS: Record<TopicId, string[]> = {
   "T-003": ["BF-C-053", "BF-C-057", "BF-C-060", "BF-C-062", "BF-C-069", "BF-C-072"],
   "T-004": ["BF-C-051", "BF-C-054", "BF-C-056", "BF-C-058", "BF-C-068", "BF-C-070"]
 };
+
+export type CandidateProofProject = {
+  project_id: string;
+  project_name: string;
+  relevance: string;
+  facts: CandidateRecord[];
+};
+
+const actionPattern = /\b(used|conducted|researched|embedded|prototyped|surveyed|combined|directed|redesign|workshops|aligned|analyzed|prepared|worked|produced|led)\b/i;
+const outcomePattern = /\b(helped|informed|reported|recommendations?|increase|improvement|results?|save|produced|development-ready|backlog|scores?|rose|reaching|used by)\b/i;
+
+function resultTypeFor(record: CandidateRecord): ProofResultType {
+  const claim = record.original_text;
+  if (/\$|save .*annually|financial/i.test(claim)) return "financial_impact";
+  if (/decid|vendor|re-platform/i.test(claim)) return "business_decision";
+  if (/usability|ease.of.use|usefulness|Net Promoter|response-rate|response rate/i.test(claim)) return "experience_measurement";
+  if (/recommendations?|frustration themes|research program/i.test(claim)) return "research_output";
+  if (/development-ready|design specification|prototype|interface designs|backlog/i.test(claim)) return "delivery_output";
+  if (/users?|people|countries|languages|adoption|reach/i.test(claim)) return "adoption_or_reach";
+  return "other_documented_outcome";
+}
+
+function proofSummary(records: CandidateRecord[]) {
+  const explicitOutcomes = records.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome");
+  const inferredOutcomes = records.filter((record) => outcomePattern.test(record.original_text));
+  const outcomePool = explicitOutcomes.length ? explicitOutcomes : inferredOutcomes.length ? inferredOutcomes : records;
+  const inRangeOutcome = outcomePool.filter((record) => {
+    const words = record.original_text.trim().split(/\s+/).length;
+    return words >= 25 && words <= 45;
+  });
+  const primary = (inRangeOutcome.length ? inRangeOutcome : outcomePool)
+    .sort((a, b) => strengthScore(b.evidence_strength) - strengthScore(a.evidence_strength))[0];
+  const primaryWords = primary.original_text.trim().split(/\s+/).length;
+  if (primaryWords >= 25 && primaryWords <= 45) {
+    return { narrative: primary.original_text, evidence_fact_ids: [primary.candidate_id] };
+  }
+
+  const action = records.find((record) => record !== primary && actionPattern.test(record.original_text));
+  if (action) {
+    const first = action.original_text.replace(/[.!?]+$/, "");
+    const second = primary.original_text.replace(/^([A-Z])/, (letter) => letter.toLowerCase());
+    const combined = `${first}; ${second}`;
+    const words = combined.trim().split(/\s+/).length;
+    if (words >= 25 && words <= 45) {
+      return { narrative: combined, evidence_fact_ids: [action.candidate_id, primary.candidate_id] };
+    }
+  }
+
+  const fallback = records.find((record) => {
+    const words = record.original_text.trim().split(/\s+/).length;
+    return words >= 25 && words <= 45;
+  }) || primary;
+  return { narrative: fallback.original_text, evidence_fact_ids: [fallback.candidate_id] };
+}
+
+function relevanceFor(records: CandidateRecord[], topics: TopicId[]) {
+  if (!topics.length) return "Selected as a strong, complete example for a balanced portfolio view.";
+  const matching = topics.filter((topic) => records.some((record) => record.proposed_topics.includes(topic)));
+  const labels = matching.map((topic) => TOPIC_LABELS[topic]);
+  return labels.length ? `Selected for its relevance to ${labels.join(" and ")}.` : "Selected as a complementary proof point.";
+}
+
+function projectScore(project: CandidateProofProject, topics: TopicId[]) {
+  const topicRelevance = topics.reduce((score, topic) => score + project.facts.filter((record) => record.proposed_topics.includes(topic)).length, 0);
+  const outcomes = project.facts.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
+  const outcomeStrength = outcomes.reduce((score, record) => score + strengthScore(record.evidence_strength), 0);
+  const recency = Math.max(...project.facts.map((record) => periodScore[candidateEditorialMetadata[record.candidate_id]?.careerPeriod || "earlier"]));
+  const evidenceCompleteness = project.facts.length * 10
+    + (project.facts.some((record) => actionPattern.test(record.original_text)) ? 5 : 0)
+    + (outcomes.length ? 5 : 0);
+  return [topicRelevance, outcomeStrength, recency, evidenceCompleteness] as const;
+}
+
+export function selectCandidateProofProjects(topics: TopicId[], limit = 3): CandidateProofProject[] {
+  const grouped = new Map<string, CandidateRecord[]>();
+  for (const record of candidates) {
+    if (record.target_type !== "project_candidate" || !record.project_id || !PROJECT_NAMES[record.project_id]) continue;
+    grouped.set(record.project_id, [...(grouped.get(record.project_id) || []), record]);
+  }
+  return [...grouped.entries()].map(([project_id, facts]) => ({
+    project_id,
+    project_name: PROJECT_NAMES[project_id],
+    relevance: relevanceFor(facts, topics),
+    facts: facts.sort((a, b) => a.candidate_id.localeCompare(b.candidate_id))
+  })).sort((a, b) => {
+    const left = projectScore(a, topics);
+    const right = projectScore(b, topics);
+    for (let index = 0; index < left.length; index += 1) {
+      if (left[index] !== right[index]) return right[index] - left[index];
+    }
+    return a.project_id.localeCompare(b.project_id);
+  }).slice(0, limit);
+}
+
+export function buildCandidateProofItem(project: CandidateProofProject): ProofItem {
+  const situationRecord = project.facts[0];
+  const taskRecord = project.facts.find((record) => actionPattern.test(record.original_text)) || situationRecord;
+  const actionRecords = project.facts.filter((record) => actionPattern.test(record.original_text));
+  const resultRecords = project.facts.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
+  const item = {
+    project_id: project.project_id,
+    project_name: project.project_name,
+    relevance: project.relevance,
+    situation: { narrative: situationRecord.original_text, evidence_fact_ids: [situationRecord.candidate_id] },
+    task: { narrative: taskRecord.original_text, evidence_fact_ids: [taskRecord.candidate_id] },
+    actions: (actionRecords.length ? actionRecords : [taskRecord]).map((record) => ({
+      action: record.original_text,
+      evidence_fact_ids: [record.candidate_id]
+    })),
+    results: (resultRecords.length ? resultRecords : [project.facts.at(-1)!]).map((record) => ({
+      result: record.original_text,
+      result_type: resultTypeFor(record),
+      evidence_fact_ids: [record.candidate_id]
+    })),
+    summary: proofSummary(project.facts)
+  };
+  return ProofItemSchema.parse(item);
+}
+
+export function proofItemEvidenceIds(item: ProofItem) {
+  return [...new Set([
+    ...item.situation.evidence_fact_ids,
+    ...item.task.evidence_fact_ids,
+    ...item.actions.flatMap((action) => action.evidence_fact_ids),
+    ...item.results.flatMap((result) => result.evidence_fact_ids),
+    ...item.summary.evidence_fact_ids
+  ])];
+}
+
+export function validateProofItemProjectEvidence(item: ProofItem): boolean {
+  const canonicalName = PROJECT_NAMES[item.project_id];
+  return canonicalName === item.project_name && proofItemEvidenceIds(item).every((id) => {
+    const record = candidateById.get(id);
+    return Boolean(record && record.project_id === item.project_id);
+  });
+}
+
+export function validateNarrativeProofProjects(narrative: Narrative): boolean {
+  return narrative.sections.every((section) => {
+    if (!section.proof_items) return true;
+    const sectionIds = new Set(section.evidenceRefs);
+    return section.id === "proof-to-scale" && section.proof_items.every((item) =>
+      validateProofItemProjectEvidence(item) && proofItemEvidenceIds(item).every((id) => sectionIds.has(id))
+    );
+  });
+}
 
 const strengthScore = (strength: CandidateRecord["evidence_strength"]) => Number(strength[0]);
 const topicScore = (candidate: CandidateRecord, topics: TopicId[]) =>
@@ -122,10 +281,8 @@ export function assembleLegacyCandidateNarrative(topics: TopicId[]): Narrative {
     preferredIds(PRACTICE_ANCHORS, topics, ["BF-C-036", "BF-C-037", "BF-C-038", "BF-C-039", "BF-C-046", "BF-C-047"]),
     ["evidence_candidate"], topics, 4, used
   );
-  const projects = pickCandidates(
-    preferredIds(PROJECT_ANCHORS, topics, ["BF-C-053", "BF-C-055", "BF-C-057", "BF-C-062", "BF-C-069"]),
-    ["project_candidate"], topics, 4, used
-  );
+  const proofItems = selectCandidateProofProjects(topics).map(buildCandidateProofItem);
+  const projects = proofItems.flatMap(proofItemEvidenceIds);
   const throughline = pickCandidates(
     ["BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079", "BF-C-080", "BF-C-075", "BF-C-074"],
     ["evidence_candidate", "career_record_candidate", "credential_candidate"], topics, 3, used
@@ -146,14 +303,16 @@ export function assembleLegacyCandidateNarrative(topics: TopicId[]): Narrative {
       summary: boundedText(practice.slice(0, 2), 900), evidenceRefs: practice.map((item) => item.candidate_id), disclosure: "none" as const
     },
     {
-      id: "proof-to-scale", purpose: "transition" as const, eyebrow: "Proof in practice",
-      headline: labels.length ? `${emphasis} in the work` : "Selected work, grounded in outcomes",
-      summary: boundedText(projects.slice(0, 2), 900), evidenceRefs: projects.map((item) => item.candidate_id), disclosure: "deep-dive" as const
-    },
-    {
       id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
       headline: "A throughline across products and organizations",
       summary: boundedText(throughline.slice(0, 2), 900), evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "none" as const
+    },
+    {
+      id: "proof-to-scale", purpose: "transition" as const, eyebrow: "Proof in practice",
+      headline: labels.length ? `${emphasis} in the work` : "Selected work, grounded in outcomes",
+      summary: "Selected projects connect a specific challenge and response to a documented outcome.",
+      detail: "Each proof point keeps its supporting situation, actions, and results within one project provenance boundary.",
+      evidenceRefs: [...new Set(projects)], proof_items: proofItems, disclosure: "deep-dive" as const
     }
   ];
   return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });
@@ -202,9 +361,7 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
   const recentLeadership = pickForRole("recent_leadership", topics, 4, used, preferredIds(
     PRACTICE_ANCHORS, topics, ["BF-C-043", "BF-C-036", "BF-C-046", "BF-C-049", "BF-C-039"]
   ));
-  const proof = pickForRole("proof", topics, 3, used, preferredIds(
-    PROJECT_ANCHORS, topics, ["BF-C-053", "BF-C-056", "BF-C-062", "BF-C-069"]
-  ));
+  const proofItems = selectCandidateProofProjects(topics).map(buildCandidateProofItem);
 
   const recentBridge = recordsFor(["BF-C-075"], used);
   recentBridge.forEach((candidate) => used.add(candidate.candidate_id));
@@ -226,24 +383,29 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
       evidenceRefs: recentLeadership.map((item) => item.candidate_id), disclosure: "inline" as const
     },
     {
+      id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
+      headline: "A pattern across roles and industries",
+      ...editorialCopy(throughline, "The recent work extends a longer career pattern.",
+        throughline.find((record) => candidateEditorialMetadata[record.candidate_id].careerPeriod === "earlier")),
+      evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "inline" as const
+    },
+    {
       id: "proof-to-scale", purpose: "transition" as const, eyebrow: "Proof in practice",
       headline: topics.includes("T-004") ? "Measuring the impact of design"
         : topics.includes("T-002") ? "Putting systems thinking into practice"
         : topics.includes("T-001") ? "Design leadership made concrete"
         : topics.includes("T-003") ? "Making complex enterprise products usable"
         : "The operating model in practice",
-      ...editorialCopy(proof),
-      evidenceRefs: proof.map((item) => item.candidate_id), disclosure: "deep-dive" as const
-    },
-    {
-      id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
-      headline: "A pattern across roles and industries",
-      ...editorialCopy(throughline, "The recent work extends a longer career pattern.",
-        throughline.find((record) => candidateEditorialMetadata[record.candidate_id].careerPeriod === "earlier")),
-      evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "inline" as const
+      summary: "Selected projects connect a specific challenge and response to a documented outcome.",
+      detail: "Together, these project-specific examples show how research, design, and measurement moved from a defined challenge to a documented outcome without blending evidence across products.",
+      evidenceRefs: [...new Set(proofItems.flatMap(proofItemEvidenceIds))],
+      proof_items: proofItems,
+      disclosure: "deep-dive" as const
     }
   ];
-  return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });
+  const narrative = NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });
+  if (!validateNarrativeProofProjects(narrative)) throw new Error("Candidate proof project validation failed");
+  return narrative;
 }
 
 export function assembleCandidateNarrative(topics: TopicId[], mode: CandidatePlannerMode = candidateNarrativePlannerMode()): Narrative {

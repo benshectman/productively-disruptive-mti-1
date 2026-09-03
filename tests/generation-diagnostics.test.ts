@@ -73,8 +73,8 @@ describe("generation diagnostics", () => {
     framing.sections[2].detail = "Too short";
     const diagnostics = validateWithDiagnostics(framing);
     expect(diagnostics).toMatchObject({ status: "mixed", generatedFields: 9, fallbackFields: 3, aiSections: 1, mixedSections: 3, fallbackSections: 0 });
-    expect(diagnostics.sections[0].fields.headline).toBe("fallback");
-    expect(diagnostics.sections[1].fields.summary).toBe("fallback");
-    expect(diagnostics.sections[2].fields.detail).toBe("fallback");
+    expect(diagnostics.sections.find((section) => section.id === framing.sections[0].id)?.fields.headline).toBe("fallback");
+    expect(diagnostics.sections.find((section) => section.id === framing.sections[1].id)?.fields.summary).toBe("fallback");
+    expect(diagnostics.sections.find((section) => section.id === framing.sections[2].id)?.fields.detail).toBe("fallback");
   });
 });
