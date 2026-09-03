@@ -1,0 +1,3714 @@
+{
+  "meta": {
+    "name": "BenFacts mechanically cleaned pre-approval queue",
+    "version": "0.2",
+    "status": "pending_human_truth_review",
+    "important": "No fact in this file is approved.",
+    "baseline_source": "ben-facts-migration.v0.3.json",
+    "expansion_source": "ben-facts-expansion-overlap-review.v0.2.json",
+    "baseline_original_count": 80,
+    "baseline_excluded_from_benfacts_queue": 5,
+    "baseline_clean_candidate_count": 83,
+    "expansion_original_count": 73,
+    "expansion_duplicates_excluded": 9,
+    "expansion_clean_candidate_count": 64,
+    "unified_clean_candidate_count": 147,
+    "mechanical_changes": {
+      "attribution_resolved_for_baseline_ids": 27,
+      "baseline_records_replaced_or_split": 9,
+      "baseline_exclusions": 5,
+      "expansion_duplicate_exclusions": 9
+    },
+    "approval_rule": "Human review must still confirm truth, public-shareability, final wording, and final attribution before promotion to approved BenFacts."
+  },
+  "baseline_exclusions": {
+    "BF-C-010": {
+      "reason": "Unsupported legacy SupplierHub record in the current supplied source set.",
+      "disposition": "hold_outside_approval_queue_until_corroborated"
+    },
+    "BF-C-027": {
+      "reason": "Unsupported 'Human-AI interaction and cognitive bias' topic in the current supplied source set.",
+      "disposition": "hold_outside_approval_queue_until_corroborated"
+    },
+    "BF-C-030": {
+      "reason": "Runtime grounding policy, not a biographical/professional BenFact.",
+      "disposition": "retain_as_runtime_policy_not_benfact"
+    },
+    "BF-C-031": {
+      "reason": "Runtime grounding policy, not a biographical/professional BenFact.",
+      "disposition": "retain_as_runtime_policy_not_benfact"
+    },
+    "BF-C-032": {
+      "reason": "Runtime privacy/grounding policy, not a biographical/professional BenFact.",
+      "disposition": "retain_as_runtime_policy_not_benfact"
+    }
+  },
+  "baseline_replacements": {
+    "BF-C-008": [
+      {
+        "candidate_id": "BF-C-008A",
+        "original_text": "At Johnson & Johnson, Ben directed a design-services portfolio exceeding $6 million.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-008"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic split of portfolio value from engagement count."
+      },
+      {
+        "candidate_id": "BF-C-008B",
+        "original_text": "At Johnson & Johnson, Ben's design-services portfolio included more than 45 UX design engagements.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-008"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic split of engagement count from portfolio value."
+      }
+    ],
+    "BF-C-011": [
+      {
+        "candidate_id": "BF-C-011A",
+        "original_text": "Ben directed Experience Design support for Service Performance Reporting, an analytics product for Global Services.",
+        "attribution": "leadership",
+        "proposed_topics": [
+          "T-001",
+          "T-003",
+          "T-004"
+        ],
+        "source_inheritance": [
+          "BF-C-011",
+          "BF-C-054",
+          "BF-C-055",
+          "BF-C-056"
+        ],
+        "project_id": "spr",
+        "status": "pending_review",
+        "reason": "Separates Service Performance Reporting from the unrelated supply-chain Digital Twin portfolio."
+      },
+      {
+        "candidate_id": "BF-C-011B",
+        "original_text": "Ben directed Experience Design support for a portfolio of MedTech Supply Chain digital-twin and control-tower products.",
+        "attribution": "leadership",
+        "proposed_topics": [
+          "T-001",
+          "T-002",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-011",
+          "BF-C-062",
+          "BF-C-063",
+          "BF-C-064",
+          "BF-C-065"
+        ],
+        "status": "pending_review",
+        "reason": "Separates supply-chain Digital Twin/control-tower work from Service Performance Reporting."
+      }
+    ],
+    "BF-C-021": [
+      {
+        "candidate_id": "BF-C-021A",
+        "original_text": "Ben served as Senior Manager, User Experience at Pfizer from 2006 to 2011.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-021",
+          "BF-C-080"
+        ],
+        "status": "pending_review",
+        "reason": "Replaces vague bundled wording with the specific supported Pfizer role."
+      }
+    ],
+    "BF-C-025": [
+      {
+        "candidate_id": "BF-C-025A",
+        "original_text": "Ben holds Pragmatic Marketing Level 2 (PMC-II) certification.",
+        "attribution": "personal",
+        "proposed_topics": [],
+        "source_inheritance": [
+          "BF-C-025"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic credential split."
+      },
+      {
+        "candidate_id": "BF-C-025B",
+        "original_text": "Ben is a Simplexity Applied Creativity Facilitator through Basadur.",
+        "attribution": "personal",
+        "proposed_topics": [],
+        "source_inheritance": [
+          "BF-C-025"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic credential split."
+      },
+      {
+        "candidate_id": "BF-C-025C",
+        "original_text": "Ben completed Design Leadership training through Cooper.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001"
+        ],
+        "source_inheritance": [
+          "BF-C-025"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic credential split."
+      }
+    ],
+    "BF-C-044": [
+      {
+        "candidate_id": "BF-C-044R",
+        "original_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-044"
+        ],
+        "status": "pending_review",
+        "review_note": "The precise period behind the year-over-year figure still requires Ben's truth confirmation before approval.",
+        "reason": "Removes the duplicated 45+ engagement count and makes the source/qualification explicit."
+      }
+    ],
+    "BF-C-061": [
+      {
+        "candidate_id": "BF-C-061R",
+        "original_text": "The enterprise purchasing team estimated that redesigned email and status-page experiences could produce approximately $345,000 to $629,000 in annual savings through reduced service-center contacts and buyer effort.",
+        "attribution": "team",
+        "proposed_topics": [
+          "T-003",
+          "T-004"
+        ],
+        "project_id": "emarketplace-purchasing",
+        "source_inheritance": [
+          "BF-C-061"
+        ],
+        "status": "pending_review",
+        "review_note": "Forecasted value, not a realized outcome.",
+        "reason": "Preserves the source's forecast range rather than collapsing it into a single midpoint estimate."
+      }
+    ],
+    "BF-C-064": [
+      {
+        "candidate_id": "BF-C-064A",
+        "original_text": "The SWIFT control-tower design process included more than 30 user-feedback sessions over roughly three months.",
+        "attribution": "team",
+        "proposed_topics": [
+          "T-003",
+          "T-004"
+        ],
+        "project_id": "sage-swift",
+        "source_inheritance": [
+          "BF-C-064"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic project split."
+      },
+      {
+        "candidate_id": "BF-C-064B",
+        "original_text": "The Integrate control-tower design team ran about 70 user sessions across 2023 and 2024 to refine requirements and designs.",
+        "attribution": "team",
+        "proposed_topics": [
+          "T-003",
+          "T-004"
+        ],
+        "project_id": "sage-integrate",
+        "source_inheritance": [
+          "BF-C-064"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic project split."
+      },
+      {
+        "candidate_id": "BF-C-064C",
+        "original_text": "The ORC control-tower design process included roughly a dozen user sessions to refine the product concept and wireframes.",
+        "attribution": "team",
+        "proposed_topics": [
+          "T-003",
+          "T-004"
+        ],
+        "project_id": "sage-orc",
+        "source_inheritance": [
+          "BF-C-064"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic project split."
+      }
+    ],
+    "BF-C-070": [
+      {
+        "candidate_id": "BF-C-070R",
+        "original_text": "Across separate FIRST usability studies with different participant groups, reported usefulness/usability scores were 25%/33% for the current system, 80%/80% for an early prototype, 82.5%/90% in a later pre-release study, and 75%/73% in a 173-participant survey.",
+        "attribution": "team",
+        "proposed_topics": [
+          "T-003",
+          "T-004"
+        ],
+        "project_id": "first-tpi-due-diligence",
+        "source_inheritance": [
+          "BF-C-070"
+        ],
+        "status": "pending_review",
+        "review_note": "These were separate studies with different participant groups; do not present them as one controlled before/after experiment.",
+        "reason": "Clarifies chronology and study comparability."
+      }
+    ],
+    "BF-C-080": [
+      {
+        "candidate_id": "BF-C-080A",
+        "original_text": "Ben served as Senior Information Architect at BusinessEdge Solutions from 2005 to 2006.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-080"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic earlier-career role."
+      },
+      {
+        "candidate_id": "BF-C-080B",
+        "original_text": "Ben served as Chief Experience Architect at OmniModis Design / OX Interactive from 2001 to 2005.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-080"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic earlier-career role."
+      },
+      {
+        "candidate_id": "BF-C-080C",
+        "original_text": "Ben served as Manager, Customer Experience at Mainspring, an IBM company, from 2000 to 2001.",
+        "attribution": "personal",
+        "proposed_topics": [
+          "T-001",
+          "T-003"
+        ],
+        "source_inheritance": [
+          "BF-C-080"
+        ],
+        "status": "pending_review",
+        "reason": "Atomic earlier-career role."
+      }
+    ]
+  },
+  "baseline_queue": [
+    {
+      "candidate_id": "BF-C-001",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-002",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-003",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-004",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-005",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-006",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-007",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-009",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "leadership"
+    },
+    {
+      "candidate_id": "BF-C-012",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-013",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-014",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-015",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-016",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-017",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-018",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-019",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-020",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-022",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-023",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-024",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-026",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-028",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-029",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review",
+      "resolved_attribution": "personal"
+    },
+    {
+      "candidate_id": "BF-C-033",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-034",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-035",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-036",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-037",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-038",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-039",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-040",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-041",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-042",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-043",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-045",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-046",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-047",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-048",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-049",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-050",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-051",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-052",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-053",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-054",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-055",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-056",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-057",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-058",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-059",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-060",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-062",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-063",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-065",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-066",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-067",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-068",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-069",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-071",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-072",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-073",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-074",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-075",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-076",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-077",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-078",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-079",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "status": "pending_review",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-008A",
+      "original_text": "At Johnson & Johnson, Ben directed a design-services portfolio exceeding $6 million.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-008"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic split of portfolio value from engagement count.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-008",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-008B",
+      "original_text": "At Johnson & Johnson, Ben's design-services portfolio included more than 45 UX design engagements.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-008"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic split of engagement count from portfolio value.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-008",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-011A",
+      "original_text": "Ben directed Experience Design support for Service Performance Reporting, an analytics product for Global Services.",
+      "attribution": "leadership",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "source_inheritance": [
+        "BF-C-011",
+        "BF-C-054",
+        "BF-C-055",
+        "BF-C-056"
+      ],
+      "project_id": "spr",
+      "status": "pending_review",
+      "reason": "Separates Service Performance Reporting from the unrelated supply-chain Digital Twin portfolio.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-011",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-011B",
+      "original_text": "Ben directed Experience Design support for a portfolio of MedTech Supply Chain digital-twin and control-tower products.",
+      "attribution": "leadership",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-011",
+        "BF-C-062",
+        "BF-C-063",
+        "BF-C-064",
+        "BF-C-065"
+      ],
+      "status": "pending_review",
+      "reason": "Separates supply-chain Digital Twin/control-tower work from Service Performance Reporting.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-011",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-021A",
+      "original_text": "Ben served as Senior Manager, User Experience at Pfizer from 2006 to 2011.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-021",
+        "BF-C-080"
+      ],
+      "status": "pending_review",
+      "reason": "Replaces vague bundled wording with the specific supported Pfizer role.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-021",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-025A",
+      "original_text": "Ben holds Pragmatic Marketing Level 2 (PMC-II) certification.",
+      "attribution": "personal",
+      "proposed_topics": [],
+      "source_inheritance": [
+        "BF-C-025"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic credential split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-025",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-025B",
+      "original_text": "Ben is a Simplexity Applied Creativity Facilitator through Basadur.",
+      "attribution": "personal",
+      "proposed_topics": [],
+      "source_inheritance": [
+        "BF-C-025"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic credential split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-025",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-025C",
+      "original_text": "Ben completed Design Leadership training through Cooper.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001"
+      ],
+      "source_inheritance": [
+        "BF-C-025"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic credential split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-025",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-044R",
+      "original_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-044"
+      ],
+      "status": "pending_review",
+      "review_note": "The precise period behind the year-over-year figure still requires Ben's truth confirmation before approval.",
+      "reason": "Removes the duplicated 45+ engagement count and makes the source/qualification explicit.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-044",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-061R",
+      "original_text": "The enterprise purchasing team estimated that redesigned email and status-page experiences could produce approximately $345,000 to $629,000 in annual savings through reduced service-center contacts and buyer effort.",
+      "attribution": "team",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "source_inheritance": [
+        "BF-C-061"
+      ],
+      "status": "pending_review",
+      "review_note": "Forecasted value, not a realized outcome.",
+      "reason": "Preserves the source's forecast range rather than collapsing it into a single midpoint estimate.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-061",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-064A",
+      "original_text": "The SWIFT control-tower design process included more than 30 user-feedback sessions over roughly three months.",
+      "attribution": "team",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-swift",
+      "source_inheritance": [
+        "BF-C-064"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic project split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-064",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-064B",
+      "original_text": "The Integrate control-tower design team ran about 70 user sessions across 2023 and 2024 to refine requirements and designs.",
+      "attribution": "team",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-integrate",
+      "source_inheritance": [
+        "BF-C-064"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic project split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-064",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-064C",
+      "original_text": "The ORC control-tower design process included roughly a dozen user sessions to refine the product concept and wireframes.",
+      "attribution": "team",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-orc",
+      "source_inheritance": [
+        "BF-C-064"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic project split.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-064",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-070R",
+      "original_text": "Across separate FIRST usability studies with different participant groups, reported usefulness/usability scores were 25%/33% for the current system, 80%/80% for an early prototype, 82.5%/90% in a later pre-release study, and 75%/73% in a 173-participant survey.",
+      "attribution": "team",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "source_inheritance": [
+        "BF-C-070"
+      ],
+      "status": "pending_review",
+      "review_note": "These were separate studies with different participant groups; do not present them as one controlled before/after experiment.",
+      "reason": "Clarifies chronology and study comparability.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-070",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-080A",
+      "original_text": "Ben served as Senior Information Architect at BusinessEdge Solutions from 2005 to 2006.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-080"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic earlier-career role.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-080",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-080B",
+      "original_text": "Ben served as Chief Experience Architect at OmniModis Design / OX Interactive from 2001 to 2005.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-080"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic earlier-career role.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-080",
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-C-080C",
+      "original_text": "Ben served as Manager, Customer Experience at Mainspring, an IBM company, from 2000 to 2001.",
+      "attribution": "personal",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "source_inheritance": [
+        "BF-C-080"
+      ],
+      "status": "pending_review",
+      "reason": "Atomic earlier-career role.",
+      "source_record": "ben-facts-migration.v0.3.json",
+      "replaces_candidate_id": "BF-C-080",
+      "mechanical_status": "ready_for_human_truth_review"
+    }
+  ],
+  "expansion_queue": [
+    {
+      "candidate_id": "BF-X-001",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2020 Experience Design operating model gave XD a portfolio-level role in helping domains prioritize product investments by identifying investments that addressed the greatest user needs using qualitative and quantitative evidence.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-035",
+          "BF-C-038"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-002",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2020 operating model assigned XD a discovery role in identifying strong new-product opportunities by engaging directly with users before teams committed to building.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-035"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-003",
+      "target_type": "evidence_candidate",
+      "original_text": "The Experience Design model used rapid prototyping and iterative experience-quality testing to help product squads design and deploy solutions that addressed user problems.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-035",
+          "BF-C-037"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-005",
+      "target_type": "evidence_candidate",
+      "original_text": "Domain Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-037",
+          "BF-C-013"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-007",
+      "target_type": "evidence_candidate",
+      "original_text": "By 2022, the practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 28
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-039",
+          "BF-C-074"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-008",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2022 Experience Design model framed people centricity around customers, patients, employees, and partners rather than treating workforce UX as a screen-design problem alone.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 9
+            },
+            {
+              "kind": "page",
+              "number": 10
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-011",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 XD Chapter explicitly defined four service families: Experience Strategy, User Research, Design, and UX Measurement.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-075"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-012",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Chapter operating model asked whether XD was supporting the right priorities, using the right mix of services, building the right skills, carrying sufficient capacity, and influencing people centricity beyond direct XD involvement.",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-013",
+      "target_type": "evidence_candidate",
+      "original_text": "The Chapter's 2025 governance model set portfolio-level experience key results for both products with embedded XD and priority products without embedded XD.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "This is a governance fact, not a claim that the target values were achieved."
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-039"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-014",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Chapter set a goal for priority products to maintain reusable experience assets such as personas, journeys or blueprints, and user research in a shared repository.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Target/operating-goal fact; do not present as achieved coverage."
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-047"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-015",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Chapter used design-system adoption as an explicit operating objective, treating shared UI patterns as a measurable mechanism for consistency and scale.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Target/operating-goal fact; do not present target percentage as achieved."
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-013",
+          "BF-C-048"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-016",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Chapter model explicitly included training and coaching people outside the XD Chapter so user-centered practices could scale beyond direct designer involvement.",
+      "proposed_topics": [
+        "T-001",
+        "T-002"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-047",
+          "BF-C-049"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-017",
+      "target_type": "evidence_candidate",
+      "original_text": "A 2025 Chapter innovation session split participants into groups to experiment with five GenAI tools for tasks including research planning, measurement definition, visual creation, animation, and wireframing.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 137
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-012"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-018",
+      "target_type": "evidence_candidate",
+      "original_text": "In that 2025 GenAI innovation session, participants' self-reported comfort with GenAI increased from 6.9 before the session to 8 afterward.",
+      "proposed_topics": [
+        "T-001",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "shared_leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 137
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Self-reported workshop measure; do not generalize beyond the session."
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-012"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-019",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Information Security XD portfolio Ben co-presented used all four XD service types across its five products, with strategy and design on all five and research and measurement on three.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 23
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-045"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-020",
+      "target_type": "evidence_candidate",
+      "original_text": "The 2025 Information Security portfolio explicitly treated even back-end products as experiences with customers whose outcomes could be measured.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 23
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-046"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-021",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research found that users often needed prior institutional knowledge or experience with similar platforms to use the portal efficiently.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-022",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research identified search as a core frustration because users struggled to locate content efficiently and effectively.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-023",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research found that content relevance, specificity, accuracy, and freshness were recurring sources of user frustration.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-024",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research identified ticket intake as a problem when users could not self-serve and had to move into support processes.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-025",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research found that users had difficulty tracking the status and progress of service requests.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-026",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research identified orchestration as an opportunity to help users complete tasks without relying on agent assistance.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-027",
+      "target_type": "project_candidate",
+      "original_text": "AskGS research identified language as an accessibility and usability issue for users whose preferred language was not English.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "askgs",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-052"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-029",
+      "target_type": "project_candidate",
+      "original_text": "Service Performance Reporting research established a design principle that metric definitions and calculation context should be visible within dashboards rather than left implicit.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "spr",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-054"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-030",
+      "target_type": "project_candidate",
+      "original_text": "SPR design principles called for dashboards to surface meaningful insights, patterns, anomalies, and suggested courses of action rather than only display raw metrics.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "spr",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-054"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-031",
+      "target_type": "project_candidate",
+      "original_text": "SPR design principles included social features that let users capture, annotate, and share specific graphs to support conversation and action.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "spr",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-054"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-032",
+      "target_type": "project_candidate",
+      "original_text": "SPR design principles supported personalization and progressive drill-down, including rearranging visualizations, filtered views, timelines, and navigation from summary information into specific subcategories.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "spr",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-054"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-034",
+      "target_type": "project_candidate",
+      "original_text": "Vital used a dual-track product-development approach so Experience Design could continue researching and designing enhancements while development progressed.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 49
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "vital",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-041",
+          "BF-C-057"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-035",
+      "target_type": "project_candidate",
+      "original_text": "Vital's ongoing research program included five quarterly surveys and nine rounds of qualitative interviews.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "vital",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-058"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-036",
+      "target_type": "project_candidate",
+      "original_text": "Across the documented Vital research program, the team collected 98 survey responses and conducted 51 sixty-minute qualitative interviews.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "vital",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-058"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-037",
+      "target_type": "project_candidate",
+      "original_text": "Vital research generated more than 110 product recommendations from user findings.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "vital",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-058"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-039",
+      "target_type": "project_candidate",
+      "original_text": "Vital stakeholders reported that a new access-request experience reduced a process that had previously taken several days to a matter of minutes.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Stakeholder-reported qualitative outcome, not independently measured in this source."
+      },
+      "project_id": "vital",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-057"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-040",
+      "target_type": "project_candidate",
+      "original_text": "The legacy FIRST third-party due-diligence system represented an $18 million prior investment but still had major usability and risk-management shortcomings.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "first-tpi-due-diligence",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-069"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-041",
+      "target_type": "project_candidate",
+      "original_text": "FIRST's legacy experience was described as complex and difficult to learn, a significant problem because many of its users interacted with the system infrequently.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "first-tpi-due-diligence",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-069"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-042",
+      "target_type": "project_candidate",
+      "original_text": "The FIRST redesign included ongoing consultation with the development team to preserve UX specifications despite technical constraints.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "first-tpi-due-diligence",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-069"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-043",
+      "target_type": "project_candidate",
+      "original_text": "PQM360 was intended to centralize data from a broad set of repositories, accelerate record recovery and data collection, support templated and custom reporting, and help users identify product trends and events.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "pqm360",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-071"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-044",
+      "target_type": "project_candidate",
+      "original_text": "When XD joined PQM360 after its fourth release, the engagement focused on adoption, data-collection efficiency, and an industry-standard end-to-end user experience rather than a greenfield redesign.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "pqm360",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-071"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-045",
+      "target_type": "project_candidate",
+      "original_text": "Supplier Risk Sensing addressed an event-management process that was labor-intensive, reactive, and siloed across procurement and sector teams.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "supplier-risk-sensing",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-067"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-046",
+      "target_type": "project_candidate",
+      "original_text": "Supplier Risk Sensing was designed for Supply Chain Managers, Chief Procurement Officers, and Category Managers, with event-impact summaries, mitigation suggestions, customizable alerts, and reporting.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "supplier-risk-sensing",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-067"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-047",
+      "target_type": "project_candidate",
+      "original_text": "The xIAM portal vision was to provide a central point of access across J&J applications with a unified login experience and stronger security.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "xiam",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-072"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-048",
+      "target_type": "project_candidate",
+      "original_text": "xIAM was intended to let users see applications they were registered for, track pending approvals, switch between applications, and search for applications more efficiently.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "xiam",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-072"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-050",
+      "target_type": "project_candidate",
+      "original_text": "The Comet Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "comet-change-control",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-068"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-051",
+      "target_type": "project_candidate",
+      "original_text": "The legacy Comet quality-management workflow was sequential and siloed, increasing cycle time, limiting analytics, and creating redundant training and manual rework.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "comet-change-control",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-068"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-052",
+      "target_type": "project_candidate",
+      "original_text": "Experience Design was embedded with the Comet program from Q1 through Q3 2023 before program funding for XD ended in Q4.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "comet-change-control",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-068"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-053",
+      "target_type": "project_candidate",
+      "original_text": "In the Comet research program, half of survey respondents provided comments and 32% agreed to be contacted for additional feedback.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "comet-change-control",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-068"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-054",
+      "target_type": "project_candidate",
+      "original_text": "The eMarketplace research baseline reported a UMUX-Lite score of 58 for the purchase-request and purchase-order status experience, below the cited industry benchmark of 68.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "emarketplace-purchasing",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-060"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-055",
+      "target_type": "project_candidate",
+      "original_text": "The purchasing journey included substantial communication overhead: the team estimated that a typical purchase could generate roughly 10 to 15 emails.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Source presents this as an estimate."
+      },
+      "project_id": "emarketplace-purchasing",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-060"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-056",
+      "target_type": "project_candidate",
+      "original_text": "The Buying Assistant concept was designed to reduce dependence on procurement 'tribal knowledge' by guiding users toward the appropriate purchasing category based on information they entered.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "emarketplace-purchasing",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-060"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-057",
+      "target_type": "project_candidate",
+      "original_text": "Across MedTech Supply Chain, the control-tower portfolio shared recurring goals of reducing backorder, reducing order aging, reducing cost to serve, and improving workforce efficiency and satisfaction.",
+      "proposed_topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "sage-control-towers",
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-063"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-058",
+      "target_type": "project_candidate",
+      "original_text": "The control-tower design approach refined business requirements through generative research, iterated concepts with users during design, supported data-mapping refinement, and stayed involved during development when blockers emerged.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "leadership",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "sage-control-towers",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-062",
+          "BF-C-064"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-060",
+      "target_type": "project_candidate",
+      "original_text": "SWIFT included forward-looking shortage visibility, proactive personalized alerts, what-if modeling for product movement, and a collaborative workspace for resolving backorder issues.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "sage-swift",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-064"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-061",
+      "target_type": "project_candidate",
+      "original_text": "The Vision Control Tower was created in a business that had been managing a nine-digit backorder problem for multiple years.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "team",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "4 - Strong",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "project_id": "vision-control-tower",
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-063"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-062",
+      "target_type": "evidence_candidate",
+      "original_text": "At Crestron, Ben's UX remit spanned enterprise, residential, mobile, and dealer-facing configuration experiences across a combined hardware, software, and services ecosystem.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-017",
+          "BF-C-077"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-063",
+      "target_type": "evidence_candidate",
+      "original_text": "At Crestron, Ben managed internal UX designers and agency partners producing research, flows, prototypes, and implementation-ready interface specifications.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-017",
+          "BF-C-077"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-064",
+      "target_type": "evidence_candidate",
+      "original_text": "At REDI, Ben's research program combined contextual inquiry, behavioral-data analysis, usability studies, and quantitative research for complex institutional-trading workflows.",
+      "proposed_topics": [
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-078"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-065",
+      "target_type": "evidence_candidate",
+      "original_text": "At REDI, Ben translated research into UX architecture, interaction models, personas, and prioritized improvements for professional trading workflows.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-078"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-066",
+      "target_type": "evidence_candidate",
+      "original_text": "At REDI, Ben facilitated design studios to explore future-state product opportunities and align stakeholders around potential experience directions.",
+      "proposed_topics": [
+        "T-001",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-078"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-067",
+      "target_type": "evidence_candidate",
+      "original_text": "At REDI, Ben developed the strategy for a customer self-service portal intended to improve access to product resources and scale customer engagement.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-078"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-068",
+      "target_type": "evidence_candidate",
+      "original_text": "REDI initiatives associated with Ben's UX strategy were forecast to return more than $1 million in annual revenue.",
+      "proposed_topics": [
+        "T-001",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Forecasted value, not realized value."
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-018",
+          "BF-C-078"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-069",
+      "target_type": "evidence_candidate",
+      "original_text": "Sparta Systems was a roughly $90 million B2B enterprise SaaS company serving regulated quality-management workflows when Ben built its internal UX function.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-019",
+          "BF-C-079"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-070",
+      "target_type": "evidence_candidate",
+      "original_text": "At Sparta, Ben's UX remit included TrackWise, a configurable no-code workflow platform used to build pages, forms, and process-driven enterprise workflows.",
+      "proposed_topics": [
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-019",
+          "BF-C-079"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-071",
+      "target_type": "evidence_candidate",
+      "original_text": "At Sparta, Ben established a Customer Engagement Program supporting qualitative and quantitative voice-of-customer research, satisfaction tracking, and the company's first formal usability-testing program.",
+      "proposed_topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-079",
+          "BF-C-022"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-072",
+      "target_type": "evidence_candidate",
+      "original_text": "At Sparta, Ben championed Lean UX so discovery, prototyping, and user validation could be integrated more tightly into Agile product delivery.",
+      "proposed_topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": ""
+      },
+      "overlap_review": {
+        "classification": "useful_atomic_decomposition",
+        "baseline_overlap_refs": [
+          "BF-C-023",
+          "BF-C-079"
+        ],
+        "rationale": "Substantively overlaps a broader existing fact, but isolates a reusable detail that can increase narrative specificity and reduce repetition.",
+        "recommended_action": "promote_to_review_queue_as_atomic_child"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    },
+    {
+      "candidate_id": "BF-X-073",
+      "target_type": "evidence_candidate",
+      "original_text": "Sparta's UX (R)evolution initiative was forecast to return more than $2 million in annual revenue.",
+      "proposed_topics": [
+        "T-001",
+        "T-004"
+      ],
+      "status": "pending_review",
+      "visibility": "proposed_shareable",
+      "attribution": "personal",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "evidence_strength": "3 - Good",
+      "review": {
+        "source_corroboration_required": false,
+        "atomicity_review": "review",
+        "possible_overlap_refs": [],
+        "notes": "Forecasted value, not realized value."
+      },
+      "overlap_review": {
+        "classification": "strong_net_new",
+        "baseline_overlap_refs": [
+          "BF-C-019",
+          "BF-C-079"
+        ],
+        "rationale": "Adds a distinct mechanism, context, method, scope, feature, outcome, or career detail not represented as a standalone fact in the current 80-candidate corpus.",
+        "recommended_action": "promote_to_review_queue"
+      },
+      "mechanical_status": "ready_for_human_truth_review"
+    }
+  ]
+}
