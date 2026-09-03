@@ -3371,9 +3371,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Approve only with the stated geography, time period, and confidence caveat preserved.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:04.645Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
