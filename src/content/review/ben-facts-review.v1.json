@@ -11,7 +11,7 @@
     {
       "candidate_id": "BF-C-001",
       "original_text": "Ben Shectman is an executive UX and product design leader with more than 20 years of professional experience.",
-      "reviewed_text": "Ben Shectman is an executive UX and product design leader with more than 20 years of professional experience.",
+      "reviewed_text": "Ben Shectman is an executive UX and Product Design leader with more than 20 years of professional experience.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -35,9 +35,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T03:43:31.598Z",
       "target_type": "proposition_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
