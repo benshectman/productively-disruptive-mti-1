@@ -1495,9 +1495,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "rejected",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T03:54:31.699Z",
       "target_type": "topic_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
