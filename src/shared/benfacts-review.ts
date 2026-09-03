@@ -16,6 +16,15 @@ export const SourceRefSchema = z.object({
   locations: z.array(SourceLocationSchema).default([])
 }).passthrough();
 
+export const CareerPeriodSchema = z.object({
+  start_year: z.number().int().min(1900).max(2100).optional(),
+  end_year: z.number().int().min(1900).max(2100).optional()
+}).strict().refine((period) => period.start_year !== undefined || period.end_year !== undefined, {
+  message: "A specific period must include a start year or end year"
+}).refine((period) => period.start_year === undefined || period.end_year === undefined || period.start_year <= period.end_year, {
+  message: "Specific period start year cannot be after end year"
+});
+
 export const BenFactReviewSchema = z.object({
   candidate_id: z.string().regex(/^BF-[CX]-\d{3}[A-Z]?$/),
   original_text: z.string().min(1),
@@ -23,6 +32,8 @@ export const BenFactReviewSchema = z.object({
   attribution: AttributionSchema,
   topics: z.array(TopicIdSchema).max(4),
   project_id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+  career_context_id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+  period: CareerPeriodSchema.optional(),
   visibility: ReviewVisibilitySchema,
   source_refs: z.array(SourceRefSchema),
   evidence_strength: z.string().optional(),
@@ -60,4 +71,3 @@ export const BenFactsReviewCorpusSchema = z.object({
 export type BenFactReview = z.infer<typeof BenFactReviewSchema>;
 export type BenFactsReviewCorpus = z.infer<typeof BenFactsReviewCorpusSchema>;
 export type ReviewStatus = z.infer<typeof ReviewStatusSchema>;
-
