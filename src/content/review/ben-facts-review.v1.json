@@ -1158,7 +1158,7 @@
     {
       "candidate_id": "BF-C-020",
       "original_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
-      "reviewed_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
+      "reviewed_text": "Ben served as Practice Lead, Digital Strategy at EMC2 Global Consulting between 2011 to 2012.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -1183,9 +1183,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:00:37.122Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
