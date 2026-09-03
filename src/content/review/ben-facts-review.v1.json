@@ -1110,7 +1110,7 @@
     {
       "candidate_id": "BF-C-019",
       "original_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
-      "reviewed_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
+      "reviewed_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise SaaS, on-prem and mobile solutions.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -1135,9 +1135,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:58:38.780Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
