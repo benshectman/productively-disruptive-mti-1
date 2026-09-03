@@ -99,7 +99,7 @@ describe("temporary candidate BenFacts validation mode", () => {
     }
   );
 
-  it("recognizes every attribution-safe project_id in the v0.3 runtime corpus", () => {
+  it("recognizes every attribution-safe project_id in the v0.4 runtime corpus", () => {
     const selected = selectCandidateProofProjects([], Number.POSITIVE_INFINITY);
     expect(selected.map((project) => project.project_id).sort()).toEqual([
       "askgs",
