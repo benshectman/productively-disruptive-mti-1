@@ -70,6 +70,9 @@ export const candidateEditorialMetadata: Record<string, CandidateEditorialMetada
   "BF-C-077": { careerPeriod: "earlier", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["throughline"] },
   "BF-C-078": { careerPeriod: "earlier", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["throughline"] },
   "BF-C-079": { careerPeriod: "earlier", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["throughline"] },
-  "BF-C-080": { careerPeriod: "earlier", portfolioSalience: "supporting", scope: "career_wide", narrativeRoles: ["throughline"] }
+  "BF-C-080": { careerPeriod: "earlier", portfolioSalience: "supporting", scope: "career_wide", narrativeRoles: ["throughline"] },
+  "BF-C-081": { careerPeriod: "earlier", portfolioSalience: "supporting", scope: "role", narrativeRoles: ["throughline"] },
+  "BF-C-082": { careerPeriod: "earlier", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["throughline"] },
+  "BF-C-083": { careerPeriod: "earlier", portfolioSalience: "supporting", scope: "role", narrativeRoles: ["throughline"] }
 };
 

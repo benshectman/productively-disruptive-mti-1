@@ -19,7 +19,7 @@ Knowledge-only source artifacts may ground server-side framing but their metadat
 
 ### BenFacts migration candidates
 
-The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The runtime review corpus is `src/content/candidates/ben-facts-migration.v0.3.json`: it preserves all 32 migrated records, adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews, and assigns `project_id` only to cleanly single-project facts. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
+The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The runtime review corpus is `src/content/candidates/ben-facts-migration.v0.4.json`: it preserves all 32 migrated records, includes 51 source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews, and assigns `project_id` only to cleanly single-project facts. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
 ## Deterministic mode
 
@@ -53,7 +53,7 @@ Headlines may use supported abbreviations such as J&J or XD only when the visibl
 
 ## Temporary candidate-validation mode
 
-The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `candidates`. In this explicit validation mode, deterministic topic selection and optional AI framing use only the sanitized wording, candidate ID, attribution, and topic tags from source-derived records `BF-C-033` through `BF-C-080`.
+The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `candidates`. In this explicit validation mode, deterministic topic selection and optional AI framing use only the sanitized wording, candidate ID, attribution, and topic tags from source-derived records `BF-C-033` through `BF-C-083`.
 
 The browser never receives the candidate manifest, source references, filenames, hashes, internal excerpts, review notes, or evidence-strength rationale. Generated pages and evidence dialogs visibly identify the facts as unapproved validation candidates. The approved four-stage deep dive remains grounded in the approved MTI-1 packet.
 
