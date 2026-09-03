@@ -1,5 +1,6 @@
 import type { Handler } from "@netlify/functions";
 import { BenFactsReviewCorpusSchema } from "../../src/shared/benfacts-review";
+import { applyCareerContextDefaults, validateCareerPeriod } from "../../src/shared/benfacts-career-context";
 
 const REVIEW_PATH = "src/content/review/ben-facts-review.v1.json";
 const jsonHeaders = { "Content-Type": "application/json", "Cache-Control": "no-store" };
@@ -33,17 +34,20 @@ export const handler: Handler = async (event) => {
       const response = await githubRequest(`${url}?ref=${encodeURIComponent(branch)}`);
       if (!response.ok) return { statusCode: response.status, headers: jsonHeaders, body: JSON.stringify({ error: "Could not load the review corpus from GitHub" }) };
       const payload = await response.json() as { content: string; sha: string };
-      const corpus = BenFactsReviewCorpusSchema.parse(JSON.parse(Buffer.from(payload.content.replace(/\s/g, ""), "base64").toString("utf8")));
+      const parsed = BenFactsReviewCorpusSchema.parse(JSON.parse(Buffer.from(payload.content.replace(/\s/g, ""), "base64").toString("utf8")));
+      const corpus = applyCareerContextDefaults(parsed);
       return { statusCode: 200, headers: jsonHeaders, body: JSON.stringify({ corpus, sha: payload.sha, branch }) };
     }
 
     if (event.httpMethod === "PUT") {
       if (!token) return { statusCode: 503, headers: jsonHeaders, body: JSON.stringify({ error: "GitHub persistence is not configured" }) };
       const body = JSON.parse(event.body || "{}");
-      const corpus = BenFactsReviewCorpusSchema.parse(body.corpus);
+      const corpus = applyCareerContextDefaults(BenFactsReviewCorpusSchema.parse(body.corpus));
       if (typeof body.expectedSha !== "string" || !body.expectedSha) return { statusCode: 400, headers: jsonHeaders, body: JSON.stringify({ error: "The expected GitHub SHA is required" }) };
       const candidate = corpus.candidates.find((item) => item.candidate_id === body.candidateId);
       if (!candidate) return { statusCode: 400, headers: jsonHeaders, body: JSON.stringify({ error: "The reviewed candidate was not found" }) };
+      const periodError = validateCareerPeriod(candidate);
+      if (periodError) return { statusCode: 400, headers: jsonHeaders, body: JSON.stringify({ error: periodError }) };
       const edited = candidate.reviewed_text !== candidate.original_text;
       const message = `Review ${candidate.candidate_id}: ${candidate.review_status}${edited && candidate.review_status === "approved" ? " with edits" : ""}`;
       const response = await githubRequest(url, {
@@ -70,4 +74,3 @@ export const handler: Handler = async (event) => {
 };
 
 export default handler;
-
