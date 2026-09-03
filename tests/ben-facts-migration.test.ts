@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import legacy from "../src/content/legacy/ben-profile-v0.1-alpha.json";
 import migrationV01 from "../src/content/candidates/ben-facts-migration.v0.1.json";
-import migration from "../src/content/candidates/ben-facts-migration.v0.3.json";
+import migration from "../src/content/candidates/ben-facts-migration.v0.4.json";
 
 describe("BenFacts migration boundary", () => {
   const legacyProfileEntries = Object.values(legacy.profile).flat();
@@ -17,6 +17,15 @@ describe("BenFacts migration boundary", () => {
     expect(migration.summary.legacy_candidates).toBe(32);
     expect(migration.summary.source_derived_candidates).toBeGreaterThan(40);
     expect(migration.candidates).toHaveLength(migration.summary.total_candidates);
+    expect(migration.summary.total_candidates).toBe(83);
+    expect(migration.summary.source_derived_candidates).toBe(51);
+  });
+
+  it("adds the three Crestron career facts in v0.4", () => {
+    const additions = migration.candidates.filter((candidate) => ["BF-C-081", "BF-C-082", "BF-C-083"].includes(candidate.candidate_id));
+    expect(additions).toHaveLength(3);
+    expect(additions.every((candidate) => candidate.target_type === "evidence_candidate")).toBe(true);
+    expect(additions.every((candidate) => candidate.source_refs.some((source) => source.source_id === "SRC-BF-006"))).toBe(true);
   });
 
   it("preserves every legacy UUID and original wording exactly once", () => {
