@@ -3479,6 +3479,7 @@
         "T-001",
         "T-003"
       ],
+      "project_id": "sage-swift",
       "career_context_id": "jnj-2019-2025",
       "period": {
         "start_year": 2022,
@@ -3523,8 +3524,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:40.740Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
