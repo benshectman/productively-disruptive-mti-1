@@ -1,8 +1,8 @@
 # BenFacts candidate review
 
-The review corpus is `src/content/candidates/ben-facts-migration.v0.3.json`. It contains the 32 records preserved from the earlier Ben-GPT profile plus 48 additional candidates derived from 22 supplied source files. Version 0.3 adds stable `project_id` values only where a record can be scoped to one product or project; mixed and portfolio-level records remain unassigned.
+The review corpus is `src/content/candidates/ben-facts-migration.v0.4.json`. It contains the 32 records preserved from the earlier Ben-GPT profile plus 51 additional candidates derived from 22 supplied source files. Version 0.4 preserves the project scoping introduced in v0.3 and adds three Crestron career-evidence candidates from the current résumé.
 
-All 80 records remain candidates. They are outside the approved MTI-1 content packet, are not loaded by the portfolio, and are not sent to OpenAI.
+All 83 records remain candidates. They are outside the approved MTI-1 content packet and remain explicitly labeled as unapproved validation content when candidate-validation mode is enabled.
 
 ## Source boundary
 
