@@ -3542,8 +3542,10 @@
       "reviewed_text": "In 2023, the SAGE partnership supported design of seven supply-chain products intended to reduce backorder, improve service, and improve the efficiency and experience of supply-chain users.",
       "attribution": "leadership",
       "topics": [
-        "T-003"
+        "T-003",
+        "T-002"
       ],
+      "project_id": "sage-swift",
       "career_context_id": "jnj-2019-2025",
       "period": {
         "start_year": 2023,
@@ -3580,8 +3582,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:30:00.343Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
