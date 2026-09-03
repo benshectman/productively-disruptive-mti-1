@@ -608,6 +608,10 @@
         "T-001"
       ],
       "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -643,9 +647,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Current MTI-1 topic taxonomy does not fully represent this subject.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:55:43.286Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
