@@ -1379,7 +1379,7 @@
     {
       "candidate_id": "BF-C-024",
       "original_text": "Bachelor of Arts in Psychology from Yale University.",
-      "reviewed_text": "Bachelor of Arts in Psychology from Yale University.",
+      "reviewed_text": "Ben holds a Bachelor of Arts in Psychology from Yale University.",
       "attribution": "personal",
       "topics": [],
       "visibility": "shareable",
@@ -1400,9 +1400,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:14.945Z",
       "target_type": "credential_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
