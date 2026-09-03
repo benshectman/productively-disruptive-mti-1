@@ -10,6 +10,7 @@ import "./contrast-fix.css";
 import "./evidence-dialog.css";
 import "./validation-mode.css";
 import "./narrative-hierarchy.css";
+import "./benfacts-editor.css";
 import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(

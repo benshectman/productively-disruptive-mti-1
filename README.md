@@ -21,6 +21,12 @@ Knowledge-only source artifacts may ground server-side framing but their metadat
 
 The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The runtime review corpus is `src/content/candidates/ben-facts-migration.v0.3.json`: it preserves all 32 migrated records, adds source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews, and assigns `project_id` only to cleanly single-project facts. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
+### BenFacts Editor
+
+Deploy Preview and `develop` builds expose the internal review route at `/benfacts-editor`. It reads and updates `src/content/review/ben-facts-review.v1.json` through a server-side Netlify Function. Each disposition uses the loaded GitHub SHA to prevent stale writes and creates one descriptive commit on the review branch. The editor route and function are disabled in production builds.
+
+The initial corpus is deterministically normalized from `ben-facts-clean-preapproval-queue.v0.2.json`; all 147 records begin `unreviewed`. Run `npm run benfacts:normalize` to reproduce the review corpus and `npm run benfacts:promote` to generate `src/content/approved/ben-facts.v1.json` from explicitly approved records only.
+
 ## Deterministic mode
 
 The complete experience works without an OpenAI key. Topic overlap and small transparent priority lists select approved evidence, which is assembled into the semantic narrative contract and rendered through Astryx Neutral.
@@ -81,10 +87,14 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 - `NARRATIVE_PLANNER_MODE` — temporary candidate-mode planner switch; `editorial` is the default and `legacy` restores the previous selection behavior.
 - `ALLOWED_ORIGINS` — comma-separated exact browser origins.
 - `VITE_GENERATE_ENDPOINT` — optional client endpoint override.
+- `GITHUB_TOKEN` — required server-side for BenFacts review writes; use a narrowly scoped repository credential.
+- `GITHUB_REPO` — repository receiving review commits; defaults to `benshectman/productively-disruptive-mti-1`.
+- `BENFACTS_REVIEW_BRANCH` — optional fixed content-review branch. Otherwise the Netlify head branch is used.
+- `VITE_ENABLE_BENFACTS_EDITOR` — build-time editor gate. Netlify enables it for Deploy Previews and `develop`, and disables it in production.
 
 ## Verification
 
-- `npm test` validates content integrity, reference resolution, selection behavior, contracts, attribution, knowledge-only isolation, and fallback behavior.
+- `npm test` validates content integrity, reference resolution, selection behavior, contracts, attribution, knowledge-only isolation, BenFacts review and promotion behavior, GitHub conflict protection, and fallback behavior.
 - `npm run build` performs TypeScript and production Vite builds.
 
 ## Deployment

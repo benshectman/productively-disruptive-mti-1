@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { Card } from "@astryxdesign/core/Card";
 import { Carousel } from "@astryxdesign/core/Carousel";
 import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
@@ -7,6 +7,9 @@ import { assembleNarrative, buildDeepDiveNarrative } from "./shared/narrative";
 import { GenerateResponseSchema, type GenerationDiagnostics, type Narrative, type ProofItem, type PublicEvidence, type TopicId, type VisitorContext } from "./shared/contracts";
 import { deterministicGenerationDiagnostics } from "./shared/generation-diagnostics";
 import { approvedEvidenceCatalog, buildEvidencePresentation, evidencePointsLabel, type EvidencePresentation } from "./shared/evidence-presentation";
+const BenFactsEditor = import.meta.env.VITE_ENABLE_BENFACTS_EDITOR === "true"
+  ? lazy(() => import("./BenFactsEditor").then((module) => ({ default: module.BenFactsEditor })))
+  : null;
 
 const endpoint = import.meta.env.VITE_GENERATE_ENDPOINT || "/.netlify/functions/generate";
 const activity = [
@@ -165,6 +168,9 @@ function DeepDive({ context, onBack, onEvidence }: { context: VisitorContext; on
 }
 
 export function App() {
+  if (window.location.pathname.replace(/\/$/, "") === "/benfacts-editor") return BenFactsEditor
+    ? <Suspense fallback={<main id="main-content" className="generating"><p className="kicker">BenFacts Editor</p><h1>Loading review corpus</h1></main>}><BenFactsEditor /></Suspense>
+    : <main id="main-content" className="generating"><p className="kicker">Productively Disruptive</p><h1>Page not found</h1></main>;
   const [view, setView] = useState<"configure" | "generating" | "experience" | "deep-dive">("configure");
   const [step, setStep] = useState(0);
   const [context, setContext] = useState<VisitorContext>({ designSystem: "astryx", theme: "neutral", topics: [], inlineExpansionsOpened: [], deepDivesOpened: [] });
