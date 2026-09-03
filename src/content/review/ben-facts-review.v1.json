@@ -205,6 +205,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -265,6 +270,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -334,9 +340,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:53:21.150Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -368,6 +375,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -426,6 +434,7 @@
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -499,6 +508,7 @@
         "T-003"
       ],
       "project_id": "signifi",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -590,6 +600,7 @@
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -988,6 +999,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1034,6 +1046,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1080,6 +1097,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1126,6 +1144,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "emc-2011-2012",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1604,6 +1623,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2019
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1665,6 +1689,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1733,6 +1762,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1806,6 +1836,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1898,6 +1929,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1955,6 +1987,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2043,6 +2076,7 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2135,6 +2169,11 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2195,6 +2234,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2256,6 +2296,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2338,6 +2383,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2372,6 +2422,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2434,6 +2485,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2508,6 +2560,7 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2606,6 +2659,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2678,6 +2732,7 @@
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2741,6 +2796,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2785,6 +2845,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2828,6 +2889,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2871,6 +2933,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2906,6 +2969,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2971,6 +3035,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3023,6 +3088,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3080,6 +3146,11 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3160,6 +3231,11 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3195,6 +3271,11 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3232,6 +3313,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3314,6 +3396,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3372,6 +3459,11 @@
       "topics": [
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3423,6 +3515,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3465,6 +3558,7 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3534,6 +3628,11 @@
         "T-004"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3577,6 +3676,11 @@
         "T-004"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3629,6 +3733,7 @@
         "T-004"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3680,6 +3785,11 @@
         "T-004"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3730,6 +3840,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3774,6 +3885,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3891,6 +4003,7 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3963,6 +4076,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4095,6 +4213,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4130,6 +4249,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4166,6 +4290,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4200,6 +4325,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4253,6 +4379,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4308,6 +4435,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4453,6 +4581,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4588,6 +4717,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "pfizer-2006-2011",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4794,6 +4924,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4837,6 +4968,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4888,6 +5020,11 @@
         "T-004"
       ],
       "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4955,6 +5092,11 @@
         "T-004"
       ],
       "project_id": "sage-integrate",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5022,6 +5164,11 @@
         "T-004"
       ],
       "project_id": "sage-orc",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5089,6 +5236,7 @@
         "T-004"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5130,6 +5278,7 @@
       "topics": [
         "T-003"
       ],
+      "career_context_id": "businessedge-2005-2006",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5171,6 +5320,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "omnimodis-ox-2001-2005",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5212,6 +5362,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "mainspring-2000-2001",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5254,6 +5405,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5297,6 +5453,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5339,6 +5500,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5387,6 +5549,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5434,6 +5597,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5476,6 +5644,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5521,6 +5694,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5580,6 +5758,11 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5629,6 +5812,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5681,6 +5869,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5733,6 +5926,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5785,6 +5983,11 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5841,6 +6044,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5882,6 +6090,11 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5925,6 +6138,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5971,6 +6189,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6017,6 +6240,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6059,6 +6283,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6101,6 +6326,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6143,6 +6369,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6185,6 +6412,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6227,6 +6455,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6269,6 +6498,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6312,6 +6542,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6354,6 +6585,7 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6396,6 +6628,7 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6438,6 +6671,7 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6481,6 +6715,7 @@
         "T-003"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6524,6 +6759,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6566,6 +6802,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6608,6 +6845,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6650,6 +6888,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6693,6 +6932,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6735,6 +6975,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6777,6 +7018,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6819,6 +7061,7 @@
         "T-003"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6862,6 +7105,7 @@
         "T-003"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6908,6 +7152,7 @@
         "T-003"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6950,6 +7195,7 @@
         "T-003"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6992,6 +7238,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7034,6 +7281,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7076,6 +7324,11 @@
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7118,6 +7371,7 @@
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7160,6 +7414,11 @@
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7202,6 +7461,7 @@
         "T-004"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7244,6 +7504,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7290,6 +7551,7 @@
         "T-003"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7333,6 +7595,7 @@
         "T-003"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7380,6 +7643,11 @@
         "T-004"
       ],
       "project_id": "sage-control-towers",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7423,6 +7691,7 @@
         "T-003"
       ],
       "project_id": "sage-control-towers",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7466,6 +7735,11 @@
         "T-003"
       ],
       "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7517,6 +7791,11 @@
         "T-003"
       ],
       "project_id": "vision-control-tower",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7559,6 +7838,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7601,6 +7881,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7643,6 +7924,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7684,6 +7970,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7725,6 +8016,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7767,6 +8063,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7808,6 +8109,11 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7852,6 +8158,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7894,6 +8201,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7937,6 +8245,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7980,6 +8289,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -8022,6 +8332,7 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
