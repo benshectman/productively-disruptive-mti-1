@@ -3876,7 +3876,7 @@
     {
       "candidate_id": "BF-C-071",
       "original_text": "For PQM360, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
-      "reviewed_text": "For PQM360, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
+      "reviewed_text": "For Product Quality Management, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
       "attribution": "leadership",
       "topics": [
         "T-003",
@@ -3918,8 +3918,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:33:20.713Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
