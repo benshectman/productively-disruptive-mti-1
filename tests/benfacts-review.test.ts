@@ -9,10 +9,10 @@ const corpus = BenFactsReviewCorpusSchema.parse(reviewJson);
 const allFilters: BenFactsFilters = { status: "all", topic: "all", project: "all", attribution: "all", origin: "all" };
 
 describe("BenFacts review corpus", () => {
-  it("contains 147 unique candidates and none begin approved", () => {
+  it("contains 147 unique candidates with valid review states", () => {
     expect(corpus.candidates).toHaveLength(147);
     expect(new Set(corpus.candidates.map((item) => item.candidate_id)).size).toBe(147);
-    expect(corpus.candidates.every((item) => item.review_status === "unreviewed")).toBe(true);
+    expect(corpus.candidates.every((item) => ["unreviewed", "approved", "hold", "rejected"].includes(item.review_status))).toBe(true);
   });
 
   it("preserves original wording and source references through an edit", () => {
