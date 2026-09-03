@@ -3312,10 +3312,6 @@
       ],
       "project_id": "vital",
       "career_context_id": "jnj-2019-2025",
-      "period": {
-        "start_year": 2023,
-        "end_year": 2023
-      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3330,8 +3326,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:28:48.415Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3339,6 +3336,10 @@
         "atomicity_review": "review",
         "possible_overlap_refs": [],
         "notes": ""
+      },
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
       }
     },
     {
