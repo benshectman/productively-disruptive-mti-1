@@ -1,4 +1,4 @@
-import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.3.json";
+import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.4.json";
 import { NarrativeSchema, ProofItemSchema, type Attribution, type Narrative, type ProofItem, type ProofResultType, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
 import { candidateEditorialMetadata, type NarrativeRole } from "./candidate-editorial-metadata";
 import { expandPresentationAcronyms } from "../../src/shared/narrative-presentation";
