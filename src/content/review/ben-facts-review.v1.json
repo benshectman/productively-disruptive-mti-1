@@ -2266,7 +2266,8 @@
       "attribution": "leadership",
       "topics": [
         "T-002",
-        "T-003"
+        "T-003",
+        "T-001"
       ],
       "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
@@ -2310,8 +2311,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:49.611Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
