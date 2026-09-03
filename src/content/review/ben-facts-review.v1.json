@@ -148,7 +148,7 @@
     {
       "candidate_id": "BF-C-003",
       "original_text": "He specializes in complex, regulated, and multi-stakeholder enterprise environments.",
-      "reviewed_text": "He specializes in complex, regulated, and multi-stakeholder enterprise environments.",
+      "reviewed_text": "He specializes in designing intuitive, human-centered experiences for complex, regulated, and multi-stakeholder enterprise environments.",
       "attribution": "personal",
       "topics": [
         "T-002",
@@ -176,9 +176,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T03:51:24.552Z",
       "target_type": "proposition_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
