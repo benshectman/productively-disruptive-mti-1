@@ -199,7 +199,7 @@
     {
       "candidate_id": "BF-C-004",
       "original_text": "From 2019 to 2025, Ben served as Experience Design Chapter Leader at Johnson & Johnson.",
-      "reviewed_text": "From 2019 to 2025, Ben served as Experience Design Chapter Leader at Johnson & Johnson.",
+      "reviewed_text": "From 2019 to 2025, Ben served as Enterprise Experience Design Chapter Leader at Johnson & Johnson.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -232,9 +232,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T04:08:01.657Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
