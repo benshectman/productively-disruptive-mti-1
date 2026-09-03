@@ -2422,7 +2422,7 @@
       ],
       "career_context_id": "jnj-2019-2025",
       "period": {
-        "start_year": 2025,
+        "start_year": 2023,
         "end_year": 2025
       },
       "visibility": "shareable",
@@ -2439,8 +2439,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:06:02.158Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
