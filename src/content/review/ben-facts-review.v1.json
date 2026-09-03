@@ -2326,7 +2326,7 @@
     {
       "candidate_id": "BF-C-042",
       "original_text": "By early 2025, the broader J&J Experience Design chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
-      "reviewed_text": "By early 2025, the broader J&J Experience Design chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
+      "reviewed_text": "By early 2025, the broader J&J Experience Design Chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
       "attribution": "organization",
       "topics": [
         "T-001",
@@ -2398,9 +2398,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "This describes the broader chapter context, not a claim that all 24 people reported directly to Ben.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:05:24.036Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
