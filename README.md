@@ -13,13 +13,13 @@ The first testable vertical slice of Ben Shectman’s generative professional po
 
 ## Content boundary
 
-`src/content/mti-1-content-packet.json` is the only approved professional knowledge source for MTI-1. Typed access and reference validation live in `src/content/content.ts`. Deterministic selection and narrative assembly live in `src/shared/narrative.ts`.
+`src/content/approved/ben-facts.v1.json` is the approved professional fact corpus used for deterministic selection, AI framing, runtime evidence, and project-scoped Proof in Practice items. `src/content/mti-1-content-packet.json` remains the approved source for the fixed topic taxonomy and focused four-stage deep dive. Typed approved-corpus adaptation and deterministic planning live in `src/shared/approved-benfacts.ts`.
 
 Knowledge-only source artifacts may ground server-side framing but their metadata and raw source contents are never returned to the browser. Client-visible evidence contains only the approved claim, evidence ID, attribution, and topic references.
 
-### BenFacts migration candidates
+### BenFacts governance sources
 
-The earlier Ben-GPT profile is preserved under `src/content/legacy/`. The runtime review corpus is `src/content/candidates/ben-facts-migration.v0.4.json`: it preserves all 32 migrated records, includes 51 source-derived candidates from the supplied résumé, case studies, launch materials, walking deck, and quarterly reviews, and assigns `project_id` only to cleanly single-project facts. Every record remains pending review and outside the approved MTI-1 packet. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
+The earlier Ben-GPT profile and migration candidate files remain under `src/content/legacy/` and `src/content/candidates/` as internal governance inputs. Review state remains in `src/content/review/ben-facts-review.v1.json`. Generation and visitor-facing selection do not import those files; promotion produces the smaller approved `id`/`claim` schema consumed at runtime. See `docs/ben-facts-migration-review.md` for source visibility, evidence strength, attribution, and promotion rules.
 
 ### BenFacts Editor
 
@@ -57,17 +57,15 @@ AI may generate headings, lead paragraphs, narrative detail, emphasis, and conne
 
 Headlines may use supported abbreviations such as J&J or XD only when the visible lead spells out Johnson & Johnson or Experience Design. The server supplies the eligible abbreviations to the model and checks its output against the same list. Unknown product acronyms are never expanded by guesswork. The source facts themselves remain unchanged.
 
-## Temporary candidate-validation mode
+## Approved BenFacts planner
 
-The generation function temporarily defaults `BENFACTS_VALIDATION_MODE` to `candidates`. In this explicit validation mode, deterministic topic selection and optional AI framing use only the sanitized wording, candidate ID, attribution, and topic tags from source-derived records `BF-C-033` through `BF-C-083`.
+The generation function and browser fallback always use `src/content/approved/ben-facts.v1.json`. The runtime adapter maps approved `id` and `claim` fields onto the deterministic planner while preserving attribution, topics, career context, period, and optional `project_id` project provenance.
 
-The browser never receives the candidate manifest, source references, filenames, hashes, internal excerpts, review notes, or evidence-strength rationale. Generated pages and evidence dialogs visibly identify the facts as unapproved validation candidates. The approved four-stage deep dive remains grounded in the approved MTI-1 packet.
+The browser receives only the selected approved fact ID, claim, attribution, and topic tags. Source references, filenames, hashes, internal excerpts, review notes, and governance metadata remain outside the public response.
 
-Candidate validation uses an editorial planner by default. It creates a stable audience-facing arc—About Ben → Recent Leadership → Career Throughline → Proof in Practice—then selects facts according to section fit, visitor-topic relevance, recency, portfolio salience, evidence strength, and non-repetition. Recent experience provides the center of gravity while earlier roles establish a longer career pattern. Proof projects are selected before their facts are retrieved, and every mini-STAR proof item is validated against one `project_id` before its 25–45 word summary is rendered. Provisional editorial guidance lives separately in the server-only `netlify/functions/candidate-editorial-metadata.ts`; it does not alter the candidate compendium or its approval status.
+The editorial planner creates a stable audience-facing arc—About Ben → Recent Leadership → Career Throughline → Proof in Practice—then selects approved facts according to section fit, visitor-topic relevance, recency, portfolio salience, and non-repetition. Proof projects are selected before their facts are retrieved, each project is bounded to a deterministic subset, and every mini-STAR proof item is validated against one `project_id` before its 25–45 word summary is rendered.
 
-The previous flat-selection planner remains available as a rollback path. Set the Functions runtime variable `NARRATIVE_PLANNER_MODE=legacy` and redeploy to restore its selection behavior. Set it to `editorial` (or omit it) to use the new planner. Both planners return the same validated semantic narrative contract, and neither gives the model control of evidence selection, section structure, visitor labels, or rendering.
-
-To end the experiment immediately, set `BENFACTS_VALIDATION_MODE=approved` for the Functions runtime in Netlify and redeploy. To end it in code, change the temporary default in `netlify/functions/candidate-validation.ts` from `candidates` to `approved`. The server then returns to the original approved deterministic and AI corpus.
+The model never controls evidence selection, project grouping, section structure, visitor labels, or rendering.
 
 The implementation uses the Responses API `text.format` JSON-schema configuration with strict schema adherence, as described in the [official OpenAI API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create).
 
@@ -83,8 +81,6 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 
 - `OPENAI_API_KEY` — optional, server-side only.
 - `OPENAI_MODEL` — optional; defaults to `gpt-4.1-mini`.
-- `BENFACTS_VALIDATION_MODE` — temporary; defaults to `candidates` (sanitized, unapproved candidate facts). Set explicitly to `approved` to use only the approved packet.
-- `NARRATIVE_PLANNER_MODE` — temporary candidate-mode planner switch; `editorial` is the default and `legacy` restores the previous selection behavior.
 - `ALLOWED_ORIGINS` — comma-separated exact browser origins.
 - `VITE_GENERATE_ENDPOINT` — optional client endpoint override.
 - `GITHUB_TOKEN` — required server-side for BenFacts review writes; use a narrowly scoped repository credential.

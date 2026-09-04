@@ -5,13 +5,10 @@ import { assembleNarrative } from "../src/shared/narrative";
 import type { GenerationDiagnostics } from "../src/shared/contracts";
 
 const originalApiKey = process.env.OPENAI_API_KEY;
-const originalValidationMode = process.env.BENFACTS_VALIDATION_MODE;
 
 afterEach(() => {
   if (originalApiKey === undefined) delete process.env.OPENAI_API_KEY;
   else process.env.OPENAI_API_KEY = originalApiKey;
-  if (originalValidationMode === undefined) delete process.env.BENFACTS_VALIDATION_MODE;
-  else process.env.BENFACTS_VALIDATION_MODE = originalValidationMode;
 });
 
 describe("generation diagnostics", () => {

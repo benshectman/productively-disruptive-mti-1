@@ -1,28 +1,27 @@
 export type NarrativeRole = "about" | "recent_leadership" | "proof" | "throughline";
 export type CareerPeriod = "career_wide" | "recent" | "earlier";
 export type PortfolioSalience = "anchor" | "supporting" | "detail";
-export type CandidateScope = "career_wide" | "organization" | "role" | "practice" | "project" | "outcome";
+export type ApprovedScope = "career_wide" | "organization" | "role" | "practice" | "project" | "outcome";
 
-export type CandidateEditorialMetadata = {
+export type ApprovedEditorialMetadata = {
   careerPeriod: CareerPeriod;
   portfolioSalience: PortfolioSalience;
-  scope: CandidateScope;
+  scope: ApprovedScope;
   narrativeRoles: NarrativeRole[];
 };
 
-const recentPractice = (portfolioSalience: PortfolioSalience = "supporting"): CandidateEditorialMetadata => ({
+const recentPractice = (portfolioSalience: PortfolioSalience = "supporting"): ApprovedEditorialMetadata => ({
   careerPeriod: "recent", portfolioSalience, scope: "practice", narrativeRoles: ["recent_leadership"]
 });
-const recentProject = (scope: "project" | "outcome" = "project", portfolioSalience: PortfolioSalience = "supporting"): CandidateEditorialMetadata => ({
+const recentProject = (scope: "project" | "outcome" = "project", portfolioSalience: PortfolioSalience = "supporting"): ApprovedEditorialMetadata => ({
   careerPeriod: "recent", portfolioSalience, scope, narrativeRoles: ["proof"]
 });
 
 /**
- * Provisional, server-only editorial guidance for the validation corpus.
- * It does not modify candidate facts or their review status and can be removed
- * without changing the underlying BenFacts compendium.
+ * Editorial guidance for approved BenFacts. It affects deterministic selection
+ * only and never changes promoted claims, attribution, or provenance.
  */
-export const candidateEditorialMetadata: Record<string, CandidateEditorialMetadata> = {
+export const approvedEditorialMetadata: Record<string, ApprovedEditorialMetadata> = {
   "BF-C-033": { careerPeriod: "recent", portfolioSalience: "anchor", scope: "role", narrativeRoles: ["about", "recent_leadership"] },
   "BF-C-034": recentPractice("anchor"),
   "BF-C-035": recentPractice("anchor"),

@@ -1,19 +1,17 @@
 import type { Handler } from "@netlify/functions";
 import crypto from "node:crypto";
-import { contentPacket, publicEvidenceView, sourceById } from "../../src/content/content";
-import { assembleNarrative, validateNarrativeEvidence } from "../../src/shared/narrative";
+import { validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
 import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, type GenerationSectionDiagnostics, type Narrative, type ProofItem, type TopicId } from "../../src/shared/contracts";
 import { deterministicGenerationDiagnostics, summarizeGenerationDiagnostics } from "../../src/shared/generation-diagnostics";
 import {
-  assembleCandidateNarrative,
-  candidateValidationEnabled,
-  candidateValidationIds,
+  approvedBenFactIds,
+  assembleApprovedBenFactsNarrative,
   proofItemEvidenceIds,
-  publicCandidateEvidence,
+  publicApprovedBenFacts,
   validateNarrativeProofProjects,
   validateProofItemProjectEvidence
-} from "./candidate-validation";
+} from "../../src/shared/approved-benfacts";
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
@@ -269,19 +267,14 @@ async function requestStructured(fetcher: typeof fetch, signal: AbortSignal, bod
 
 function constrainedEvidence(fallback: Narrative) {
   const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
-  if (fallback.grounding === "candidate_validation") return publicCandidateEvidence(relevantIds);
-  return contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map((record) => ({
-    ...publicEvidenceView(record),
-    sourceAuthority: [...new Set(record.sources.map((id) => sourceById.get(id)?.authority).filter(Boolean))]
-  }));
+  return publicApprovedBenFacts(relevantIds);
 }
 
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
 Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
-  const useCandidates = candidateValidationEnabled();
-  const fallback = useCandidates ? assembleCandidateNarrative(topics) : assembleNarrative(topics);
+  const fallback = assembleApprovedBenFactsNarrative(topics);
   const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
-  const allowedIds = useCandidates ? candidateValidationIds : undefined;
+  const allowedIds = approvedBenFactIds;
   if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key", diagnostics: fallbackDiagnostics };
   const evidence = constrainedEvidence(fallback);
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
@@ -301,15 +294,12 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
           "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, connect it to the longer career throughline, then introduce topic-relevant proof in practice.",
           "Make the sequence of headlines build from broad identity to recent leadership, career continuity, and proof. Do not repeat the same claim or construction.",
-          useCandidates
-            ? "This is an explicitly labeled validation run using unapproved candidate BenFacts. Use only the candidate facts assigned to each section; do not imply that they have been approved."
-            : "Use only the approved proposition and evidence assigned to each section.",
+          "Use only the approved BenFacts assigned to each section.",
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Do not add a number unless that exact number appears in the evidence assigned to that section. Preserve its unit and the measure it describes.",
           "Never combine multiple measurements into a shared threshold or range. State each cited metric separately. For example, do not claim that all improvements exceeded 100% when one assigned improvement is 85%.",
           "Do not infer causation or documentary corroboration beyond the assigned evidence.",
-          "Claims supported only by first_person_attestation must not be described as independently documented.",
           "Make each lead a connected introduction of no more than 75 words. Make each detail add context and supporting examples rather than repeating the lead or concatenating facts.",
           "Make transitions across sections feel intentional, but do not add facts from one section to another.",
           "For Proof in practice, write only general section framing. Do not mention, combine, or summarize any project-specific work, actions, outcomes, or metrics; separate project-scoped proof items are generated independently.",
@@ -322,7 +312,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
         input: JSON.stringify({
           selectedTopics: topics,
           groundingMode: fallback.grounding,
-          approvedProposition: useCandidates ? undefined : contentPacket.propositions[0].statement,
+          approvedProposition: publicApprovedBenFacts(["BF-C-073"])[0]?.claim,
           sections: fallback.sections.map((section) => ({
             id: section.id,
             audienceLabel: section.eyebrow,
@@ -341,7 +331,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
     });
 
     const fallbackProofItems = fallback.sections.find((section) => section.id === "proof-to-scale")?.proof_items || [];
-    const proofRequests = useCandidates ? fallbackProofItems.map((item) => {
+    const proofRequests = fallbackProofItems.map((item) => {
       const projectEvidence = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id));
       return requestStructured(fetcher, controller.signal, {
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1800,
@@ -374,7 +364,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           }
         }
       });
-    }) : [];
+    });
 
     const [response, ...proofValues] = await Promise.all([framingRequest, ...proofRequests]);
     let framingStatus: GenerationStatus = "ai";
@@ -458,9 +448,7 @@ export const handler: Handler = async (event) => {
   const generation = await generateNarrativeWithStatus(parsed.data.topics, fetch, requestId);
   const narrative = generation.narrative;
   const relevantIds = new Set(narrative.sections.flatMap((section) => section.evidenceRefs));
-  const evidence = narrative.grounding === "candidate_validation"
-    ? publicCandidateEvidence(relevantIds)
-    : contentPacket.evidence.filter((record) => relevantIds.has(record.id)).map(publicEvidenceView);
+  const evidence = publicApprovedBenFacts(relevantIds);
   return {
     statusCode: 200,
     headers: {
