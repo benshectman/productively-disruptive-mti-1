@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import reviewJson from "./content/review/ben-facts-review.v1.json";
 import { BenFactsReviewCorpusSchema, type BenFactReview, type BenFactsReviewCorpus, type ReviewStatus } from "./shared/benfacts-review";
+import { applyCareerContextDefaults, careerContexts, validateCareerPeriod } from "./shared/benfacts-career-context";
 import { filterBenFacts, reconcileCurrentFactId, type BenFactsFilters } from "./shared/benfacts-navigation";
 import { similarFacts } from "./shared/benfacts-similarity";
 import type { TopicId } from "./shared/contracts";
 
 const endpoint = "/.netlify/functions/benfacts-review";
-const initialCorpus = BenFactsReviewCorpusSchema.parse(reviewJson);
+const initialCorpus = applyCareerContextDefaults(BenFactsReviewCorpusSchema.parse(reviewJson));
 const topicLabels: Record<TopicId, string> = {
   "T-001": "Design Leadership",
   "T-002": "Systems Thinking",
@@ -20,12 +21,20 @@ const attributionLabels = {
   shared_leadership: "Shared leadership",
   organization: "Organization"
 } as const;
-type EditableFact = Pick<BenFactReview, "reviewed_text" | "attribution" | "topics" | "project_id" | "visibility">;
+type EditableFact = Pick<BenFactReview, "reviewed_text" | "attribution" | "topics" | "project_id" | "career_context_id" | "period" | "visibility">;
 type Filters = BenFactsFilters;
 const defaultFilters: Filters = { status: "unreviewed", topic: "all", project: "all", attribution: "all", origin: "all" };
 
 function editableFrom(record: BenFactReview): EditableFact {
-  return { reviewed_text: record.reviewed_text, attribution: record.attribution, topics: record.topics, project_id: record.project_id, visibility: record.visibility };
+  return {
+    reviewed_text: record.reviewed_text,
+    attribution: record.attribution,
+    topics: record.topics,
+    project_id: record.project_id,
+    career_context_id: record.career_context_id,
+    period: record.period,
+    visibility: record.visibility
+  };
 }
 
 function draftKey(id: string) { return `benfacts-editor:draft:${id}`; }
@@ -40,6 +49,13 @@ function readDraft(record: BenFactReview): EditableFact {
 function sourceLabel(source: BenFactReview["source_refs"][number]) {
   const locations = source.locations.map((location) => `${location.kind}${location.number ? ` ${location.number}` : location.label ? ` ${location.label}` : ""}`).join(", ");
   return locations ? `${source.source_id}, ${locations}` : source.source_id;
+}
+
+function withPeriodYear(draft: EditableFact, field: "start_year" | "end_year", rawValue: string): EditableFact {
+  const value = rawValue === "" ? undefined : Number(rawValue);
+  const period = { ...draft.period, [field]: value };
+  const nextPeriod = period.start_year === undefined && period.end_year === undefined ? undefined : period;
+  return { ...draft, period: nextPeriod };
 }
 
 export function BenFactsEditor() {
@@ -69,7 +85,7 @@ export function BenFactsEditor() {
       return response.json();
     }).then((payload) => {
       if (!active) return;
-      const loaded = BenFactsReviewCorpusSchema.parse(payload.corpus);
+      const loaded = applyCareerContextDefaults(BenFactsReviewCorpusSchema.parse(payload.corpus));
       setCorpus(loaded); setSha(payload.sha); setCurrentId((id) => loaded.candidates.some((item) => item.candidate_id === id) ? id : loaded.candidates[0].candidate_id);
       setNotice({ kind: "info", message: `Reviewing ${payload.branch}` });
     }).catch((error) => active && setNotice({ kind: "error", message: error instanceof Error ? error.message : "Could not load the committed review corpus." }));
@@ -107,6 +123,8 @@ export function BenFactsEditor() {
 
   async function disposition(review_status: Exclude<ReviewStatus, "unreviewed">) {
     if (!draft.reviewed_text.trim()) { setNotice({ kind: "error", message: "Fact wording cannot be empty." }); return; }
+    const periodError = validateCareerPeriod(draft);
+    if (periodError) { setNotice({ kind: "error", message: periodError }); return; }
     if (!sha) { setNotice({ kind: "error", message: "GitHub persistence is unavailable. Your edit remains saved locally." }); return; }
     const reviewed: BenFactReview = { ...current, ...draft, reviewed_text: draft.reviewed_text.trim(), review_status, reviewed_at: new Date().toISOString() };
     const nextCorpus = { ...corpus, candidates: corpus.candidates.map((item) => item.candidate_id === current.candidate_id ? reviewed : item) };
@@ -182,6 +200,9 @@ export function BenFactsEditor() {
           <label>Attribution<select value={draft.attribution} onChange={(event) => setDraft({ ...draft, attribution: event.target.value as BenFactReview["attribution"] })}>{Object.entries(attributionLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label>Project<select value={draft.project_id ?? ""} onChange={(event) => setDraft({ ...draft, project_id: event.target.value || undefined })}><option value="">No project</option>{projects.map((project) => <option key={project}>{project}</option>)}</select></label>
           <label>Visibility<select value={draft.visibility} onChange={(event) => setDraft({ ...draft, visibility: event.target.value as BenFactReview["visibility"] })}><option value="shareable">Shareable</option><option value="knowledge_only">Knowledge only</option></select></label>
+          <label>Career context<select value={draft.career_context_id ?? ""} onChange={(event) => setDraft({ ...draft, career_context_id: event.target.value || undefined, ...(event.target.value ? {} : { period: undefined }) })}><option value="">No single career context</option>{careerContexts.map((context) => <option key={context.id} value={context.id}>{context.display_name} · {context.start_year}–{context.end_year}</option>)}</select></label>
+          <label>Specific period start<input type="number" min="1900" max="2100" value={draft.period?.start_year ?? ""} onChange={(event) => setDraft(withPeriodYear(draft, "start_year", event.target.value))} placeholder="Optional"/></label>
+          <label>Specific period end<input type="number" min="1900" max="2100" value={draft.period?.end_year ?? ""} onChange={(event) => setDraft(withPeriodYear(draft, "end_year", event.target.value))} placeholder="Optional"/></label>
         </div>
 
         <fieldset className="topic-fieldset"><legend>Topics</legend><div className="topic-checks">{Object.entries(topicLabels).map(([id, label]) => <label key={id}><input type="checkbox" checked={draft.topics.includes(id as TopicId)} onChange={(event) => setDraft({ ...draft, topics: event.target.checked ? [...draft.topics, id as TopicId] : draft.topics.filter((topic) => topic !== id) })}/><span>{label}</span></label>)}</div></fieldset>

@@ -205,6 +205,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -265,6 +270,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -334,9 +340,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:53:21.150Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -368,6 +375,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -399,9 +411,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:54:01.297Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -421,11 +434,12 @@
     {
       "candidate_id": "BF-C-007",
       "original_text": "He built and led a design team that grew from one designer to more than twenty.",
-      "reviewed_text": "He built and led a design team that grew from one designer to more than twenty.",
+      "reviewed_text": "He built and led a design team that grew from one designer to more than twenty, including full-time direct report design managers and contract staff.",
       "attribution": "personal",
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -466,9 +480,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:55:07.186Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -499,6 +514,7 @@
         "T-003"
       ],
       "project_id": "signifi",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -563,9 +579,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:55:24.264Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -590,6 +607,11 @@
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -625,9 +647,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Current MTI-1 topic taxonomy does not fully represent this subject.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:55:43.286Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -647,7 +670,7 @@
     {
       "candidate_id": "BF-C-013",
       "original_text": "Ben has established DesignOps practices, design systems, and governance models to support scaling teams.",
-      "reviewed_text": "Ben has established DesignOps practices, design systems, and governance models to support scaling teams.",
+      "reviewed_text": "Ben has established DesignOps practices, design systems, skills ladders, and governance models to support scaling teams.",
       "attribution": "personal",
       "topics": [
         "T-001",
@@ -698,9 +721,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:56:20.891Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -730,6 +754,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -761,9 +786,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:56:50.808Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -886,9 +912,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:57:04.518Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -960,9 +987,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:57:17.861Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -988,6 +1016,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1006,9 +1035,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:57:34.294Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1028,12 +1058,17 @@
     {
       "candidate_id": "BF-C-018",
       "original_text": "Head of User Experience at REDI Global Technologies (2015), supporting institutional trading platform development.",
-      "reviewed_text": "Head of User Experience at REDI Global Technologies (2015), supporting institutional trading platform development.",
+      "reviewed_text": "Head of User Experience at REDI Global Technologies (contract - 2015), supporting institutional trading platform development.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1052,9 +1087,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:57:59.531Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1074,12 +1110,13 @@
     {
       "candidate_id": "BF-C-019",
       "original_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
-      "reviewed_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise software.",
+      "reviewed_text": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise SaaS, on-prem and mobile solutions.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1098,9 +1135,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T18:58:38.780Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1120,12 +1158,13 @@
     {
       "candidate_id": "BF-C-020",
       "original_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
-      "reviewed_text": "Practice Lead, Digital Strategy at EMC2 Global Consulting.",
+      "reviewed_text": "Ben served as Practice Lead, Digital Strategy at EMC2 Global Consulting between 2011 to 2012.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "emc-2011-2012",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1144,9 +1183,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:00:37.122Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1228,9 +1268,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:00:46.986Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1315,9 +1356,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:01.317Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1337,7 +1379,7 @@
     {
       "candidate_id": "BF-C-024",
       "original_text": "Bachelor of Arts in Psychology from Yale University.",
-      "reviewed_text": "Bachelor of Arts in Psychology from Yale University.",
+      "reviewed_text": "Ben holds a Bachelor of Arts in Psychology from Yale University.",
       "attribution": "personal",
       "topics": [],
       "visibility": "shareable",
@@ -1358,9 +1400,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:14.945Z",
       "target_type": "credential_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1425,9 +1468,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "rejected",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:31.153Z",
       "target_type": "topic_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1573,9 +1617,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "rejected",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:41.750Z",
       "target_type": "topic_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1604,6 +1649,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2019
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1644,8 +1694,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:01:52.033Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1665,6 +1716,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1712,8 +1768,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:02:01.970Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1726,13 +1783,14 @@
     {
       "candidate_id": "BF-C-035",
       "original_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities—summarized as ‘build the right things’ and ‘build those things right.’",
-      "reviewed_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities—summarized as ‘build the right things’ and ‘build those things right.’",
+      "reviewed_text": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities, focused on ‘build the right things’ and ‘build those things right.’",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1785,8 +1843,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:03:08.960Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1806,6 +1865,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1878,8 +1938,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:03:19.190Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1898,6 +1959,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -1934,8 +1996,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:03:32.587Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -1948,13 +2011,14 @@
     {
       "candidate_id": "BF-C-038",
       "original_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics.",
-      "reviewed_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics.",
+      "reviewed_text": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics and OKRs.",
       "attribution": "leadership",
       "topics": [
         "T-002",
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2023,8 +2087,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:04.993Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2043,6 +2108,7 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2115,8 +2181,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:16.596Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2135,6 +2202,11 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2175,8 +2247,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:29.751Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2193,8 +2266,10 @@
       "attribution": "leadership",
       "topics": [
         "T-002",
-        "T-003"
+        "T-003",
+        "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2236,8 +2311,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:04:49.611Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2250,12 +2326,17 @@
     {
       "candidate_id": "BF-C-042",
       "original_text": "By early 2025, the broader J&J Experience Design chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
-      "reviewed_text": "By early 2025, the broader J&J Experience Design chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
+      "reviewed_text": "By early 2025, the broader J&J Experience Design Chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
       "attribution": "organization",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2317,9 +2398,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "This describes the broader chapter context, not a claim that all 24 people reported directly to Ben.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:05:24.036Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2338,6 +2420,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2352,8 +2439,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:06:02.158Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2372,6 +2460,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2413,8 +2502,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:06:11.984Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2434,6 +2524,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2487,8 +2582,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:06:31.237Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2501,13 +2597,18 @@
     {
       "candidate_id": "BF-C-047",
       "original_text": "The 2025 chapter model promoted reusable assets—personas, journey maps or blueprints, research readouts, and experience metrics—to standardize user-centered practice, reduce rework, and increase consistency and velocity.",
-      "reviewed_text": "The 2025 chapter model promoted reusable assets—personas, journey maps or blueprints, research readouts, and experience metrics—to standardize user-centered practice, reduce rework, and increase consistency and velocity.",
+      "reviewed_text": "To standardize user-centered practices, reduce rework, and increase consistency and velocity, the 2025 chapter model promoted reusable assets such as personas, journey maps, service design blueprints, research readouts, and experience metrics.",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2585,8 +2686,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:08:37.042Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2606,6 +2708,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2659,8 +2762,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:08:56.422Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2678,6 +2782,7 @@
       "topics": [
         "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2721,8 +2826,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:09:12.270Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2735,12 +2841,17 @@
     {
       "candidate_id": "BF-C-050",
       "original_text": "In July 2020, Ben hired a Product Experience Design Lead to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
-      "reviewed_text": "In July 2020, Ben hired a Product Experience Design Lead to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
+      "reviewed_text": "In July 2020, Ben hired a Product Experience Design Lead, his first of many full-time direct reports, to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2764,8 +2875,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:10:39.413Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2778,13 +2890,15 @@
     {
       "candidate_id": "BF-C-051",
       "original_text": "The AskGS team used a mixed-method research program—knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents—to triangulate user frustrations in a colleague support portal.",
-      "reviewed_text": "The AskGS team used a mixed-method research program—knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents—to triangulate user frustrations in a colleague support portal.",
+      "reviewed_text": "For the AskGS product owner, the XD team used a mixed-method research program that spanned knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents to triangulate user frustrations in a colleague support portal.",
       "attribution": "leadership",
       "topics": [
         "T-003",
-        "T-004"
+        "T-004",
+        "T-002"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2807,8 +2921,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:11:53.580Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2828,6 +2943,11 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2850,8 +2970,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:24:28.847Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2871,6 +2992,11 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2885,8 +3011,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:24:57.100Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2906,6 +3033,11 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -2949,8 +3081,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:26:02.103Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -2971,6 +3104,11 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3002,8 +3140,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:26:13.885Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3023,6 +3162,11 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3058,9 +3202,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Retain the source’s baseline framing and avoid attributing the outcomes solely to design.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:26:43.922Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3073,13 +3218,18 @@
     {
       "candidate_id": "BF-C-057",
       "original_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 people over a twelve-month period.",
-      "reviewed_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 people over a twelve-month period.",
+      "reviewed_text": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 global finance colleagues over a twelve-month period.",
       "attribution": "leadership",
       "topics": [
         "T-003",
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3139,8 +3289,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:28:26.282Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3160,6 +3311,11 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3174,8 +3330,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:28:48.415Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3195,6 +3352,11 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3209,9 +3371,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Approve only with the stated geography, time period, and confidence caveat preserved.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:04.645Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3232,6 +3395,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3294,8 +3458,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:22.495Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3314,6 +3479,12 @@
         "T-001",
         "T-003"
       ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3353,8 +3524,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:29:40.740Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3370,8 +3542,15 @@
       "reviewed_text": "In 2023, the SAGE partnership supported design of seven supply-chain products intended to reduce backorder, improve service, and improve the efficiency and experience of supply-chain users.",
       "attribution": "leadership",
       "topics": [
-        "T-003"
+        "T-003",
+        "T-002"
       ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3403,8 +3582,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:30:00.343Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3423,6 +3603,8 @@
         "T-002",
         "T-003"
       ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3445,8 +3627,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:30:14.517Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3465,6 +3648,7 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3513,8 +3697,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:30:31.655Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3534,6 +3719,11 @@
         "T-004"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3556,8 +3746,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:30:53.383Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3570,13 +3761,18 @@
     {
       "candidate_id": "BF-C-068",
       "original_text": "For the Comet Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
-      "reviewed_text": "For the Comet Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
+      "reviewed_text": "For the Quality Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
       "attribution": "leadership",
       "topics": [
         "T-003",
         "T-004"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3607,9 +3803,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Preserve the source’s methodology and baseline qualifications when reviewing the numeric claims.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:31:53.120Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3629,6 +3826,11 @@
         "T-004"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3659,8 +3861,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicit, direct source statement with clear authority for this record type.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:32:32.181Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3673,13 +3876,18 @@
     {
       "candidate_id": "BF-C-071",
       "original_text": "For PQM360, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
-      "reviewed_text": "For PQM360, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
+      "reviewed_text": "For Product Quality Management, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
       "attribution": "leadership",
       "topics": [
         "T-003",
         "T-004"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3710,8 +3918,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:33:20.713Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3730,6 +3939,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3752,8 +3962,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:33:37.850Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3774,6 +3985,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3871,8 +4083,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-03T19:33:48.823Z",
       "target_type": "proposition_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3885,12 +4098,13 @@
     {
       "candidate_id": "BF-C-074",
       "original_text": "Ben’s practice treated product outcomes as behavioral choices and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
-      "reviewed_text": "Ben’s practice treated product outcomes as behavioral choices and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
+      "reviewed_text": "Ben’s practice treated experience-related product outcomes through the lens of changes in users' beliefs and behaviors, and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
       "attribution": "shared_leadership",
       "topics": [
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3942,8 +4156,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:17:31.818Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -3956,13 +4171,18 @@
     {
       "candidate_id": "BF-C-075",
       "original_text": "By 2025, the chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
-      "reviewed_text": "By 2025, the chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
+      "reviewed_text": "By 2025, the J&J XD chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4036,8 +4256,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:17:51.363Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4074,8 +4295,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:18:00.670Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4095,6 +4317,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4109,8 +4332,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:18:10.300Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4130,6 +4354,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4144,8 +4373,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:18:18.385Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4166,6 +4396,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4180,8 +4411,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:18:45.438Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4200,6 +4432,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4218,9 +4451,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:18:54.737Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4253,6 +4487,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4271,9 +4506,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:00.280Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4300,7 +4536,7 @@
     {
       "candidate_id": "BF-C-011A",
       "original_text": "Ben directed Experience Design support for Service Performance Reporting, an analytics product for Global Services.",
-      "reviewed_text": "Ben directed Experience Design support for Service Performance Reporting, an analytics product for Global Services.",
+      "reviewed_text": "Ben directed Experience Design support for Service Performance Reporting, an operational analytics product for Global Services.",
       "attribution": "leadership",
       "topics": [
         "T-001",
@@ -4308,6 +4544,7 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4414,9 +4651,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:16.630Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4453,6 +4691,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4549,9 +4788,10 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:23.252Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4588,6 +4828,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "pfizer-2006-2011",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4606,9 +4847,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:27.880Z",
       "target_type": "career_record_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4657,9 +4899,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:31.457Z",
       "target_type": "credential_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4707,9 +4950,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:35.155Z",
       "target_type": "credential_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4759,9 +5003,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Documentary sources added; wording, attribution, and visibility still require approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:19:38.897Z",
       "target_type": "credential_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4788,12 +5033,17 @@
     {
       "candidate_id": "BF-C-044R",
       "original_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
-      "reviewed_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
+      "reviewed_text": "At Johnson & Johnson, Ben grew hist team by 200% year over year.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4808,9 +5058,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "The precise period behind the year-over-year figure still requires Ben's truth confirmation before approval. The résumé is explicit, but the precise period behind the year-over-year figure should be confirmed before approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:20:46.232Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4837,6 +5088,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4859,9 +5111,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Forecasted value, not a realized outcome. This is a forecast, not a realized outcome; preserve that distinction.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:21:25.450Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4888,6 +5141,11 @@
         "T-004"
       ],
       "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4927,8 +5185,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:21:33.273Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -4955,6 +5214,11 @@
         "T-004"
       ],
       "project_id": "sage-integrate",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -4994,8 +5258,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:21:45.145Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5022,6 +5287,11 @@
         "T-004"
       ],
       "project_id": "sage-orc",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5061,8 +5331,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:21:50.732Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5089,6 +5360,7 @@
         "T-004"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5103,9 +5375,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "These were separate studies with different participant groups; do not present them as one controlled before/after experiment. The sequence, study sizes, and differing participant groups must remain visible; do not present this as a single before/after experiment.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:22:10.256Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5130,6 +5403,7 @@
       "topics": [
         "T-003"
       ],
+      "career_context_id": "businessedge-2005-2006",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5144,8 +5418,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:22:17.552Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5171,6 +5446,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "omnimodis-ox-2001-2005",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5185,8 +5461,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:22:21.963Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5212,6 +5489,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "mainspring-2000-2001",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5226,8 +5504,9 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:22:25.780Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5254,6 +5533,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5267,8 +5551,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:22:52.127Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5297,6 +5582,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5310,8 +5600,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:23:32.627Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5339,6 +5630,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5356,8 +5648,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:23:40.878Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5379,7 +5672,7 @@
     {
       "candidate_id": "BF-X-005",
       "original_text": "Domain Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
-      "reviewed_text": "Domain Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
+      "reviewed_text": "Functional Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
       "attribution": "leadership",
       "topics": [
         "T-001",
@@ -5387,6 +5680,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5404,8 +5698,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:24:13.652Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5427,13 +5722,18 @@
     {
       "candidate_id": "BF-X-007",
       "original_text": "By 2022, the practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
-      "reviewed_text": "By 2022, the practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
+      "reviewed_text": "By 2022, the J&J XD practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
       "attribution": "leadership",
       "topics": [
         "T-001",
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5447,8 +5747,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:24:43.232Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5470,12 +5771,18 @@
     {
       "candidate_id": "BF-X-008",
       "original_text": "The 2022 Experience Design model framed people centricity around customers, patients, employees, and partners rather than treating workforce UX as a screen-design problem alone.",
-      "reviewed_text": "The 2022 Experience Design model framed people centricity around customers, patients, employees, and partners rather than treating workforce UX as a screen-design problem alone.",
+      "reviewed_text": "The 2022 Experience Design model framed people centricity around meeting the needs of customers, patients, employees, and partners rather than treating UX as a screen-design problem alone.",
       "attribution": "leadership",
       "topics": [
         "T-002",
-        "T-003"
+        "T-003",
+        "T-001"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5493,8 +5800,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:26:27.474Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5521,6 +5829,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5552,8 +5865,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:26:36.024Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5574,12 +5888,17 @@
     {
       "candidate_id": "BF-X-012",
       "original_text": "The 2025 Chapter operating model asked whether XD was supporting the right priorities, using the right mix of services, building the right skills, carrying sufficient capacity, and influencing people centricity beyond direct XD involvement.",
-      "reviewed_text": "The 2025 Chapter operating model asked whether XD was supporting the right priorities, using the right mix of services, building the right skills, carrying sufficient capacity, and influencing people centricity beyond direct XD involvement.",
+      "reviewed_text": "The 2025 Chapter operating model set OKRs around whether XD was supporting the right priorities, using the right mix of services, building the right skills, carrying sufficient capacity, and influencing people centricity beyond direct XD involvement.",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
-        "T-002"
+        "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5602,8 +5921,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:27:37.756Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5629,6 +5949,11 @@
         "T-002",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5651,9 +5976,10 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "This is a governance fact, not a claim that the target values were achieved.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:27:51.279Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5681,6 +6007,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5703,9 +6034,10 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Target/operating-goal fact; do not present as achieved coverage.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:27:59.484Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5733,6 +6065,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5755,9 +6092,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Target/operating-goal fact; do not present target percentage as achieved.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:06.369Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5785,6 +6123,11 @@
         "T-001",
         "T-002"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5811,8 +6154,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:17.357Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5841,6 +6185,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5854,8 +6203,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:30.287Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5882,6 +6232,11 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5895,9 +6250,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "hold",
       "review_notes": "Self-reported workshop measure; do not generalize beyond the session.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:38.191Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5925,6 +6281,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5942,8 +6303,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "hold",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:57.609Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -5964,13 +6326,18 @@
     {
       "candidate_id": "BF-X-020",
       "original_text": "The 2025 Information Security portfolio explicitly treated even back-end products as experiences with customers whose outcomes could be measured.",
-      "reviewed_text": "The 2025 Information Security portfolio explicitly treated even back-end products as experiences with customers whose outcomes could be measured.",
+      "reviewed_text": "The 2025 Information Security portfolio explicitly included back-end products as experiences with customers whose outcomes could be measured.",
       "attribution": "leadership",
       "topics": [
         "T-002",
         "T-003",
         "T-004"
       ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5988,8 +6355,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:29:28.854Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6017,6 +6385,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6030,8 +6399,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:29:44.822Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6059,6 +6429,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6072,8 +6443,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:29:52.816Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6101,6 +6473,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6114,8 +6487,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:29:58.389Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6143,6 +6517,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6156,8 +6531,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:30:07.577Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6185,6 +6561,7 @@
         "T-004"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6198,8 +6575,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:30:26.304Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6227,6 +6605,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6240,8 +6619,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:30:31.936Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6269,6 +6649,7 @@
         "T-003"
       ],
       "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6282,8 +6663,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:30:36.661Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6312,6 +6694,11 @@
         "T-004"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6325,8 +6712,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:05.551Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6354,6 +6742,11 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6367,8 +6760,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:15.466Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6396,6 +6790,11 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6409,8 +6808,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:26.124Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6438,6 +6838,11 @@
         "T-003"
       ],
       "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6451,8 +6856,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:37.299Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6481,6 +6887,7 @@
         "T-003"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6494,8 +6901,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:49.434Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6524,6 +6932,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6537,8 +6946,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:31:54.016Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6566,6 +6976,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6579,8 +6990,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:32:00.459Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6608,6 +7020,7 @@
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6621,8 +7034,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:32:04.988Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6643,13 +7057,14 @@
     {
       "candidate_id": "BF-X-039",
       "original_text": "Vital stakeholders reported that a new access-request experience reduced a process that had previously taken several days to a matter of minutes.",
-      "reviewed_text": "Vital stakeholders reported that a new access-request experience reduced a process that had previously taken several days to a matter of minutes.",
+      "reviewed_text": "Vital stakeholders reported that a new access-request experience reduced the time it took to complete a key process from several days to a matter of minutes.",
       "attribution": "team",
       "topics": [
         "T-003",
         "T-004"
       ],
       "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6663,9 +7078,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Stakeholder-reported qualitative outcome, not independently measured in this source.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:00.226Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6693,6 +7109,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6706,8 +7123,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:11.229Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6735,6 +7153,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6748,8 +7167,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:18.241Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6777,6 +7197,7 @@
         "T-003"
       ],
       "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6790,8 +7211,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:25.584Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6819,6 +7241,7 @@
         "T-003"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6832,8 +7255,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:34.193Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6862,6 +7286,7 @@
         "T-003"
       ],
       "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6879,8 +7304,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:43.524Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6908,6 +7334,7 @@
         "T-003"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6921,8 +7348,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:51.428Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6950,6 +7378,7 @@
         "T-003"
       ],
       "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -6963,8 +7392,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:00.578Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -6992,6 +7422,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7005,8 +7436,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:10.838Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7034,6 +7466,7 @@
         "T-003"
       ],
       "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7047,8 +7480,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:17.671Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7069,13 +7503,18 @@
     {
       "candidate_id": "BF-X-050",
       "original_text": "The Comet Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
-      "reviewed_text": "The Comet Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
+      "reviewed_text": "The Quality Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
       "attribution": "team",
       "topics": [
         "T-002",
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7089,8 +7528,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:43.568Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7118,6 +7558,7 @@
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7131,8 +7572,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:53.896Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7160,6 +7602,11 @@
         "T-003"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7173,8 +7620,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:04.771Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7195,13 +7643,14 @@
     {
       "candidate_id": "BF-X-053",
       "original_text": "In the Comet research program, half of survey respondents provided comments and 32% agreed to be contacted for additional feedback.",
-      "reviewed_text": "In the Comet research program, half of survey respondents provided comments and 32% agreed to be contacted for additional feedback.",
+      "reviewed_text": "In the Comet research program, half of survey respondents provided comments and about a third agreed to be contacted for additional feedback.",
       "attribution": "team",
       "topics": [
         "T-003",
         "T-004"
       ],
       "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7215,8 +7664,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:25.658Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7244,6 +7694,7 @@
         "T-004"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7261,8 +7712,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:35.693Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7290,6 +7742,7 @@
         "T-003"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7303,9 +7756,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Source presents this as an estimate.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:43.411Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7333,6 +7787,7 @@
         "T-003"
       ],
       "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7350,8 +7805,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:54.788Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7379,7 +7835,12 @@
         "T-003",
         "T-004"
       ],
-      "project_id": "sage-control-towers",
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7393,8 +7854,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:09.968Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7422,7 +7884,8 @@
         "T-002",
         "T-003"
       ],
-      "project_id": "sage-control-towers",
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7436,8 +7899,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:20.888Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7466,6 +7930,11 @@
         "T-003"
       ],
       "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7488,8 +7957,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:30.353Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7516,7 +7986,12 @@
         "T-002",
         "T-003"
       ],
-      "project_id": "vision-control-tower",
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7530,8 +8005,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:39.795Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7559,6 +8035,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7572,8 +8049,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:48.090Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7601,6 +8079,7 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "crestron-2016-2018",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7614,8 +8093,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:54.803Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7643,6 +8123,11 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7656,8 +8141,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:36:59.386Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7684,6 +8170,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7697,8 +8188,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:03.900Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7725,6 +8217,11 @@
         "T-001",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7738,8 +8235,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:10.613Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7767,6 +8265,11 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7780,8 +8283,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:17.490Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7808,6 +8312,11 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7821,9 +8330,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Forecasted value, not realized value.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:23.175Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7852,6 +8362,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7865,8 +8376,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:30.548Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7894,6 +8406,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7907,8 +8420,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:36.720Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7937,6 +8451,7 @@
         "T-003",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7950,8 +8465,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:40.778Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -7980,6 +8496,7 @@
         "T-002",
         "T-003"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -7993,8 +8510,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:37:47.520Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
@@ -8022,6 +8540,7 @@
         "T-001",
         "T-004"
       ],
+      "career_context_id": "sparta-2012-2014",
       "visibility": "shareable",
       "source_refs": [
         {
@@ -8035,9 +8554,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Forecasted value, not realized value.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:38:10.583Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
