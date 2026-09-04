@@ -7503,7 +7503,7 @@
     {
       "candidate_id": "BF-X-050",
       "original_text": "The Comet Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
-      "reviewed_text": "The Comet Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
+      "reviewed_text": "The Quality Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
       "attribution": "team",
       "topics": [
         "T-002",
@@ -7528,8 +7528,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:34:43.568Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
