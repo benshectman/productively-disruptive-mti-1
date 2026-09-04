@@ -7,7 +7,7 @@ const jsonHeaders = { "Content-Type": "application/json", "Cache-Control": "no-s
 
 function configuration() {
   const repository = process.env.GITHUB_REPO || "benshectman/productively-disruptive-mti-1";
-  const branch = process.env.BENFACTS_REVIEW_BRANCH || process.env.HEAD || process.env.BRANCH || "feature/benfacts-editor";
+  const branch = process.env.HEAD || process.env.BRANCH || process.env.BENFACTS_REVIEW_BRANCH || "feature/benfacts-editor";
   return { repository, branch, token: process.env.GITHUB_TOKEN };
 }
 
