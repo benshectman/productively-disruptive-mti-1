@@ -6619,8 +6619,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:30:31.936Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
