@@ -7643,7 +7643,7 @@
     {
       "candidate_id": "BF-X-053",
       "original_text": "In the Comet research program, half of survey respondents provided comments and 32% agreed to be contacted for additional feedback.",
-      "reviewed_text": "In the Comet research program, half of survey respondents provided comments and 32% agreed to be contacted for additional feedback.",
+      "reviewed_text": "In the Comet research program, half of survey respondents provided comments and about a third agreed to be contacted for additional feedback.",
       "attribution": "team",
       "topics": [
         "T-003",
@@ -7664,8 +7664,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:35:25.658Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
