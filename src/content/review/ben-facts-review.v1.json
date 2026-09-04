@@ -5033,13 +5033,17 @@
     {
       "candidate_id": "BF-C-044R",
       "original_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
-      "reviewed_text": "Ben's 2026 résumé reports that his Johnson & Johnson team grew by 200% year over year.",
+      "reviewed_text": "At Johnson & Johnson, Ben grew hist team by 200% year over year.",
       "attribution": "personal",
       "topics": [
         "T-001",
         "T-003"
       ],
       "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2024
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -5054,9 +5058,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "The precise period behind the year-over-year figure still requires Ben's truth confirmation before approval. The résumé is explicit, but the precise period behind the year-over-year figure should be confirmed before approval.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:20:46.232Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
