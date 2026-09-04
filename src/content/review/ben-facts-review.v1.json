@@ -6250,9 +6250,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "hold",
       "review_notes": "Self-reported workshop measure; do not generalize beyond the session.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:28:38.191Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
