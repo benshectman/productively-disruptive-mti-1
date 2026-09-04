@@ -5771,11 +5771,12 @@
     {
       "candidate_id": "BF-X-008",
       "original_text": "The 2022 Experience Design model framed people centricity around customers, patients, employees, and partners rather than treating workforce UX as a screen-design problem alone.",
-      "reviewed_text": "The 2022 Experience Design model framed people centricity around customers, patients, employees, and partners rather than treating workforce UX as a screen-design problem alone.",
+      "reviewed_text": "The 2022 Experience Design model framed people centricity around meeting the needs of customers, patients, employees, and partners rather than treating UX as a screen-design problem alone.",
       "attribution": "leadership",
       "topics": [
         "T-002",
-        "T-003"
+        "T-003",
+        "T-001"
       ],
       "career_context_id": "jnj-2019-2025",
       "period": {
@@ -5799,8 +5800,9 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:26:27.474Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
