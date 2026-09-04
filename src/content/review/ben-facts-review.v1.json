@@ -5722,7 +5722,7 @@
     {
       "candidate_id": "BF-X-007",
       "original_text": "By 2022, the practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
-      "reviewed_text": "By 2022, the practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
+      "reviewed_text": "By 2022, the J&J XD practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
       "attribution": "leadership",
       "topics": [
         "T-001",
@@ -5747,8 +5747,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:24:43.232Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
