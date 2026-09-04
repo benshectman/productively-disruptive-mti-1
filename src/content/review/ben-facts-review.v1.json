@@ -7057,7 +7057,7 @@
     {
       "candidate_id": "BF-X-039",
       "original_text": "Vital stakeholders reported that a new access-request experience reduced a process that had previously taken several days to a matter of minutes.",
-      "reviewed_text": "Vital stakeholders reported that a new access-request experience reduced a process that had previously taken several days to a matter of minutes.",
+      "reviewed_text": "Vital stakeholders reported that a new access-request experience reduced the time it took to complete a key process from several days to a matter of minutes.",
       "attribution": "team",
       "topics": [
         "T-003",
@@ -7078,9 +7078,10 @@
         }
       ],
       "evidence_strength": "3 - Good",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "Stakeholder-reported qualitative outcome, not independently measured in this source.",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:33:00.226Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
