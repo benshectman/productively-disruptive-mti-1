@@ -4171,7 +4171,7 @@
     {
       "candidate_id": "BF-C-075",
       "original_text": "By 2025, the chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
-      "reviewed_text": "By 2025, the chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
+      "reviewed_text": "By 2025, the J&J XD chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
       "attribution": "shared_leadership",
       "topics": [
         "T-001",
@@ -4256,8 +4256,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:17:51.363Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
