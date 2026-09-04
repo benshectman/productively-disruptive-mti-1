@@ -5375,9 +5375,10 @@
       ],
       "evidence_strength": "3 - Good",
       "evidence_strength_rationale": "Explicitly supported by a clear authoritative source, but not independently corroborated in this source set.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "review_notes": "These were separate studies with different participant groups; do not present them as one controlled before/after experiment. The sequence, study sizes, and differing participant groups must remain visible; do not present this as a single before/after experiment.",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:22:10.256Z",
       "target_type": "project_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
