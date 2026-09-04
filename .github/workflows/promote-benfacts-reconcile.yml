@@ -1,0 +1,40 @@
+name: Promote reconciled BenFacts
+
+on:
+  push:
+    branches:
+      - feature/benfacts-reconcile-promote
+    paths:
+      - src/content/review/ben-facts-review.v1.json
+      - scripts/promote-benfacts.mjs
+      - .github/workflows/promote-benfacts-reconcile.yml
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out reconciliation branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/benfacts-reconcile-promote
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Promote approved facts
+        run: node scripts/promote-benfacts.mjs
+      - name: Commit generated approved corpus
+        run: |
+          if git diff --quiet -- src/content/approved/ben-facts.v1.json; then
+            echo "Approved corpus is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/approved/ben-facts.v1.json
+          git commit -m "Promote approved BenFacts corpus"
+          git push origin HEAD:feature/benfacts-reconcile-promote
