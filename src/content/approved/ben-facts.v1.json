@@ -2,7 +2,5429 @@
   "meta": {
     "version": "1.0",
     "generated_from": "ben-facts-review.v1.json",
-    "approved_count": 0
+    "approved_count": 142
   },
-  "facts": []
+  "facts": [
+    {
+      "id": "BF-C-001",
+      "claim": "Ben Shectman is an executive UX and Product Design leader with more than 20 years of professional experience.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-002",
+      "claim": "His work focuses on building and scaling design organizations and crafting enterprise-grade digital product experiences.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-003",
+      "claim": "He specializes in designing intuitive, human-centered experiences for complex, regulated, and multi-stakeholder enterprise environments.",
+      "attribution": "personal",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-004",
+      "claim": "From 2019 to 2025, Ben served as Enterprise Experience Design Chapter Leader at Johnson & Johnson.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-005",
+      "claim": "He established and scaled an Experience Design center of excellence supporting corporate, finance, supply chain, technology services, and information security organizations.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 22
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 50
+            },
+            {
+              "kind": "slide",
+              "number": 52
+            },
+            {
+              "kind": "slide",
+              "number": 53
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-006",
+      "claim": "He was accountable for UX leadership across more than 40 workforce-facing enterprise platforms.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 23
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-007",
+      "claim": "He built and led a design team that grew from one designer to more than twenty, including full-time direct report design managers and contract staff.",
+      "attribution": "personal",
+      "topics": [
+        "T-001"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-009",
+      "claim": "Ben led design for SigniFi, a multi-year global transformation of finance operations.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "project_id": "signifi",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 43
+            },
+            {
+              "kind": "page",
+              "number": 44
+            },
+            {
+              "kind": "page",
+              "number": 45
+            },
+            {
+              "kind": "page",
+              "number": 46
+            },
+            {
+              "kind": "page",
+              "number": 47
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-012",
+      "claim": "He championed exploration of GenAI-enabled rapid prototyping tools to accelerate design discovery.",
+      "attribution": "personal",
+      "topics": [
+        "T-001"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 135
+            },
+            {
+              "kind": "slide",
+              "number": 136
+            },
+            {
+              "kind": "slide",
+              "number": 137
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-013",
+      "claim": "Ben has established DesignOps practices, design systems, skills ladders, and governance models to support scaling teams.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-014",
+      "claim": "He has created component libraries and prototyping systems in collaboration with global brand organizations.",
+      "attribution": "personal",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-015",
+      "claim": "He has standardized UX practices across product delivery lifecycles and cross-functional product squads.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 23
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-016",
+      "claim": "He has mentored and coached designers, supporting skills development and career progression.",
+      "attribution": "personal",
+      "topics": [
+        "T-001"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 113
+            },
+            {
+              "kind": "slide",
+              "number": 114
+            },
+            {
+              "kind": "slide",
+              "number": 129
+            },
+            {
+              "kind": "slide",
+              "number": 130
+            },
+            {
+              "kind": "slide",
+              "number": 131
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-017",
+      "claim": "Director of User Experience at Crestron Electronics (2016-2018), leading UX across residential and enterprise control systems.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "crestron-2016-2018",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-018",
+      "claim": "Head of User Experience at REDI Global Technologies (contract - 2015), supporting institutional trading platform development.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-019",
+      "claim": "Director of User Experience at Sparta Systems (2012-2014), establishing an internal UX function for enterprise SaaS, on-prem and mobile solutions.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-020",
+      "claim": "Ben served as Practice Lead, Digital Strategy at EMC2 Global Consulting between 2011 to 2012.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "emc-2011-2012",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-022",
+      "claim": "Ben has led qualitative and quantitative user research programs, including usability testing, contextual inquiry, and behavioral analysis.",
+      "attribution": "personal",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-023",
+      "claim": "He applies human-centered design, Lean UX, and agile practices within product development environments.",
+      "attribution": "personal",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-024",
+      "claim": "Ben holds a Bachelor of Arts in Psychology from Yale University.",
+      "attribution": "personal",
+      "topics": [],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-033",
+      "claim": "Ben joined Johnson & Johnson in winter 2019 as the sole member of a newly defined UX/Human-Centered Design Center of Excellence within Corporate Business Technology.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2019,
+        "end_year": 2019
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-034",
+      "claim": "By April–May 2020, Corporate Business Technology had formally established and launched its Experience Design Management Office to support product squads.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-035",
+      "claim": "The early operating model positioned Experience Design to help teams identify the right product opportunities, design and test initiatives, and reveal portfolio enhancement opportunities, focused on ‘build the right things’ and ‘build those things right.’",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-036",
+      "claim": "Ben’s organization advocated for Experience Design to be a persistent, embedded capability in product domains rather than project-based support that appears only at isolated moments.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 22
+            },
+            {
+              "kind": "page",
+              "number": 23
+            },
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-037",
+      "claim": "The Experience Design service model spanned strategy, research, ideation, prototyping, implementation support, and continuous improvement through a six-stage framework: Immersion, Insights, Ideate, Iterate, Implement, Improve.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-038",
+      "claim": "Ben’s Experience Design practice used qualitative and quantitative evidence together, including interviews, ethnography, usability testing, surveys, behavioral analytics, and product metrics and OKRs.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 25
+            },
+            {
+              "kind": "slide",
+              "number": 26
+            },
+            {
+              "kind": "slide",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 19
+            },
+            {
+              "kind": "page",
+              "number": 20
+            },
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-039",
+      "claim": "The practice established ongoing experience-quality measurement as part of product management, defining, baselining, and repeatedly measuring experience outcomes to guide roadmaps.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 28
+            },
+            {
+              "kind": "slide",
+              "number": 31
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 26
+            },
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 57
+            },
+            {
+              "kind": "slide",
+              "number": 92
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-040",
+      "claim": "By mid-2022, the Corporate Business Technology Experience Design team had expanded into a multidisciplinary organization with domain-aligned design leaders, designers, researchers, and external delivery partners.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-041",
+      "claim": "The organization embedded Dual-Track Agile practices so discovery, prototyping, testing, and validation could run alongside delivery.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-001"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 24
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-042",
+      "claim": "By early 2025, the broader J&J Experience Design Chapter reported 24 full-time designers operating at or above capacity, with substantial opportunity to extend coverage across priority products.",
+      "attribution": "organization",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 45
+            },
+            {
+              "kind": "slide",
+              "number": 50
+            },
+            {
+              "kind": "slide",
+              "number": 52
+            },
+            {
+              "kind": "slide",
+              "number": 53
+            },
+            {
+              "kind": "slide",
+              "number": 61
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-043",
+      "claim": "At Johnson & Johnson, Ben was accountable to four divisional CIOs for experience design strategy, delivery, and portfolio alignment across a design-services portfolio exceeding $6 million.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-045",
+      "claim": "Ben led experience strategy and design direction across workforce-facing platforms spanning human resources, finance, procurement, global services, cybersecurity, supplier, and compliance workflows.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 23
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 26
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 51
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-046",
+      "claim": "The organization’s later operating model shifted attention from isolated product and organizational silos toward end-to-end journeys across people, products, processes, and environments.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 30
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 54
+            },
+            {
+              "kind": "slide",
+              "number": 55
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-047",
+      "claim": "To standardize user-centered practices, reduce rework, and increase consistency and velocity, the 2025 chapter model promoted reusable assets such as personas, journey maps, service design blueprints, research readouts, and experience metrics.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2024,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 19
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 28
+            },
+            {
+              "kind": "slide",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 27
+            },
+            {
+              "kind": "slide",
+              "number": 28
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 41
+            },
+            {
+              "kind": "slide",
+              "number": 44
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            },
+            {
+              "kind": "slide",
+              "number": 128
+            },
+            {
+              "kind": "slide",
+              "number": 134
+            },
+            {
+              "kind": "slide",
+              "number": 143
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-048",
+      "claim": "Ben’s teams used design systems, shared component libraries, and pattern-based interfaces to reduce redundant UI work and improve consistency across enterprise products.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 25
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 68
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-049",
+      "claim": "Ben recruited, coached, and mentored designers and design managers and helped establish a skills-development approach for the Experience Design chapter.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 113
+            },
+            {
+              "kind": "slide",
+              "number": 114
+            },
+            {
+              "kind": "slide",
+              "number": 129
+            },
+            {
+              "kind": "slide",
+              "number": 130
+            },
+            {
+              "kind": "slide",
+              "number": 131
+            },
+            {
+              "kind": "slide",
+              "number": 132
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-050",
+      "claim": "In July 2020, Ben hired a Product Experience Design Lead, his first of many full-time direct reports, to help expand the Experience Design practice, mature human-centered design, and lead work across the Corporate Business Technology portfolio.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-013",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-051",
+      "claim": "For the AskGS product owner, the XD team used a mixed-method research program that spanned knowledge assessment, 13 participatory interviews, and a survey of 1,104 respondents to triangulate user frustrations in a colleague support portal.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004",
+        "T-002"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            },
+            {
+              "kind": "page",
+              "number": 3
+            },
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-052",
+      "claim": "AskGS research identified seven core frustration themes and informed 43 specific improvement recommendations illustrated through a future-state vision prototype.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            },
+            {
+              "kind": "page",
+              "number": 5
+            },
+            {
+              "kind": "page",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-053",
+      "claim": "The AskGS future-state vision helped the organization decide to re-platform the portal; its target capabilities informed vendor and implementation-partner selection, and Experience Design led detailed design specification work.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-054",
+      "claim": "For Service Performance Reporting, the Experience Design team researched 14 participants across four regions, four service areas, and three user roles to shape a future reporting experience.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-055",
+      "claim": "Service Performance Reporting embedded Experience Design in the squad, conducted primary research before major phases, prototyped visualizations before development, paired usability studies with releases, and surveyed users quarterly.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 31
+            },
+            {
+              "kind": "page",
+              "number": 32
+            },
+            {
+              "kind": "page",
+              "number": 33
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-056",
+      "claim": "Compared with the prior Service Performance Reporting solution, the redesigned product reported a 114% increase in speed to insight, an 85% increase in ease of use, a 122% increase in usefulness, and a 104-point increase in Net Promoter Score.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 31
+            },
+            {
+              "kind": "page",
+              "number": 32
+            },
+            {
+              "kind": "page",
+              "number": 33
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-057",
+      "claim": "On the Vital finance platform, the Experience Design team combined workshops, ongoing research, design, and recurring measurement to guide a product used by approximately 14,500 global finance colleagues over a twelve-month period.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 43
+            },
+            {
+              "kind": "page",
+              "number": 44
+            },
+            {
+              "kind": "page",
+              "number": 45
+            },
+            {
+              "kind": "page",
+              "number": 46
+            },
+            {
+              "kind": "page",
+              "number": 47
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-058",
+      "claim": "Vital’s research program reported five quarterly surveys, 98 survey responses, nine rounds of qualitative interviews, 51 hour-long interviews, and more than 110 product recommendations.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-059",
+      "claim": "Vital’s 2023 North America results reported ease-of-use and usefulness scores above the cited industry benchmark, with 78/100 for ease of use and 72/100 for usefulness versus a benchmark of 68.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-060",
+      "claim": "For the enterprise purchasing experience, Ben’s organization directed research and redesign work across purchase-request, purchase-order, invoice-status, email, and self-service touchpoints.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-062",
+      "claim": "From late 2022 through 2024, Experience Design worked continuously with MedTech Supply Chain to launch a family of control-tower products across multiple franchises.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-063",
+      "claim": "In 2023, the SAGE partnership supported design of seven supply-chain products intended to reduce backorder, improve service, and improve the efficiency and experience of supply-chain users.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-002"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-065",
+      "claim": "The SAGE work reused modular patterns and existing React components across multiple control towers instead of repeatedly creating bespoke interface designs.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-066",
+      "claim": "Ben’s organization extended capacity through design partners operating under the Experience Design team’s authority and quality oversight, with regular performance and leadership reviews.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-067",
+      "claim": "The Supplier Risk Sensing team used cross-functional workshops and more than ten user-feedback sessions over eight weeks to produce development-ready interface designs and a future-release backlog.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-068",
+      "claim": "For the Quality Change Control module, the Experience Design team used four research methods, produced 69 design recommendations, and reported a response-rate increase from 3% to 22% and a 19% usability improvement versus the legacy environment.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-069",
+      "claim": "For the FIRST third-party due-diligence platform serving approximately 28,000 users across 57 countries and 24 languages, the Experience Design team used collaborative workshops, iterative prototyping, and repeated usability studies to redesign a complex global workflow.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-071",
+      "claim": "For Product Quality Management, the Experience Design team joined an existing product after its fourth release, aligned product objectives and key results with the business, established a UX-Lite baseline, analyzed the information architecture, and prepared iterative feature prototyping.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-072",
+      "claim": "For external identity and access management, the Experience Design team worked with product and development partners to refine a partially built portal, align it with the enterprise brand, and plan research, testing, and iterative design.",
+      "attribution": "leadership",
+      "topics": [
+        "T-003"
+      ],
+      "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-073",
+      "claim": "Ben designs at multiple levels of the system: he shapes individual product experiences while also designing the operating structures, practices, measures, reusable assets, and governance that enable design quality at scale.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-019",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 19
+            },
+            {
+              "kind": "slide",
+              "number": 20
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 86
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-074",
+      "claim": "Ben’s practice treated experience-related product outcomes through the lens of changes in users' beliefs and behaviors, and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 27
+            },
+            {
+              "kind": "page",
+              "number": 28
+            },
+            {
+              "kind": "page",
+              "number": 29
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            },
+            {
+              "kind": "slide",
+              "number": 18
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            },
+            {
+              "kind": "slide",
+              "number": 67
+            },
+            {
+              "kind": "slide",
+              "number": 68
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-075",
+      "claim": "By 2025, the J&J XD chapter was intentionally shifting design effort earlier in the product lifecycle toward experience strategy and user research, while continuing design and measurement support.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 13
+            },
+            {
+              "kind": "slide",
+              "number": 60
+            },
+            {
+              "kind": "slide",
+              "number": 66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-076",
+      "claim": "Ben’s career includes building or leading internal UX functions in regulated enterprise software, institutional trading technology, integrated hardware-software ecosystems, consulting, and global life-sciences technology.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            },
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-077",
+      "claim": "At Crestron, Ben introduced formal usability testing, established design standards and pattern libraries, and led work that resulted in a patent for interface innovation.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "crestron-2016-2018",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-078",
+      "claim": "At REDI Global Technologies, Ben established the company’s first qualitative and quantitative user-research programs for an institutional trading platform and developed a next-generation experience strategy.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-079",
+      "claim": "At Sparta Systems, Ben established an internal UX function, introduced user-centered practices into product management and Agile delivery, and created the company’s first formal usability-testing program for regulated enterprise software.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-008A",
+      "claim": "At Johnson & Johnson, Ben directed a design-services portfolio exceeding $6 million.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-008B",
+      "claim": "At Johnson & Johnson, Ben's design-services portfolio included more than 45 UX design engagements.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-011A",
+      "claim": "Ben directed Experience Design support for Service Performance Reporting, an operational analytics product for Global Services.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 9
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 31
+            },
+            {
+              "kind": "page",
+              "number": 32
+            },
+            {
+              "kind": "page",
+              "number": 33
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-011B",
+      "claim": "Ben directed Experience Design support for a portfolio of MedTech Supply Chain digital-twin and control-tower products.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-015",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 1
+            },
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            },
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-021A",
+      "claim": "Ben served as Senior Manager, User Experience at Pfizer from 2006 to 2011.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "pfizer-2006-2011",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-025A",
+      "claim": "Ben holds Pragmatic Marketing Level 2 (PMC-II) certification.",
+      "attribution": "personal",
+      "topics": [],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-025B",
+      "claim": "Ben is a Simplexity Applied Creativity Facilitator through Basadur.",
+      "attribution": "personal",
+      "topics": [],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-025C",
+      "claim": "Ben completed Design Leadership training through Cooper.",
+      "attribution": "personal",
+      "topics": [
+        "T-001"
+      ],
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BENFACTS-001",
+          "locations": []
+        },
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-044R",
+      "claim": "At Johnson & Johnson, Ben grew hist team by 200% year over year.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-061R",
+      "claim": "The enterprise purchasing team estimated that redesigned email and status-page experiences could produce approximately $345,000 to $629,000 in annual savings through reduced service-center contacts and buyer effort.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            },
+            {
+              "kind": "slide",
+              "number": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-064A",
+      "claim": "The SWIFT control-tower design process included more than 30 user-feedback sessions over roughly three months.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-064B",
+      "claim": "The Integrate control-tower design team ran about 70 user sessions across 2023 and 2024 to refine requirements and designs.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-integrate",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-064C",
+      "claim": "The ORC control-tower design process included roughly a dozen user sessions to refine the product concept and wireframes.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-orc",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            },
+            {
+              "kind": "slide",
+              "number": 8
+            },
+            {
+              "kind": "slide",
+              "number": 10
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            },
+            {
+              "kind": "slide",
+              "number": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-070R",
+      "claim": "Across separate FIRST usability studies with different participant groups, reported usefulness/usability scores were 25%/33% for the current system, 80%/80% for an early prototype, 82.5%/90% in a later pre-release study, and 75%/73% in a 173-participant survey.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-080A",
+      "claim": "Ben served as Senior Information Architect at BusinessEdge Solutions from 2005 to 2006.",
+      "attribution": "personal",
+      "topics": [
+        "T-003"
+      ],
+      "career_context_id": "businessedge-2005-2006",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-080B",
+      "claim": "Ben served as Chief Experience Architect at OmniModis Design / OX Interactive from 2001 to 2005.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "omnimodis-ox-2001-2005",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-C-080C",
+      "claim": "Ben served as Manager, Customer Experience at Mainspring, an IBM company, from 2000 to 2001.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "mainspring-2000-2001",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-001",
+      "claim": "The 2020 Experience Design operating model gave XD a portfolio-level role in helping domains prioritize product investments by identifying investments that addressed the greatest user needs using qualitative and quantitative evidence.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-002",
+      "claim": "The 2020 operating model assigned XD a discovery role in identifying strong new-product opportunities by engaging directly with users before teams committed to building.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2020
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-003",
+      "claim": "The Experience Design model used rapid prototyping and iterative experience-quality testing to help product squads design and deploy solutions that addressed user problems.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 16
+            },
+            {
+              "kind": "slide",
+              "number": 17
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-005",
+      "claim": "Functional Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-007",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 20
+            },
+            {
+              "kind": "slide",
+              "number": 21
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-007",
+      "claim": "By 2022, the J&J XD practice explicitly helped product teams define the experience 'metrics that matter' and establish continuous product-discovery programs informed by those measures.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 28
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-008",
+      "claim": "The 2022 Experience Design model framed people centricity around meeting the needs of customers, patients, employees, and partners rather than treating UX as a screen-design problem alone.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-001"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 9
+            },
+            {
+              "kind": "page",
+              "number": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-011",
+      "claim": "The 2025 XD Chapter explicitly defined four service families: Experience Strategy, User Research, Design, and UX Measurement.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-016",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-012",
+      "claim": "The 2025 Chapter operating model set OKRs around whether XD was supporting the right priorities, using the right mix of services, building the right skills, carrying sufficient capacity, and influencing people centricity beyond direct XD involvement.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-013",
+      "claim": "The Chapter's 2025 governance model set portfolio-level experience key results for both products with embedded XD and priority products without embedded XD.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-014",
+      "claim": "The 2025 Chapter set a goal for priority products to maintain reusable experience assets such as personas, journeys or blueprints, and user research in a shared repository.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-015",
+      "claim": "The 2025 Chapter used design-system adoption as an explicit operating objective, treating shared UI patterns as a measurable mechanism for consistency and scale.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-016",
+      "claim": "The 2025 Chapter model explicitly included training and coaching people outside the XD Chapter so user-centered practices could scale beyond direct designer involvement.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-008",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-017",
+      "claim": "A 2025 Chapter innovation session split participants into groups to experiment with five GenAI tools for tasks including research planning, measurement definition, visual creation, animation, and wireframing.",
+      "attribution": "shared_leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-021",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 137
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-020",
+      "claim": "The 2025 Information Security portfolio explicitly included back-end products as experiences with customers whose outcomes could be measured.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2025,
+        "end_year": 2025
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-011",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 23
+            },
+            {
+              "kind": "slide",
+              "number": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-021",
+      "claim": "AskGS research found that users often needed prior institutional knowledge or experience with similar platforms to use the portal efficiently.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-022",
+      "claim": "AskGS research identified search as a core frustration because users struggled to locate content efficiently and effectively.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-023",
+      "claim": "AskGS research found that content relevance, specificity, accuracy, and freshness were recurring sources of user frustration.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-024",
+      "claim": "AskGS research identified ticket intake as a problem when users could not self-serve and had to move into support processes.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-025",
+      "claim": "AskGS research found that users had difficulty tracking the status and progress of service requests.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-026",
+      "claim": "AskGS research identified orchestration as an opportunity to help users complete tasks without relying on agent assistance.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-027",
+      "claim": "AskGS research identified language as an accessibility and usability issue for users whose preferred language was not English.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "askgs",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-005",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-029",
+      "claim": "Service Performance Reporting research established a design principle that metric definitions and calculation context should be visible within dashboards rather than left implicit.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-030",
+      "claim": "SPR design principles called for dashboards to surface meaningful insights, patterns, anomalies, and suggested courses of action rather than only display raw metrics.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-031",
+      "claim": "SPR design principles included social features that let users capture, annotate, and share specific graphs to support conversation and action.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-032",
+      "claim": "SPR design principles supported personalization and progressive drill-down, including rearranging visualizations, filtered views, timelines, and navigation from summary information into specific subcategories.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "spr",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2020,
+        "end_year": 2022
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-014",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-034",
+      "claim": "Vital used a dual-track product-development approach so Experience Design could continue researching and designing enhancements while development progressed.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-018",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 49
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-035",
+      "claim": "Vital's ongoing research program included five quarterly surveys and nine rounds of qualitative interviews.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-036",
+      "claim": "Across the documented Vital research program, the team collected 98 survey responses and conducted 51 sixty-minute qualitative interviews.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-037",
+      "claim": "Vital research generated more than 110 product recommendations from user findings.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-039",
+      "claim": "Vital stakeholders reported that a new access-request experience reduced the time it took to complete a key process from several days to a matter of minutes.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "vital",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-003",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-040",
+      "claim": "The legacy FIRST third-party due-diligence system represented an $18 million prior investment but still had major usability and risk-management shortcomings.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-041",
+      "claim": "FIRST's legacy experience was described as complex and difficult to learn, a significant problem because many of its users interacted with the system infrequently.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-042",
+      "claim": "The FIRST redesign included ongoing consultation with the development team to preserve UX specifications despite technical constraints.",
+      "attribution": "team",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "project_id": "first-tpi-due-diligence",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-010",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-043",
+      "claim": "PQM360 was intended to centralize data from a broad set of repositories, accelerate record recovery and data collection, support templated and custom reporting, and help users identify product trends and events.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-044",
+      "claim": "When XD joined PQM360 after its fourth release, the engagement focused on adoption, data-collection efficiency, and an industry-standard end-to-end user experience rather than a greenfield redesign.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "pqm360",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-012",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            },
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-045",
+      "claim": "Supplier Risk Sensing addressed an event-management process that was labor-intensive, reactive, and siloed across procurement and sector teams.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-046",
+      "claim": "Supplier Risk Sensing was designed for Supply Chain Managers, Chief Procurement Officers, and Category Managers, with event-impact summaries, mitigation suggestions, customizable alerts, and reporting.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "supplier-risk-sensing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-002",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-047",
+      "claim": "The xIAM portal vision was to provide a central point of access across J&J applications with a unified login experience and stronger security.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-048",
+      "claim": "xIAM was intended to let users see applications they were registered for, track pending approvals, switch between applications, and search for applications more efficiently.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "xiam",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-022",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-050",
+      "claim": "The Quality Change Control work was part of a broader re-platforming of quality-management modules from TrackWise to Salesforce.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-051",
+      "claim": "The legacy Comet quality-management workflow was sequential and siloed, increasing cycle time, limiting analytics, and creating redundant training and manual rework.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-052",
+      "claim": "Experience Design was embedded with the Comet program from Q1 through Q3 2023 before program funding for XD ended in Q4.",
+      "attribution": "team",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-053",
+      "claim": "In the Comet research program, half of survey respondents provided comments and about a third agreed to be contacted for additional feedback.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "comet-change-control",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-009",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-054",
+      "claim": "The eMarketplace research baseline reported a UMUX-Lite score of 58 for the purchase-request and purchase-order status experience, below the cited industry benchmark of 68.",
+      "attribution": "team",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 5
+            },
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-055",
+      "claim": "The purchasing journey included substantial communication overhead: the team estimated that a typical purchase could generate roughly 10 to 15 emails.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-056",
+      "claim": "The Buying Assistant concept was designed to reduce dependence on procurement 'tribal knowledge' by guiding users toward the appropriate purchasing category based on information they entered.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "emarketplace-purchasing",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-020",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            },
+            {
+              "kind": "slide",
+              "number": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-057",
+      "claim": "Across MedTech Supply Chain, the control-tower portfolio shared recurring goals of reducing backorder, reducing order aging, reducing cost to serve, and improving workforce efficiency and satisfaction.",
+      "attribution": "leadership",
+      "topics": [
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-058",
+      "claim": "The control-tower design approach refined business requirements through generative research, iterated concepts with users during design, supported data-mapping refinement, and stayed involved during development when blockers emerged.",
+      "attribution": "leadership",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-060",
+      "claim": "SWIFT included forward-looking shortage visibility, proactive personalized alerts, what-if modeling for product movement, and a collaborative workspace for resolving backorder issues.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "source_id": "SRC-BF-001",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-061",
+      "claim": "The Vision Control Tower was created in a business that had been managing a nine-digit backorder problem for multiple years.",
+      "attribution": "team",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "project_id": "sage-swift",
+      "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2022,
+        "end_year": 2024
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-004",
+          "locations": [
+            {
+              "kind": "slide",
+              "number": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-062",
+      "claim": "At Crestron, Ben's UX remit spanned enterprise, residential, mobile, and dealer-facing configuration experiences across a combined hardware, software, and services ecosystem.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "crestron-2016-2018",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-063",
+      "claim": "At Crestron, Ben managed internal UX designers and agency partners producing research, flows, prototypes, and implementation-ready interface specifications.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "crestron-2016-2018",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-064",
+      "claim": "At REDI, Ben's research program combined contextual inquiry, behavioral-data analysis, usability studies, and quantitative research for complex institutional-trading workflows.",
+      "attribution": "personal",
+      "topics": [
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-065",
+      "claim": "At REDI, Ben translated research into UX architecture, interaction models, personas, and prioritized improvements for professional trading workflows.",
+      "attribution": "personal",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-066",
+      "claim": "At REDI, Ben facilitated design studios to explore future-state product opportunities and align stakeholders around potential experience directions.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-067",
+      "claim": "At REDI, Ben developed the strategy for a customer self-service portal intended to improve access to product resources and scale customer engagement.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-068",
+      "claim": "REDI initiatives associated with Ben's UX strategy were forecast to return more than $1 million in annual revenue.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-004"
+      ],
+      "career_context_id": "redi-2015",
+      "period": {
+        "start_year": 2015,
+        "end_year": 2015
+      },
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-069",
+      "claim": "Sparta Systems was a roughly $90 million B2B enterprise SaaS company serving regulated quality-management workflows when Ben built its internal UX function.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-070",
+      "claim": "At Sparta, Ben's UX remit included TrackWise, a configurable no-code workflow platform used to build pages, forms, and process-driven enterprise workflows.",
+      "attribution": "personal",
+      "topics": [
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-071",
+      "claim": "At Sparta, Ben established a Customer Engagement Program supporting qualitative and quantitative voice-of-customer research, satisfaction tracking, and the company's first formal usability-testing program.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-003",
+        "T-004"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-072",
+      "claim": "At Sparta, Ben championed Lean UX so discovery, prototyping, and user validation could be integrated more tightly into Agile product delivery.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BF-X-073",
+      "claim": "Sparta's UX (R)evolution initiative was forecast to return more than $2 million in annual revenue.",
+      "attribution": "personal",
+      "topics": [
+        "T-001",
+        "T-004"
+      ],
+      "career_context_id": "sparta-2012-2014",
+      "visibility": "shareable",
+      "source_refs": [
+        {
+          "source_id": "SRC-BF-006",
+          "locations": [
+            {
+              "kind": "page",
+              "number": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
