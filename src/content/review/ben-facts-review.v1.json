@@ -5672,7 +5672,7 @@
     {
       "candidate_id": "BF-X-005",
       "original_text": "Domain Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
-      "reviewed_text": "Domain Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
+      "reviewed_text": "Functional Experience Design leads were expected to combine user research and experience strategy with facilitation, service design mapping, experience/value measurement, partner quality oversight, and cross-domain design-system visibility.",
       "attribution": "leadership",
       "topics": [
         "T-001",
@@ -5698,8 +5698,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:24:13.652Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
