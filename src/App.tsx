@@ -52,7 +52,7 @@ function Configurator({ context, onTopics, onGenerate }: {
           </div>
         </fieldset>
         <button className="generate" type="button" onClick={onGenerate}>Generate my experience <span aria-hidden="true">↗</span></button>
-        <p className="grounding-note">AI shapes the framing, never the underlying facts. Validation builds may use clearly labeled, unapproved candidate BenFacts.</p>
+        <p className="grounding-note">AI shapes the framing, never the underlying approved BenFacts.</p>
       </section>
     </main>
   );
@@ -85,9 +85,8 @@ function Experience({ narrative, generationDiagnostics, diagnosticsEnabled, evid
       <div><p className="kicker">Ben Shectman · Productively Disruptive</p><p>{selectedLabels.length ? `Framed around ${selectedLabels.join(" · ")}` : "A balanced view across leadership, systems, enterprise experience, and measurement"}</p></div>
       <button className="text-button" onClick={onReset}>Reshape experience</button>
     </header>
-    <section className="narrative-intro"><p className="section-number">Your generated experience</p><h1>Design leadership,<br/><em>assembled for you.</em></h1><p>{narrative.grounding === "candidate_validation" ? "Validation mode: framed from unapproved candidate BenFacts so the expanded corpus can be evaluated before approval." : narrative.mode === "ai" ? "AI-framed from a bounded set of approved evidence." : "Assembled deterministically from approved evidence."}</p></section>
-    {(narrative.grounding === "candidate_validation" || diagnosticsEnabled) && <aside className={`validation-notice${diagnosticsEnabled ? " has-generation-diagnostics" : ""}`} role="note">
-      {narrative.grounding === "candidate_validation" && <><strong>Temporary validation corpus</strong><span>Claims in this experience are candidates under review and must not be treated as approved portfolio content.</span></>}
+    <section className="narrative-intro"><p className="section-number">Your generated experience</p><h1>Design leadership,<br/><em>assembled for you.</em></h1><p>{narrative.mode === "ai" ? "AI-framed from a bounded set of approved BenFacts." : "Assembled deterministically from approved BenFacts."}</p></section>
+    {diagnosticsEnabled && <aside className="validation-notice has-generation-diagnostics" role="note">
       {diagnosticsEnabled && <div className="generation-diagnostics" data-generation-status={generationDiagnostics.status}>
         <strong>Generation diagnostics</strong>
         <span>{generationDiagnostics.generatedFields} of {generationDiagnostics.totalFields} fields generated · {generationDiagnostics.fallbackFields} fallback</span>
@@ -125,7 +124,7 @@ function Experience({ narrative, generationDiagnostics, diagnosticsEnabled, evid
         </article>;
       })}
     </div>
-    <footer><p>{narrative.grounding === "candidate_validation" ? "This validation experience uses unapproved candidate facts while preserving personal, leadership, team, shared, and organizational attribution." : "This experience is grounded in approved evidence and preserves the attribution of individual, shared, and organizational work."}</p><button className="text-button" onClick={onReset}>Start again ↑</button></footer>
+    <footer><p>This experience is grounded in approved BenFacts and preserves the attribution of individual, shared, and organizational work.</p><button className="text-button" onClick={onReset}>Start again ↑</button></footer>
   </main>;
 }
 
@@ -141,10 +140,10 @@ function EvidenceDialog({ presentation, onClose }: { presentation: EvidencePrese
     {presentation && <>
       <DialogHeader title="Evidence behind this" subtitle={`${evidencePointsLabel(count, presentation.grounding)} supporting “${presentation.contextLabel}”`} onOpenChange={(open) => { if (!open) onClose(); }}/>
       <div className="evidence-dialog-body">
-        <p className="evidence-dialog-intro">{presentation.grounding === "candidate_validation" ? "These unapproved candidate facts are being used temporarily to test the adaptive portfolio. They remain subject to Ben’s review." : "These are the approved evidence points used to ground this part of the experience."}</p>
+        <p className="evidence-dialog-intro">These are the approved evidence points used to ground this part of the experience.</p>
         <Carousel aria-label={`Evidence supporting ${presentation.contextLabel}`} gap={2} hasButtons={count > 1} hasEdgeFade={count > 1} hasSnap>
           {presentation.items.map((item, index) => <Card key={item.id} className="evidence-card" width="var(--evidence-card-width)" minHeight={280} padding={4} variant="default">
-            <p className="evidence-card-position">{presentation.grounding === "candidate_validation" ? "Candidate" : "Evidence"} {index + 1} of {count}</p>
+            <p className="evidence-card-position">Evidence {index + 1} of {count}</p>
             <p className="evidence-card-id">{item.id}</p>
             <p className="evidence-card-claim">{item.claim}</p>
             <p className="evidence-card-attribution">Attribution: {item.attribution.replaceAll("_", " ")}</p>
