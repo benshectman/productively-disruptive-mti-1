@@ -6326,7 +6326,7 @@
     {
       "candidate_id": "BF-X-020",
       "original_text": "The 2025 Information Security portfolio explicitly treated even back-end products as experiences with customers whose outcomes could be measured.",
-      "reviewed_text": "The 2025 Information Security portfolio explicitly treated even back-end products as experiences with customers whose outcomes could be measured.",
+      "reviewed_text": "The 2025 Information Security portfolio explicitly included back-end products as experiences with customers whose outcomes could be measured.",
       "attribution": "leadership",
       "topics": [
         "T-002",
@@ -6355,8 +6355,9 @@
         }
       ],
       "evidence_strength": "4 - Strong",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "expansion",
+      "reviewed_at": "2026-09-04T19:29:28.854Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
