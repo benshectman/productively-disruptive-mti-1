@@ -3226,6 +3226,10 @@
       ],
       "project_id": "vital",
       "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3295,10 +3299,6 @@
         "atomicity_review": "review",
         "possible_overlap_refs": [],
         "notes": ""
-      },
-      "period": {
-        "start_year": 2023,
-        "end_year": 2023
       }
     },
     {
@@ -3312,6 +3312,10 @@
       ],
       "project_id": "vital",
       "career_context_id": "jnj-2019-2025",
+      "period": {
+        "start_year": 2023,
+        "end_year": 2023
+      },
       "visibility": "shareable",
       "source_refs": [
         {
@@ -3336,10 +3340,6 @@
         "atomicity_review": "review",
         "possible_overlap_refs": [],
         "notes": ""
-      },
-      "period": {
-        "start_year": 2023,
-        "end_year": 2023
       }
     },
     {
@@ -4098,7 +4098,7 @@
     {
       "candidate_id": "BF-C-074",
       "original_text": "Ben’s practice treated product outcomes as behavioral choices and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
-      "reviewed_text": "Ben’s practice treated product outcomes as behavioral choices and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
+      "reviewed_text": "Ben’s practice treated experience-related product outcomes through the lens of changes in users' beliefs and behaviors, and used experience strategy and measurement to connect what users value with the business outcomes a product seeks to create.",
       "attribution": "shared_leadership",
       "topics": [
         "T-002",
@@ -4156,8 +4156,9 @@
       ],
       "evidence_strength": "4 - Strong",
       "evidence_strength_rationale": "Explicitly supported and corroborated across multiple source artifacts.",
-      "review_status": "unreviewed",
+      "review_status": "approved",
       "origin": "baseline",
+      "reviewed_at": "2026-09-04T19:17:31.818Z",
       "target_type": "evidence_candidate",
       "mechanical_status": "ready_for_human_truth_review",
       "mechanical_review": {
