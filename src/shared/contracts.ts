@@ -3,8 +3,8 @@ import { z } from "zod";
 export const TopicIdSchema = z.enum(["T-001", "T-002", "T-003", "T-004"]);
 export const DesignSystemSchema = z.literal("astryx");
 export const ThemeSchema = z.literal("neutral");
-export const GroundingModeSchema = z.enum(["approved", "candidate_validation"]);
-const EvidenceFactIdSchema = z.string().regex(/^(E-\d{3}|BF-C-\d{3})$/);
+export const GroundingModeSchema = z.literal("approved");
+const EvidenceFactIdSchema = z.string().regex(/^(E-\d{3}|BF-(?:C|X)-\d{3}[A-Z]?)$/);
 
 export const ProofNarrativeSchema = z.object({
   narrative: z.string().min(1).max(1200),

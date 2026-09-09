@@ -1,10 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { applyAiFraming, generateNarrative, GENERATION_TIMEOUT_MS } from "../netlify/functions/generate";
-import { contentPacket } from "../src/content/content";
+import approvedCorpus from "../src/content/approved/ben-facts.v1.json";
 import { assembleNarrative } from "../src/shared/narrative";
 
-afterEach(() => { delete process.env.OPENAI_API_KEY; delete process.env.BENFACTS_VALIDATION_MODE; vi.useRealTimers(); });
-beforeEach(() => { process.env.BENFACTS_VALIDATION_MODE = "approved"; });
+afterEach(() => { delete process.env.OPENAI_API_KEY; vi.useRealTimers(); });
 
 describe("bounded AI guardrails", () => {
   it("merges framing without allowing the model to change structure or evidence", () => {
@@ -60,7 +59,7 @@ describe("bounded AI guardrails", () => {
     let requestBody: Record<string, unknown> | undefined;
     const safeHeadlines = ["Designing systems behind excellent product experiences", "Embedding design leadership across the organization", "Making enterprise design impact visible", "Building a durable career throughline"];
     const fakeFetch = async (_url: string | URL | Request, init?: RequestInit) => {
-      requestBody = JSON.parse(String(init?.body));
+      requestBody ||= JSON.parse(String(init?.body));
       const framing = { sections: fallback.sections.map((section, index) => ({ id: section.id, headline: safeHeadlines[index], summary: "A generated lead paragraph grounded only in the evidence assigned to this section.", detail: "A fuller generated narrative grounded only in the evidence assigned to this section, connecting its supported facts without changing attribution." })) };
       return new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
     };
@@ -70,7 +69,7 @@ describe("bounded AI guardrails", () => {
     expect(requestBody?.text).toMatchObject({ format: { type: "json_schema", strict: true, name: "portfolio_narrative" } });
     const input = JSON.parse(String(requestBody?.input));
     const visibleEvidence = input.sections.flatMap((section: { evidence: unknown[] }) => section.evidence);
-    const approvedIds = new Set(contentPacket.evidence.map((item) => item.id));
+    const approvedIds = new Set(approvedCorpus.facts.map((item) => item.id));
     expect(visibleEvidence.length).toBeGreaterThan(0);
     expect(visibleEvidence.every((item: { id: string }) => approvedIds.has(item.id))).toBe(true);
     expect(JSON.stringify(visibleEvidence)).not.toContain("knowledge_only");

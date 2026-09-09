@@ -1,7 +1,7 @@
-import candidateManifestJson from "../../src/content/candidates/ben-facts-migration.v0.4.json";
-import { NarrativeSchema, ProofItemSchema, type Attribution, type Narrative, type ProofItem, type ProofResultType, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
-import { candidateEditorialMetadata, type NarrativeRole } from "./candidate-editorial-metadata";
-import { expandPresentationAcronyms } from "../../src/shared/narrative-presentation";
+import approvedCorpusJson from "../content/approved/ben-facts.v1.json";
+import { NarrativeSchema, ProofItemSchema, type Attribution, type Narrative, type ProofItem, type ProofResultType, type PublicEvidence, type TopicId } from "./contracts";
+import { approvedEditorialMetadata, type NarrativeRole } from "./approved-editorial-metadata";
+import { expandPresentationAcronyms } from "./narrative-presentation";
 
 type CandidateRecord = {
   candidate_id: string;
@@ -13,20 +13,44 @@ type CandidateRecord = {
   attribution: Attribution | "undetermined" | "policy";
   evidence_strength: "1 - Poor" | "2 - Fair" | "3 - Good" | "4 - Strong";
   project_id?: string;
+  career_context_id?: string;
+  period?: { start_year: number; end_year?: number };
 };
 
-const candidateManifest = candidateManifestJson as unknown as { candidates: CandidateRecord[] };
-const allowedAttributions = new Set<Attribution>(["personal", "leadership", "team", "organization", "shared_leadership"]);
-const allowedTypes = new Set(["proposition_candidate", "evidence_candidate", "project_candidate", "career_record_candidate", "credential_candidate"]);
+type ApprovedCorpusFact = {
+  id: string;
+  claim: string;
+  attribution: Attribution;
+  topics: TopicId[];
+  visibility: string;
+  project_id?: string;
+  career_context_id?: string;
+  period?: { start_year: number; end_year?: number };
+};
 
-const candidates = candidateManifest.candidates.filter((candidate) =>
-  Number(candidate.candidate_id.slice(-3)) >= 33
-  && candidate.status === "pending_review"
-  && allowedTypes.has(candidate.target_type)
-  && allowedAttributions.has(candidate.attribution as Attribution)
-);
+const approvedCorpus = approvedCorpusJson as unknown as { facts: ApprovedCorpusFact[] };
+const allowedAttributions = new Set<Attribution>(["personal", "leadership", "team", "organization", "shared_leadership"]);
+
+// The promoted corpus intentionally has a smaller public schema than the review
+// records. Adapt id/claim to the existing deterministic planner's internal shape
+// without importing candidate or review content into the runtime bundle.
+const candidates: CandidateRecord[] = approvedCorpus.facts
+  .filter((fact) => fact.visibility === "shareable" && allowedAttributions.has(fact.attribution))
+  .map((fact) => ({
+    candidate_id: fact.id,
+    original_text: fact.claim,
+    proposed_topics: fact.topics,
+    attribution: fact.attribution,
+    visibility: fact.visibility,
+    status: "pending_review",
+    target_type: fact.project_id ? "project_candidate" : "evidence_candidate",
+    evidence_strength: "4 - Strong",
+    project_id: fact.project_id,
+    career_context_id: fact.career_context_id,
+    period: fact.period
+  }));
 const candidateById = new Map(candidates.map((candidate) => [candidate.candidate_id, candidate]));
-export const candidateValidationIds = new Set(candidateById.keys());
+export const approvedBenFactIds = new Set(candidateById.keys());
 
 const PROJECT_NAMES: Record<string, string> = {
   askgs: "AskGS",
@@ -61,7 +85,7 @@ const PROJECT_ANCHORS: Record<TopicId, string[]> = {
   "T-004": ["BF-C-051", "BF-C-054", "BF-C-056", "BF-C-058", "BF-C-068", "BF-C-070"]
 };
 
-export type CandidateProofProject = {
+export type ApprovedProofProject = {
   project_id: string;
   project_name: string;
   relevance: string;
@@ -83,7 +107,7 @@ function resultTypeFor(record: CandidateRecord): ProofResultType {
 }
 
 function proofSummary(records: CandidateRecord[]) {
-  const explicitOutcomes = records.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome");
+  const explicitOutcomes = records.filter((record) => approvedEditorialMetadata[record.candidate_id]?.scope === "outcome");
   const inferredOutcomes = records.filter((record) => outcomePattern.test(record.original_text));
   const outcomePool = explicitOutcomes.length ? explicitOutcomes : inferredOutcomes.length ? inferredOutcomes : records;
   const inRangeOutcome = outcomePool.filter((record) => {
@@ -122,18 +146,18 @@ function relevanceFor(records: CandidateRecord[], topics: TopicId[]) {
   return labels.length ? `Selected for its relevance to ${labels.join(" and ")}.` : "Selected as a complementary proof point.";
 }
 
-function projectScore(project: CandidateProofProject, topics: TopicId[]) {
+function projectScore(project: ApprovedProofProject, topics: TopicId[]) {
   const topicRelevance = topics.reduce((score, topic) => score + project.facts.filter((record) => record.proposed_topics.includes(topic)).length, 0);
-  const outcomes = project.facts.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
+  const outcomes = project.facts.filter((record) => approvedEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
   const outcomeStrength = outcomes.reduce((score, record) => score + strengthScore(record.evidence_strength), 0);
-  const recency = Math.max(...project.facts.map((record) => periodScore[candidateEditorialMetadata[record.candidate_id]?.careerPeriod || "earlier"]));
+  const recency = Math.max(...project.facts.map((record) => periodScore[approvedEditorialMetadata[record.candidate_id]?.careerPeriod || "earlier"]));
   const evidenceCompleteness = project.facts.length * 10
     + (project.facts.some((record) => actionPattern.test(record.original_text)) ? 5 : 0)
     + (outcomes.length ? 5 : 0);
   return [topicRelevance, outcomeStrength, recency, evidenceCompleteness] as const;
 }
 
-export function selectCandidateProofProjects(topics: TopicId[], limit = 3): CandidateProofProject[] {
+export function selectApprovedProofProjects(topics: TopicId[], limit = 3): ApprovedProofProject[] {
   const grouped = new Map<string, CandidateRecord[]>();
   for (const record of candidates) {
     if (record.target_type !== "project_candidate" || !record.project_id || !PROJECT_NAMES[record.project_id]) continue;
@@ -143,7 +167,7 @@ export function selectCandidateProofProjects(topics: TopicId[], limit = 3): Cand
     project_id,
     project_name: PROJECT_NAMES[project_id],
     relevance: relevanceFor(facts, topics),
-    facts: facts.sort((a, b) => a.candidate_id.localeCompare(b.candidate_id))
+    facts: facts.sort((a, b) => a.candidate_id.localeCompare(b.candidate_id)).slice(0, 4)
   })).sort((a, b) => {
     const left = projectScore(a, topics);
     const right = projectScore(b, topics);
@@ -154,11 +178,11 @@ export function selectCandidateProofProjects(topics: TopicId[], limit = 3): Cand
   }).slice(0, limit);
 }
 
-export function buildCandidateProofItem(project: CandidateProofProject): ProofItem {
+export function buildApprovedProofItem(project: ApprovedProofProject): ProofItem {
   const situationRecord = project.facts[0];
   const taskRecord = project.facts.find((record) => actionPattern.test(record.original_text)) || situationRecord;
   const actionRecords = project.facts.filter((record) => actionPattern.test(record.original_text));
-  const resultRecords = project.facts.filter((record) => candidateEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
+  const resultRecords = project.facts.filter((record) => approvedEditorialMetadata[record.candidate_id]?.scope === "outcome" || outcomePattern.test(record.original_text));
   const item = {
     project_id: project.project_id,
     project_name: project.project_name,
@@ -249,8 +273,8 @@ function editorialCopy(records: CandidateRecord[], bridge = "", leadRecord = rec
   };
 }
 
-export function publicCandidateEvidence(ids?: Iterable<string>): PublicEvidence[] {
-  const selectedIds = ids ? new Set(ids) : candidateValidationIds;
+export function publicApprovedBenFacts(ids?: Iterable<string>): PublicEvidence[] {
+  const selectedIds = ids ? new Set(ids) : approvedBenFactIds;
   return candidates.filter((candidate) => selectedIds.has(candidate.candidate_id)).map((candidate) => ({
     id: candidate.candidate_id,
     claim: candidate.original_text,
@@ -259,19 +283,7 @@ export function publicCandidateEvidence(ids?: Iterable<string>): PublicEvidence[
   }));
 }
 
-export function candidateValidationEnabled() {
-  // Temporary experiment default. Set the runtime variable to "approved" or
-  // change this default after the validation period to restore approved-only generation.
-  return (process.env.BENFACTS_VALIDATION_MODE || "candidates").trim().toLowerCase() === "candidates";
-}
-
-export type CandidatePlannerMode = "legacy" | "editorial";
-
-export function candidateNarrativePlannerMode(): CandidatePlannerMode {
-  return (process.env.NARRATIVE_PLANNER_MODE || "editorial").trim().toLowerCase() === "legacy" ? "legacy" : "editorial";
-}
-
-export function assembleLegacyCandidateNarrative(topics: TopicId[]): Narrative {
+function assembleLegacyApprovedNarrative(topics: TopicId[]): Narrative {
   const used = new Set<string>();
   const about = pickCandidates(
     ["BF-C-073", ...(topics.flatMap((topic) => PRACTICE_ANCHORS[topic])), "BF-C-076", "BF-C-033", "BF-C-043"],
@@ -281,7 +293,7 @@ export function assembleLegacyCandidateNarrative(topics: TopicId[]): Narrative {
     preferredIds(PRACTICE_ANCHORS, topics, ["BF-C-036", "BF-C-037", "BF-C-038", "BF-C-039", "BF-C-046", "BF-C-047"]),
     ["evidence_candidate"], topics, 4, used
   );
-  const proofItems = selectCandidateProofProjects(topics).map(buildCandidateProofItem);
+  const proofItems = selectApprovedProofProjects(topics).map(buildApprovedProofItem);
   const projects = proofItems.flatMap(proofItemEvidenceIds);
   const throughline = pickCandidates(
     ["BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079", "BF-C-080", "BF-C-075", "BF-C-074"],
@@ -315,14 +327,14 @@ export function assembleLegacyCandidateNarrative(topics: TopicId[]): Narrative {
       evidenceRefs: [...new Set(projects)], proof_items: proofItems, disclosure: "deep-dive" as const
     }
   ];
-  return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });
+  return NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
 }
 
 const salienceScore = { anchor: 90, supporting: 45, detail: 10 } as const;
 const periodScore = { recent: 100, career_wide: 80, earlier: 20 } as const;
 
 function editorialScore(candidate: CandidateRecord, role: NarrativeRole, topics: TopicId[], preferred: string[]) {
-  const metadata = candidateEditorialMetadata[candidate.candidate_id];
+  const metadata = approvedEditorialMetadata[candidate.candidate_id];
   if (!metadata?.narrativeRoles.includes(role)) return Number.NEGATIVE_INFINITY;
   const preferredIndex = preferred.indexOf(candidate.candidate_id);
   const preference = preferredIndex >= 0 ? 400 - preferredIndex * 5 : 0;
@@ -348,7 +360,7 @@ function recordsFor(ids: string[], used: Set<string>) {
     .filter((item) => !used.has(item.candidate_id));
 }
 
-export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrative {
+export function assembleApprovedBenFactsNarrative(topics: TopicId[]): Narrative {
   const used = new Set<string>();
 
   const aboutAnchors = recordsFor(["BF-C-073", "BF-C-076"], used);
@@ -361,7 +373,7 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
   const recentLeadership = pickForRole("recent_leadership", topics, 4, used, preferredIds(
     PRACTICE_ANCHORS, topics, ["BF-C-043", "BF-C-036", "BF-C-046", "BF-C-049", "BF-C-039"]
   ));
-  const proofItems = selectCandidateProofProjects(topics).map(buildCandidateProofItem);
+  const proofItems = selectApprovedProofProjects(topics).map(buildApprovedProofItem);
 
   const recentBridge = recordsFor(["BF-C-075"], used);
   recentBridge.forEach((candidate) => used.add(candidate.candidate_id));
@@ -386,7 +398,7 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
       id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
       headline: "A pattern across roles and industries",
       ...editorialCopy(throughline, "The recent work extends a longer career pattern.",
-        throughline.find((record) => candidateEditorialMetadata[record.candidate_id].careerPeriod === "earlier")),
+        throughline.find((record) => approvedEditorialMetadata[record.candidate_id]?.careerPeriod === "earlier")),
       evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "inline" as const
     },
     {
@@ -403,12 +415,8 @@ export function assembleEditorialCandidateNarrative(topics: TopicId[]): Narrativ
       disclosure: "deep-dive" as const
     }
   ];
-  const narrative = NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "candidate_validation" });
-  if (!validateNarrativeProofProjects(narrative)) throw new Error("Candidate proof project validation failed");
+  const narrative = NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
+  if (!validateNarrativeProofProjects(narrative)) throw new Error("Approved proof project validation failed");
   return narrative;
-}
-
-export function assembleCandidateNarrative(topics: TopicId[], mode: CandidatePlannerMode = candidateNarrativePlannerMode()): Narrative {
-  return mode === "legacy" ? assembleLegacyCandidateNarrative(topics) : assembleEditorialCandidateNarrative(topics);
 }
 

@@ -27,7 +27,11 @@ describe("BenFacts review corpus", () => {
 describe("approved corpus promotion", () => {
   it("promotes only approved records and uses reviewed wording", () => {
     const statuses = ["approved", "hold", "rejected", "unreviewed"] as const;
-    const candidates = corpus.candidates.map((item, index) => index < statuses.length ? { ...item, reviewed_text: `${item.reviewed_text} reviewed`, review_status: statuses[index] } : item);
+    const candidates = corpus.candidates.map((item, index) => ({
+      ...item,
+      reviewed_text: index < statuses.length ? `${item.reviewed_text} reviewed` : item.reviewed_text,
+      review_status: index < statuses.length ? statuses[index] : "rejected" as const
+    }));
     const promoted = promoteApprovedFacts({ ...corpus, candidates });
     expect(promoted.facts).toHaveLength(1);
     expect(promoted.facts[0].id).toBe(candidates[0].candidate_id);

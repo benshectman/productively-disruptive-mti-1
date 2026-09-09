@@ -1,3 +1,4 @@
+import { publicApprovedBenFacts } from "./approved-benfacts";
 import { evidenceById, publicEvidenceView } from "../content/content";
 import type { GroundingMode, PublicEvidence } from "./contracts";
 
@@ -7,7 +8,10 @@ export type EvidencePresentation = {
   grounding: GroundingMode;
 };
 
-export const approvedEvidenceCatalog = [...evidenceById.values()].map(publicEvidenceView);
+export const approvedEvidenceCatalog = [
+  ...publicApprovedBenFacts(),
+  ...[...evidenceById.values()].map(publicEvidenceView)
+];
 
 export function buildEvidencePresentation(evidenceRefs: string[], contextLabel: string, catalog: PublicEvidence[] = approvedEvidenceCatalog): EvidencePresentation {
   const records = new Map(catalog.map((record) => [record.id, record]));
@@ -18,7 +22,7 @@ export function buildEvidencePresentation(evidenceRefs: string[], contextLabel: 
     const record = records.get(id);
     return record ? [record] : [];
   });
-  return { contextLabel, items, grounding: evidenceRefs.some((id) => id.startsWith("BF-C-")) ? "candidate_validation" : "approved" };
+  return { contextLabel, items, grounding: "approved" };
 }
 
 export function approvedPointsLabel(count: number): string {
@@ -26,7 +30,6 @@ export function approvedPointsLabel(count: number): string {
 }
 
 export function evidencePointsLabel(count: number, grounding: GroundingMode): string {
-  if (grounding === "candidate_validation") return `${count} unapproved validation ${count === 1 ? "point" : "points"}`;
   return approvedPointsLabel(count);
 }
 
