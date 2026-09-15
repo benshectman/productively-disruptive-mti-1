@@ -2,7 +2,7 @@ import type { Handler } from "@netlify/functions";
 import crypto from "node:crypto";
 import { validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
-import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, type GenerationSectionDiagnostics, type Narrative, type ProofItem, type TopicId } from "../../src/shared/contracts";
+import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, type GenerationSectionDiagnostics, type Narrative, type ProofItem, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
 import { deterministicGenerationDiagnostics, summarizeGenerationDiagnostics } from "../../src/shared/generation-diagnostics";
 import {
   approvedBenFactIds,
@@ -266,7 +266,7 @@ async function requestStructured(fetcher: typeof fetch, signal: AbortSignal, bod
   }
 }
 
-function eligibleEvidenceBySection(topics: TopicId[]) {
+function eligibleEvidenceBySection(topics: TopicId[]): Map<string, PublicEvidence[]> {
   return new Map(buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts]));
 }
 
