@@ -124,6 +124,7 @@ export function buildMarkdownReport(bundle) {
       `Randomized mapping reasonably balanced: ${sanity.mappingIsReasonablyBalanced ? "yes" : "no"} (control as A ${sanity.controlAsA}, control as B ${sanity.controlAsB}).`,
       "",
       `Obvious A/B position bias detected: ${sanity.obviousPositionBias == null ? "not evaluated because the qualitative pass was not run" : sanity.obviousPositionBias ? "yes" : "no"}.`,
+      ...(sanity.positionBiasPValue == null ? [] : [`Two-sided exact binomial p-value for the blind-position split: ${sanity.positionBiasPValue.toFixed(4)} (${sanity.decisiveComparisons} decisive comparisons).`]),
       ""
     );
   }

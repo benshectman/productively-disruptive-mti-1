@@ -146,6 +146,23 @@ describe("evaluation harness", () => {
     expect(sanityAssessment(null, [pair])).toMatchObject({ qualitativeEvaluationCompleted: false, mappingIsReasonablyBalanced: true, obviousPositionBias: null });
   });
 
+  it("flags a statistically unusual blind-position split even with seven decisive comparisons", () => {
+    const qualitative = {
+      blindPosition: {
+        controlAsA: 17,
+        controlAsB: 16,
+        aOverallWins: 0,
+        bOverallWins: 7
+      }
+    };
+    expect(sanityAssessment(qualitative)).toMatchObject({
+      obviousPositionBias: true,
+      decisiveComparisons: 7,
+      largerBlindSideShare: 1,
+      positionBiasPValue: 0.015625
+    });
+  });
+
   it("performs one structured evaluator pass and preserves its raw response", async () => {
     const runs = [run("control", "none", 1), run("treatment", "none", 1)];
     const pair = createBlindPairs(runs, "seed")[0];

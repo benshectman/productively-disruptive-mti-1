@@ -341,14 +341,26 @@ export function sanityAssessment(qualitative, pairs = []) {
   const controlAsB = qualitative?.blindPosition.controlAsB ?? pairs.filter((pair) => pair.mapping.B === "control").length;
   const decisive = qualitative ? qualitative.blindPosition.aOverallWins + qualitative.blindPosition.bOverallWins : 0;
   const sideShare = decisive ? Math.max(qualitative.blindPosition.aOverallWins, qualitative.blindPosition.bOverallWins) / decisive : 0;
+  const largerSideWins = qualitative ? Math.max(qualitative.blindPosition.aOverallWins, qualitative.blindPosition.bOverallWins) : 0;
+  let positionBiasPValue = null;
+  if (qualitative && decisive) {
+    let coefficient = 1;
+    let upperTail = 0;
+    for (let wins = 0; wins <= decisive; wins += 1) {
+      if (wins >= largerSideWins) upperTail += coefficient;
+      coefficient = coefficient * (decisive - wins) / (wins + 1);
+    }
+    positionBiasPValue = Math.min(1, (2 * upperTail) / (2 ** decisive));
+  }
   const mappingDifference = Math.abs(controlAsA - controlAsB);
   return {
     qualitativeEvaluationCompleted: Boolean(qualitative),
     controlAsA,
     controlAsB,
     mappingIsReasonablyBalanced: mappingDifference <= 1,
-    obviousPositionBias: qualitative ? decisive >= 8 && sideShare >= 0.75 : null,
+    obviousPositionBias: qualitative ? positionBiasPValue != null && positionBiasPValue <= 0.05 : null,
     decisiveComparisons: decisive,
-    largerBlindSideShare: sideShare
+    largerBlindSideShare: sideShare,
+    positionBiasPValue
   };
 }
