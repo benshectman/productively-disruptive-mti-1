@@ -13,6 +13,7 @@ import {
   validateProofItemProjectEvidence
 } from "../../src/shared/approved-benfacts";
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
+import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../../src/shared/eligible-evidence";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
@@ -265,9 +266,8 @@ async function requestStructured(fetcher: typeof fetch, signal: AbortSignal, bod
   }
 }
 
-function constrainedEvidence(fallback: Narrative) {
-  const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
-  return publicApprovedBenFacts(relevantIds);
+function eligibleEvidenceBySection(topics: TopicId[]) {
+  return new Map(buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts]));
 }
 
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
@@ -276,10 +276,10 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
   const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
   const allowedIds = approvedBenFactIds;
   if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key", diagnostics: fallbackDiagnostics };
-  const evidence = constrainedEvidence(fallback);
+  const evidenceBySection = eligibleEvidenceBySection(topics);
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
     section.id,
-    evidence.filter((item) => section.evidenceRefs.includes(item.id)).map((item) => item.claim).join(" ")
+    (evidenceBySection.get(section.id) || []).map((item) => item.claim).join(" ")
   ]));
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
@@ -323,7 +323,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
               : section.id === "operating-model" ? "recent leadership and organizational scale"
               : section.id === "proof-to-scale" ? "topic-relevant projects and outcomes"
               : "connection to earlier career experience",
-            evidence: section.id === "proof-to-scale" ? [] : evidence.filter((item) => section.evidenceRefs.includes(item.id))
+            evidence: section.id === "proof-to-scale" ? [] : (evidenceBySection.get(section.id) || [])
           }))
         }),
         text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema } }
@@ -332,7 +332,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
 
     const fallbackProofItems = fallback.sections.find((section) => section.id === "proof-to-scale")?.proof_items || [];
     const proofRequests = fallbackProofItems.map((item) => {
-      const projectEvidence = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id));
+      const projectEvidence = buildEligibleProjectEvidence(item.project_id, topics);
       return requestStructured(fetcher, controller.signal, {
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1800,
         instructions: [
@@ -405,7 +405,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
     const baseNarrative = framedNarrative || fallback;
     let generatedProofCount = 0;
     const proofItems = fallbackProofItems.map((item, index) => {
-      const evidenceText = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id)).map((record) => record.claim).join(" ");
+      const evidenceText = buildEligibleProjectEvidence(item.project_id, topics).map((record) => record.claim).join(" ");
       const generated = proofValues[index] ? applyAiProofItem(proofValues[index], item, evidenceText) : null;
       if (generated) generatedProofCount += 1;
       return generated || item;
