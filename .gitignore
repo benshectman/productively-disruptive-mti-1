@@ -9,3 +9,4 @@ dist
 .npm-cache
 .DS_Store
 
+evaluation-results/

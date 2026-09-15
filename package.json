@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "benfacts:normalize": "node scripts/normalize-benfacts-review.mjs",
     "benfacts:promote": "node scripts/promote-benfacts.mjs",
+    "eval:harness": "node scripts/evaluation/run.mjs",
+    "eval:report": "node scripts/evaluation/run.mjs --report-only",
     "test": "vitest run --configLoader runner",
     "test:watch": "vitest --configLoader runner",
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs"

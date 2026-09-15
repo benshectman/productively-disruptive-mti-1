@@ -92,6 +92,7 @@ The implementation uses the Responses API `text.format` JSON-schema configuratio
 
 - `npm test` validates content integrity, reference resolution, selection behavior, contracts, attribution, knowledge-only isolation, BenFacts review and promotion behavior, GitHub conflict protection, and fallback behavior.
 - `npm run build` performs TypeScript and production Vite builds.
+- `npm run eval:harness` compares generation behavior across configurable branch deploys or Deploy Previews. See [the generation evaluation harness guide](docs/generation-evaluation-harness.md).
 
 ## Deployment
 

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "repetitions": 3,
+  "pairingSeed": "portfolio-generation-eval-v1",
+  "requestDelayMs": 0,
+  "captureConcurrency": 2,
+  "requestTimeoutMs": 45000,
+  "generationPath": "/.netlify/functions/generate",
+  "environments": {
+    "control": {
+      "urlEnv": "EVAL_CONTROL_URL",
+      "idEnv": "EVAL_CONTROL_ID",
+      "defaultId": "develop"
+    },
+    "treatment": {
+      "urlEnv": "EVAL_TREATMENT_URL",
+      "idEnv": "EVAL_TREATMENT_ID",
+      "defaultId": "feature/prompt-synthesis-experiment"
+    }
+  },
+  "evaluator": {
+    "apiKeyEnv": "OPENAI_API_KEY",
+    "modelEnv": "EVAL_MODEL",
+    "defaultModel": "gpt-4.1-mini"
+  },
+  "reliabilityRegression": {
+    "minimumAdditionalFallbackFields": 2,
+    "minimumFallbackRateIncrease": 0.01
+  },
+  "shortlist": {
+    "minimum": 5,
+    "maximum": 10
+  },
+  "topicConfigurations": [
+    { "id": "none", "label": "No topics", "topics": [] },
+    { "id": "design-leadership", "label": "Design Leadership", "topics": ["T-001"] },
+    { "id": "systems-thinking", "label": "Systems Thinking", "topics": ["T-002"] },
+    { "id": "enterprise-ux", "label": "Enterprise UX", "topics": ["T-003"] },
+    { "id": "ux-measurement", "label": "UX Measurement", "topics": ["T-004"] },
+    { "id": "leadership-systems", "label": "Design Leadership + Systems Thinking", "topics": ["T-001", "T-002"] },
+    { "id": "leadership-enterprise", "label": "Design Leadership + Enterprise UX", "topics": ["T-001", "T-003"] },
+    { "id": "systems-measurement", "label": "Systems Thinking + UX Measurement", "topics": ["T-002", "T-004"] },
+    { "id": "enterprise-measurement", "label": "Enterprise UX + UX Measurement", "topics": ["T-003", "T-004"] },
+    { "id": "leadership-systems-enterprise", "label": "Leadership + Systems + Enterprise", "topics": ["T-001", "T-002", "T-003"] },
+    { "id": "all", "label": "All topics", "topics": ["T-001", "T-002", "T-003", "T-004"] }
+  ]
+}
