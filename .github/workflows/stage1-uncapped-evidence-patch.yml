@@ -1,0 +1,103 @@
+name: Stage 1 uncapped evidence patch
+
+on:
+  push:
+    branches:
+      - feature/uncapped-evidence-synthesis
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/uncapped-evidence-synthesis
+      - name: Patch generation evidence wiring
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('netlify/functions/generate.ts')
+          text = path.read_text()
+          import_anchor = 'import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";\n'
+          new_import = import_anchor + 'import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../../src/shared/eligible-evidence";\n'
+          if 'buildEligibleSectionEvidencePools' not in text:
+              if import_anchor not in text:
+                  raise SystemExit('import anchor not found')
+              text = text.replace(import_anchor, new_import, 1)
+
+          old = '''function constrainedEvidence(fallback: Narrative) {
+            const relevantIds = new Set(fallback.sections.flatMap((section) => section.evidenceRefs));
+            return publicApprovedBenFacts(relevantIds);
+          }
+          '''
+          new = '''function eligibleEvidenceBySection(topics: TopicId[]) {
+            return new Map(buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts]));
+          }
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif 'function eligibleEvidenceBySection' not in text:
+              raise SystemExit('constrainedEvidence anchor not found')
+
+          old = '''  const evidence = constrainedEvidence(fallback);
+            const evidenceTextBySection = new Map(fallback.sections.map((section) => [
+              section.id,
+              evidence.filter((item) => section.evidenceRefs.includes(item.id)).map((item) => item.claim).join(" ")
+            ]));
+          '''
+          new = '''  const evidenceBySection = eligibleEvidenceBySection(topics);
+            const evidenceTextBySection = new Map(fallback.sections.map((section) => [
+              section.id,
+              (evidenceBySection.get(section.id) || []).map((item) => item.claim).join(" ")
+            ]));
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif 'const evidenceBySection = eligibleEvidenceBySection(topics);' not in text:
+              raise SystemExit('evidence setup anchor not found')
+
+          old = '''            evidence: section.id === "proof-to-scale" ? [] : evidence.filter((item) => section.evidenceRefs.includes(item.id))
+          '''
+          new = '''            evidence: section.id === "proof-to-scale" ? [] : (evidenceBySection.get(section.id) || [])
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif '(evidenceBySection.get(section.id) || [])' not in text:
+              raise SystemExit('framing evidence anchor not found')
+
+          old = '''      const projectEvidence = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id));
+          '''
+          new = '''      const projectEvidence = buildEligibleProjectEvidence(item.project_id, topics);
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif 'buildEligibleProjectEvidence(item.project_id, topics)' not in text:
+              raise SystemExit('proof evidence anchor not found')
+
+          old = '''      const evidenceText = evidence.filter((record) => proofItemEvidenceIds(item).includes(record.id)).map((record) => record.claim).join(" ");
+          '''
+          new = '''      const evidenceText = buildEligibleProjectEvidence(item.project_id, topics).map((record) => record.claim).join(" ");
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif 'buildEligibleProjectEvidence(item.project_id, topics).map' not in text:
+              raise SystemExit('proof validation evidence anchor not found')
+
+          path.write_text(text)
+          PY
+      - name: Test Stage 1
+        run: |
+          npm ci
+          npm test -- --run
+      - name: Commit Stage 1 patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add netlify/functions/generate.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "Decouple AI evidence pools from fallback selection"
+          git push
