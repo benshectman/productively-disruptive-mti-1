@@ -8,7 +8,9 @@ The default matrix covers 11 configurations: no topics, each single topic, four 
 
 For every request, the harness enables `diagnostics=1` and retains the endpoint label, selected topics, repetition, request ID, latency, HTTP and generation status, validation headers, diagnostics, field provenance, prose, proof content, public evidence, and complete raw response. Detailed rejected candidates, reasons, and context remain in each run's `diagnostics.rejections` array.
 
-After capture, one evaluator-model request compares each like-for-like pair in normal comparison mode. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
+Before capture, the combined workflow makes a minimal evaluator preflight request containing no portfolio or evidence data. This verifies the API credential, network path, and evaluator model before the 66 generation requests begin.
+
+After capture, the harness atomically writes a `portfolio-generation-capture-*.json` checkpoint before qualitative evaluation starts. One evaluator-model request then compares each like-for-like pair in normal comparison mode. Evaluator progress is written back to the checkpoint after every pair, so an interrupted evaluation can resume without repeating completed generation or evaluation work. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
 
 The JSON output is the audit artifact. The Markdown report summarizes reliability, rejection diagnostics by environment/category/section/field, and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. When an endpoint does not support rejection diagnostics, the report marks that coverage as unavailable rather than treating it as zero rejections. Ben remains the final decision-maker.
 
@@ -22,6 +24,8 @@ EVAL_TREATMENT_URL="https://feature-example--example.netlify.app" \
 OPENAI_API_KEY="..." \
 npm run eval:harness
 ```
+
+The request that initiates this command should explicitly authorize sending generated portfolio prose, returned approved evidence, and selected topic configurations to the OpenAI API. The CLI preflight verifies connectivity, but it does not replace user authorization for that data transfer.
 
 Optional labels and evaluator model:
 
@@ -40,15 +44,17 @@ Capture preserves all generation data without using the evaluator model:
 
 ```bash
 EVAL_CONTROL_URL="..." EVAL_TREATMENT_URL="..." \
-npm run eval:harness -- --capture-only
+npm run eval:capture
 ```
 
 Evaluate and report a saved capture later:
 
 ```bash
 OPENAI_API_KEY="..." \
-npm run eval:harness -- --input evaluation-results/portfolio-generation-evaluation-TIMESTAMP.json
+npm run eval:evaluate -- evaluation-results/portfolio-generation-capture-TIMESTAMP.json
 ```
+
+The evaluation command runs the same preflight, skips every completed evaluator pair, retries incomplete or failed pairs, and continues updating the checkpoint after each pair. `--input FILE` remains available as a backward-compatible alias for `--evaluate-existing FILE`.
 
 Regenerate only the Markdown report from an existing JSON artifact:
 

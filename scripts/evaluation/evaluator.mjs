@@ -84,6 +84,35 @@ function responseText(result) {
   return result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim() || "";
 }
 
+export async function preflightEvaluator({ apiKey, model, fetcher = fetch, timeoutMs = 30_000 }) {
+  const marker = "EVALUATOR_PREFLIGHT_OK";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const startedAt = new Date().toISOString();
+  const start = performance.now();
+  try {
+    const response = await fetcher("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        store: false,
+        max_output_tokens: 32,
+        instructions: `This is a connectivity preflight. Reply with exactly ${marker}.`,
+        input: "Confirm evaluator connectivity using the required marker. No portfolio or evidence data is included."
+      }),
+      signal: controller.signal
+    });
+    const rawText = await response.text();
+    if (!response.ok) throw new Error(`Evaluator preflight HTTP ${response.status}`);
+    const result = JSON.parse(rawText);
+    if (!responseText(result).includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
+    return { startedAt, completedAt: new Date().toISOString(), durationMs: Math.round(performance.now() - start), evaluatorModel: model };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function assertJudgment(value) {
   if (!value || !value.criteria || !value.overall || !Array.isArray(value.concerns)) throw new Error("Evaluator response is missing required fields");
   for (const criterion of CRITERIA) if (!value.criteria[criterion]?.judgment || !value.criteria[criterion]?.rationale) throw new Error(`Evaluator response is missing ${criterion}`);

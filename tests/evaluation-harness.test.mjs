@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 
 import {
   aggregateQualitative,
@@ -13,7 +16,8 @@ import {
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
-import { evaluatePair } from "../scripts/evaluation/evaluator.mjs";
+import { evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
+import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 
 const sections = ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"];
 
@@ -244,6 +248,64 @@ describe("evaluation harness", () => {
     expect(result.error).toBeUndefined();
     expect(result.rawEvaluatorResponse.id).toBe("evaluation-response");
     expect(["control", "treatment"]).toContain(result.unblinded.overall.environmentResult);
+  });
+
+  it("preflights evaluator access without sending portfolio or evidence data", async () => {
+    let requestBody;
+    const result = await preflightEvaluator({
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async (_url, init) => {
+        requestBody = JSON.parse(init.body);
+        return new Response(JSON.stringify({ output_text: "EVALUATOR_PREFLIGHT_OK" }), { status: 200 });
+      }
+    });
+    expect(requestBody).toMatchObject({ model: "test-model", store: false });
+    expect(JSON.stringify(requestBody)).not.toContain("Approved evidence");
+    expect(result.evaluatorModel).toBe("test-model");
+  });
+
+  it("supports explicit staged evaluation and atomically persists checkpoints", async () => {
+    expect(args(["--evaluate-existing", "capture.json", "--output", "reports"])).toMatchObject({ input: "capture.json", output: "reports" });
+    const directory = await mkdtemp(path.join(os.tmpdir(), "portfolio-eval-checkpoint-"));
+    const filename = path.join(directory, "capture.json");
+    try {
+      await writeJsonAtomic(filename, { evaluations: [{ pair: { pairId: "one" } }] });
+      expect(JSON.parse(await readFile(filename, "utf8"))).toEqual({ evaluations: [{ pair: { pairId: "one" } }] });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("resumes evaluator progress pair by pair without repeating completed comparisons", async () => {
+    const runs = [
+      run("control", "one", 1), run("treatment", "one", 1),
+      run("control", "two", 1), run("treatment", "two", 1)
+    ];
+    const pairs = createBlindPairs(runs, "seed");
+    const completedRaw = judgment("equivalent");
+    const completed = { pair: pairs[0], judgment: completedRaw, unblinded: unblindJudgment(completedRaw, pairs[0]) };
+    const bundle = { metadata: { mode: "comparison" }, runs, pairs, evaluations: [completed] };
+    const evaluated = [];
+    let persisted = 0;
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(true);
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: false,
+      evaluator: async ({ pair }) => {
+        evaluated.push(pair.pairId);
+        const raw = judgment("B_stronger");
+        return { pair, judgment: raw, unblinded: unblindJudgment(raw, pair) };
+      },
+      persist: async () => { persisted += 1; }
+    });
+    expect(evaluated).toEqual([pairs[1].pairId]);
+    expect(persisted).toBe(1);
+    expect(bundle.evaluations).toHaveLength(2);
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(false);
   });
 
   it("renders reliability, qualitative evidence, and complete shortlisted prose", () => {
