@@ -426,7 +426,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           "For Proof in practice, write only general section framing. Do not mention, combine, or summarize any project-specific work, actions, outcomes, or metrics; separate project-scoped proof items are generated independently.",
           "Name the section's main idea in the headline. Do not try to summarize every supporting point in the title. Do not begin with He, She, or Ben.",
           "Target four to eight words, with a hard limit of three to nine words and sixty-four characters. Use a complete plain-English phrase; do not end with a preposition, conjunction, or article.",
-          "Acronyms are welcome only when listed in that section's allowedAcronyms. Their supported expansions already appear in its visible lead paragraph. Do not expand them in the title or invent other abbreviations.",
+          "Acronyms are welcome only when listed in that section's allowedAcronyms. Listed acronyms are either universally permitted or have a supported expansion in the visible lead paragraph. Do not expand them in the title or invent other abbreviations.",
           "Style example only, not a claim to reuse: Establishing and scaling J&J's XD organization.",
           "Do not put metrics, dates, numbers, HTML, Markdown, evidence IDs, attribution fields, disclosure choices, or design-system markup in headlines. Do not put HTML, Markdown, evidence IDs, or markup in any generated field."
         ].join(" "),
