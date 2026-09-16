@@ -9,6 +9,11 @@ export const headlineAcronymExpansions: Record<string, string> = {
   JJT: "Johnson & Johnson Technology"
 };
 
+export const universallyPermittedHeadlineAcronyms = new Set([
+  "UX",
+  "J&J"
+]);
+
 export const HEADLINE_MAX_CHARACTERS = 64;
 export const HEADLINE_MIN_WORDS = 3;
 export const HEADLINE_MAX_WORDS = 9;
@@ -24,9 +29,10 @@ export function expandPresentationAcronyms(text: string): string {
 }
 
 export function allowedHeadlineAcronyms(lead: string): string[] {
-  return Object.entries(headlineAcronymExpansions)
+  const acronymsWithSupportedExpansions = Object.entries(headlineAcronymExpansions)
     .filter(([, expansion]) => lead.toLowerCase().includes(expansion.toLowerCase()))
     .map(([acronym]) => acronym);
+  return [...new Set([...universallyPermittedHeadlineAcronyms, ...acronymsWithSupportedExpansions])];
 }
 
 export function headlineAcronymsAreExplained(headline: string, lead: string): boolean {

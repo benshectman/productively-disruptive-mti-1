@@ -138,6 +138,40 @@ describe("generation diagnostics", () => {
     ]));
   });
 
+  it("does not report acronym rejection for universally permitted terms", () => {
+    const framing = validFraming();
+    framing.sections[0].headline = "Building UX Capability at J&J";
+
+    const { narrative, rejections } = validateWithRejections(framing);
+
+    expect(narrative).not.toBeNull();
+    expect(narrative?.sections[0].headline).toBe("Building UX Capability at J&J");
+    expect(rejections.filter((rejection) => rejection.category === "headline-acronym")).toEqual([]);
+  });
+
+  it("supplies universally permitted acronyms to every generation section", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    let generationInput: { sections: Array<{ allowedAcronyms: string[] }> } | undefined;
+    const fallback = assembleNarrative([]);
+    const fakeFetch = async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body));
+      if (body.text.format.name === "portfolio_narrative") {
+        generationInput = JSON.parse(body.input);
+        return new Response(JSON.stringify({ output_text: JSON.stringify({
+          sections: fallback.sections.map(({ id, headline, summary, detail }) => ({ id, headline, summary, detail }))
+        }) }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ output_text: "{}" }), { status: 200 });
+    };
+
+    await generateNarrativeWithStatus([], fakeFetch as typeof fetch);
+
+    expect(generationInput?.sections).toHaveLength(4);
+    for (const section of generationInput?.sections || []) {
+      expect(section.allowedAcronyms).toEqual(expect.arrayContaining(["UX", "J&J"]));
+    }
+  });
+
   it("captures offending numeric tokens and numeric-grounding reason", () => {
     const framing = validFraming();
     framing.sections[0].detail = `${framing.sections[0].detail} The work produced a 99% improvement.`;

@@ -78,11 +78,21 @@ describe("headline, lead, and progressive depth", () => {
     expect(headlineAcronymsAreExplained("Building the ABC operating model", "ABC")).toBe(false);
   });
 
+  it("accepts universally permitted headline acronyms without lead expansions", () => {
+    expect(headlineAcronymsAreExplained("Scaling UX Across the Enterprise", "A concise lead without the expanded term.")).toBe(true);
+    expect(headlineAcronymsAreExplained("Leading UX at J&J", "A concise lead without either expanded term.")).toBe(true);
+  });
+
+  it("continues to require supported expansions for other headline acronyms", () => {
+    expect(headlineAcronymsAreExplained("Scaling XDMO Across the Enterprise", "A concise lead without the expanded term.")).toBe(false);
+    expect(headlineAcronymsAreExplained("Scaling XDMO Across the Enterprise", "The Experience Design Management Office created an enterprise model.")).toBe(true);
+  });
+
   it("uses supported expansions without guessing internal product meanings", () => {
     expect(expandPresentationAcronyms("J&J invested in XD and UX."))
       .toBe("Johnson & Johnson invested in Experience Design and User Experience.");
     expect(expandPresentationAcronyms("The FIRST product")).toBe("The FIRST product");
-    expect(allowedHeadlineAcronyms("Experience Design at Johnson & Johnson")).toEqual(["J&J", "XD"]);
+    expect(allowedHeadlineAcronyms("Experience Design at Johnson & Johnson")).toEqual(["UX", "J&J", "XD"]);
   });
 
   it("offers accessible inline depth independently of the deep-dive branch", () => {
