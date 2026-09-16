@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { applyAiFraming, generateNarrativeWithStatus } from "../netlify/functions/generate";
 import { assembleNarrative } from "../src/shared/narrative";
-import type { GenerationDiagnostics } from "../src/shared/contracts";
+import type { GenerationDiagnostics, GenerationRejection } from "../src/shared/contracts";
 
 const originalApiKey = process.env.OPENAI_API_KEY;
 
@@ -57,6 +57,20 @@ describe("generation diagnostics", () => {
     return diagnostics!;
   }
 
+  function validateWithRejections(value: unknown, evidenceTextBySection?: Map<string, string>) {
+    const rejections: GenerationRejection[] = [];
+    const narrative = applyAiFraming(
+      value,
+      assembleNarrative([]),
+      undefined,
+      evidenceTextBySection,
+      undefined,
+      undefined,
+      (rejection) => { rejections.push(rejection); },
+    );
+    return { narrative, rejections };
+  }
+
   it("records all twelve fields when every generated field passes validation", () => {
     const diagnostics = validateWithDiagnostics(validFraming());
     expect(diagnostics).toMatchObject({ status: "ai", generatedFields: 12, fallbackFields: 0, aiSections: 4, mixedSections: 0, fallbackSections: 0 });
@@ -73,5 +87,79 @@ describe("generation diagnostics", () => {
     expect(diagnostics.sections.find((section) => section.id === framing.sections[0].id)?.fields.headline).toBe("fallback");
     expect(diagnostics.sections.find((section) => section.id === framing.sections[1].id)?.fields.summary).toBe("fallback");
     expect(diagnostics.sections.find((section) => section.id === framing.sections[2].id)?.fields.detail).toBe("fallback");
+  });
+
+  it("does not add rejection detail when diagnostics are off", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    const framing = validFraming();
+    framing.sections[0].headline = "Tiny";
+    const fakeFetch = async () => new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
+
+    const result = await generateNarrativeWithStatus(["T-001"], fakeFetch as typeof fetch, "diagnostics-off");
+
+    expect(result.status).toBe("ai");
+    expect(result.diagnostics).not.toHaveProperty("rejections");
+  });
+
+  it("captures a rejected headline candidate and specific reason when diagnostics are on", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    const framing = validFraming();
+    framing.sections[0].headline = "Tiny";
+    const fakeFetch = async () => new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
+
+    const result = await generateNarrativeWithStatus(["T-001"], fakeFetch as typeof fetch, "diagnostics-on", true);
+
+    expect(result.diagnostics.rejections).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sectionId: "system-behind-design",
+        field: "headline",
+        category: "headline-too-short",
+        candidate: "Tiny",
+        reason: expect.stringContaining("minimum is 8")
+      })
+    ]));
+  });
+
+  it("captures acronym rejection detail and the lead used for validation", () => {
+    const framing = validFraming();
+    framing.sections[0].headline = "Building the XDMO operating model";
+
+    const { narrative, rejections } = validateWithRejections(framing);
+
+    expect(narrative).not.toBeNull();
+    expect(rejections).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sectionId: "system-behind-design",
+        field: "headline",
+        category: "headline-acronym",
+        candidate: "Building the XDMO operating model",
+        context: expect.objectContaining({ rejectedAcronyms: ["XDMO"], leadUsed: framing.sections[0].summary })
+      })
+    ]));
+  });
+
+  it("captures offending numeric tokens and numeric-grounding reason", () => {
+    const framing = validFraming();
+    framing.sections[0].detail = `${framing.sections[0].detail} The work produced a 99% improvement.`;
+    const evidenceBySection = new Map(framing.sections.map((section) => [section.id, "The assigned evidence reports an 85% improvement."]));
+
+    const { narrative, rejections } = validateWithRejections(framing, evidenceBySection);
+
+    expect(narrative).toBeNull();
+    expect(rejections).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sectionId: "system-behind-design",
+        field: "summary+detail",
+        category: "numeric-grounding",
+        context: expect.objectContaining({ offendingNumericTokens: ["99%"], unsupportedAggregate: false })
+      })
+    ]));
+  });
+
+  it("does not create false rejection records for successful generated fields", () => {
+    const { narrative, rejections } = validateWithRejections(validFraming());
+
+    expect(narrative).not.toBeNull();
+    expect(rejections).toEqual([]);
   });
 });

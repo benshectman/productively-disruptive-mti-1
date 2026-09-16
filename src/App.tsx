@@ -177,13 +177,15 @@ export function App() {
   const [generationDiagnostics, setGenerationDiagnostics] = useState<GenerationDiagnostics>(() => deterministicGenerationDiagnostics(assembleNarrative([])));
   const [evidenceCatalog, setEvidenceCatalog] = useState<PublicEvidence[]>(approvedEvidenceCatalog);
   const [evidencePresentation, setEvidencePresentation] = useState<EvidencePresentation | null>(null);
+  const diagnosticsEnabled = useMemo(() => new URLSearchParams(window.location.search).get("diagnostics") === "1", []);
 
   async function generate() {
     const fallback = assembleNarrative(context.topics as TopicId[]);
     setNarrative(fallback); setGenerationDiagnostics(deterministicGenerationDiagnostics(fallback)); setEvidenceCatalog(approvedEvidenceCatalog); setStep(0); setView("generating");
     const timers = [350, 800, 1300].map((delay, index) => window.setTimeout(() => setStep(index + 1), delay));
     try {
-      const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ designSystem: context.designSystem, theme: context.theme, topics: context.topics }) });
+      const requestEndpoint = diagnosticsEnabled ? `${endpoint}${endpoint.includes("?") ? "&" : "?"}diagnostics=1` : endpoint;
+      const response = await fetch(requestEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ designSystem: context.designSystem, theme: context.theme, topics: context.topics }) });
       if (response.ok) {
         const generated = GenerateResponseSchema.parse(await response.json());
         setNarrative(generated.narrative);
@@ -194,7 +196,6 @@ export function App() {
     finally { timers.forEach(window.clearTimeout); setView("experience"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   }
   const openDeepDive = () => { setContext((current) => ({ ...current, deepDivesOpened: current.deepDivesOpened.includes("S-001") ? current.deepDivesOpened : [...current.deepDivesOpened, "S-001"] })); setView("deep-dive"); window.scrollTo(0, 0); };
-  const diagnosticsEnabled = useMemo(() => new URLSearchParams(window.location.search).get("diagnostics") === "1", []);
   const openEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, evidenceCatalog));
   const openApprovedEvidence = (refs: string[], contextLabel: string) => setEvidencePresentation(buildEvidencePresentation(refs, contextLabel, approvedEvidenceCatalog));
   return <>

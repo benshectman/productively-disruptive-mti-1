@@ -2,7 +2,7 @@ import type { Handler } from "@netlify/functions";
 import crypto from "node:crypto";
 import { validateNarrativeEvidence } from "../../src/shared/narrative";
 import { z } from "zod";
-import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, type GenerationSectionDiagnostics, type Narrative, type ProofItem, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
+import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, type GenerationRejection, type GenerationSectionDiagnostics, type Narrative, type ProofItem, type PublicEvidence, type TopicId } from "../../src/shared/contracts";
 import { deterministicGenerationDiagnostics, summarizeGenerationDiagnostics } from "../../src/shared/generation-diagnostics";
 import {
   approvedBenFactIds,
@@ -183,6 +183,79 @@ function generatedProseIsGrounded(generated: { summary: string; detail: string }
   return generatedTextIsGrounded(`${generated.summary} ${generated.detail}`, evidenceText);
 }
 
+function candidateText(value: unknown): string {
+  if (typeof value === "string") return value;
+  try { return JSON.stringify(value); } catch { return String(value); }
+}
+
+function headlineRejections(sectionId: string, candidate: string, leadUsed: string): GenerationRejection[] {
+  const rejections: GenerationRejection[] = [];
+  const words = candidate.trim().split(/\s+/).filter(Boolean);
+  const add = (category: string, reason: string, context?: GenerationRejection["context"]) => {
+    rejections.push({ sectionId, field: "headline", category, reason, candidate, ...(context ? { context } : {}) });
+  };
+  if (candidate.length < 8) add("headline-too-short", `Headline is ${candidate.length} characters; minimum is 8.`);
+  if (candidate.length > HEADLINE_MAX_CHARACTERS) add("headline-too-long", `Headline is ${candidate.length} characters; maximum is ${HEADLINE_MAX_CHARACTERS}.`);
+  if (words.length < HEADLINE_MIN_WORDS || words.length > HEADLINE_MAX_WORDS) {
+    add("headline-word-count", `Headline has ${words.length} words; allowed range is ${HEADLINE_MIN_WORDS} to ${HEADLINE_MAX_WORDS}.`);
+  }
+  if (!/^[A-Za-z][A-Za-z &’',:–—-]*[A-Za-z]$/.test(candidate)) {
+    add("headline-characters", "Headline does not match the required plain-English character pattern.");
+  }
+  const finalWord = words.at(-1)?.toLowerCase();
+  if (finalWord && danglingHeadlineWords.has(finalWord)) {
+    add("headline-dangling-word", `Headline ends with the incomplete word “${words.at(-1)}”.`);
+  }
+  if (/^(He|She)\b/i.test(candidate)) add("headline-pronoun", "Headline starts with He or She.");
+  if (GeneratedHeadlineSchema.safeParse(candidate).success && !headlineAcronymsAreExplained(candidate, leadUsed)) {
+    const acronyms = candidate.match(/\b[A-Z][A-Z&]+\b/g) || [];
+    const allowedAcronyms = allowedHeadlineAcronyms(leadUsed);
+    const rejectedAcronyms = acronyms.filter((acronym) => !allowedAcronyms.includes(acronym));
+    add(
+      "headline-acronym",
+      `Headline acronym${rejectedAcronyms.length === 1 ? "" : "s"} ${rejectedAcronyms.join(", ")} not permitted because the expansion is not present in the lead used for validation.`,
+      { rejectedAcronyms, allowedAcronyms, leadUsed }
+    );
+  }
+  return rejections;
+}
+
+function proseRejections(sectionId: string, field: "summary" | "detail", candidate: string): GenerationRejection[] {
+  const minimum = field === "summary" ? 40 : 80;
+  const maximum = field === "summary" ? 900 : 1600;
+  const rejections: GenerationRejection[] = [];
+  const add = (category: string, reason: string) => rejections.push({ sectionId, field, category, reason, candidate });
+  if (candidate.length < minimum) add("prose-too-short", `${field} is ${candidate.length} characters; minimum is ${minimum}.`);
+  if (candidate.length > maximum) add("prose-too-long", `${field} is ${candidate.length} characters; maximum is ${maximum}.`);
+  if (field === "summary") {
+    const words = candidate.trim().split(/\s+/).filter(Boolean).length;
+    if (words > 75) add("lead-word-count", `summary has ${words} words; maximum is 75.`);
+  }
+  if (/<\/?[A-Za-z][^>]*>|(?:^|\s)(?:#{1,6}|[-*+]\s|```)|\b(?:E-\d{3}|BF-C-\d{3})\b/.test(candidate)) {
+    add("prose-contamination", `${field} contains markup or an evidence ID.`);
+  }
+  if (!(field === "summary" ? GeneratedSummarySchema : GeneratedDetailSchema).safeParse(candidate).success && rejections.length === 0) {
+    add("prose-schema", `${field} failed its prose schema.`);
+  }
+  return rejections;
+}
+
+function numericGroundingRejection(sectionId: string, generatedText: string, evidenceText: string): GenerationRejection {
+  const evidenceNumbers = new Set(numericTokens(evidenceText).map(normalizedNumericToken));
+  const offendingNumericTokens = numericTokens(generatedText).filter((token) => !evidenceNumbers.has(normalizedNumericToken(token)));
+  const unsupportedAggregate = /\b(all|each|every|both)\b[^.!?]{0,120}\b(over|above|exceed(?:ed|ing)?|more than|greater than|at least)\b[^.!?]{0,30}\d/i.test(generatedText);
+  return {
+    sectionId,
+    field: "summary+detail",
+    category: "numeric-grounding",
+    reason: unsupportedAggregate
+      ? "Generated prose makes an unsupported aggregate numeric comparison."
+      : `Generated prose contains numeric token${offendingNumericTokens.length === 1 ? "" : "s"} not present in the section evidence.`,
+    candidate: generatedText,
+    context: { offendingNumericTokens, unsupportedAggregate }
+  };
+}
+
 function proofItemText(item: ProofItem): string {
   return [
     item.relevance,
@@ -212,12 +285,31 @@ export function applyAiFraming(
   evidenceTextBySection?: Map<string, string>,
   onReject?: (status: ValidationStatus) => void,
   onProvenance?: (diagnostics: GenerationDiagnostics) => void,
+  onRejectionDetail?: (rejection: GenerationRejection) => void,
 ): Narrative | null {
   const result = WireFramingSchema.safeParse(value);
-  if (!result.success) { onReject?.("schema"); return null; }
+  if (!result.success) {
+    onReject?.("schema");
+    onRejectionDetail?.({
+      field: "framing",
+      category: "schema",
+      reason: result.error.issues.map((issue) => `${issue.path.join(".") || "framing"}: ${issue.message}`).join("; "),
+      candidate: candidateText(value),
+      context: { issues: result.error.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message })) }
+    });
+    return null;
+  }
   const framingById = new Map(result.data.sections.map((section) => [section.id, section]));
   if (framingById.size !== fallback.sections.length || fallback.sections.some((section) => !framingById.has(section.id as typeof result.data.sections[number]["id"]))) {
-    onReject?.("section-ids"); return null;
+    onReject?.("section-ids");
+    onRejectionDetail?.({
+      field: "framing",
+      category: "section-ids",
+      reason: "Generated framing does not contain every expected section ID exactly once.",
+      candidate: candidateText(result.data.sections.map((section) => section.id)),
+      context: { expectedSectionIds: fallback.sections.map((section) => section.id), receivedSectionIds: result.data.sections.map((section) => section.id) }
+    });
+    return null;
   }
   const provenance: Array<{ id: string; fields: GenerationSectionDiagnostics["fields"] }> = [];
   const narrative: Narrative = {
@@ -231,6 +323,11 @@ export function applyAiFraming(
       const detail = detailResult.success ? detailResult.data : section.detail;
       const headlineResult = GeneratedHeadlineSchema.safeParse(framing.headline);
       const headlineIsAi = headlineResult.success && headlineAcronymsAreExplained(headlineResult.data, summary);
+      if (onRejectionDetail) {
+        if (!summaryResult.success) proseRejections(section.id, "summary", framing.summary).forEach(onRejectionDetail);
+        if (!detailResult.success) proseRejections(section.id, "detail", framing.detail).forEach(onRejectionDetail);
+        if (!headlineIsAi) headlineRejections(section.id, framing.headline, summary).forEach(onRejectionDetail);
+      }
       const headline = headlineIsAi
         ? framing.headline
         : section.headline;
@@ -242,10 +339,34 @@ export function applyAiFraming(
       return { ...section, headline, summary, detail };
     })
   };
-  if (evidenceTextBySection && narrative.sections.some((section) => !generatedProseIsGrounded(
-    { summary: section.summary, detail: section.detail || "" }, evidenceTextBySection.get(section.id) || ""
-  ))) { onReject?.("numeric-grounding"); return null; }
-  if (!validateNarrativeEvidence(narrative, allowedIds)) { onReject?.("narrative-evidence"); return null; }
+  if (evidenceTextBySection) {
+    const sectionIsUngrounded = (section: Narrative["sections"][number]) => !generatedProseIsGrounded(
+      { summary: section.summary, detail: section.detail || "" }, evidenceTextBySection.get(section.id) || ""
+    );
+    if (!onRejectionDetail && narrative.sections.some(sectionIsUngrounded)) {
+      onReject?.("numeric-grounding");
+      return null;
+    }
+    const ungroundedSections = onRejectionDetail ? narrative.sections.filter(sectionIsUngrounded) : [];
+    if (ungroundedSections.length) {
+      onReject?.("numeric-grounding");
+      if (onRejectionDetail) ungroundedSections.forEach((section) => {
+        const generatedText = `${section.summary} ${section.detail || ""}`;
+        onRejectionDetail(numericGroundingRejection(section.id, generatedText, evidenceTextBySection.get(section.id) || ""));
+      });
+      return null;
+    }
+  }
+  if (!validateNarrativeEvidence(narrative, allowedIds)) {
+    onReject?.("narrative-evidence");
+    onRejectionDetail?.({
+      field: "framing",
+      category: "narrative-evidence",
+      reason: "Generated framing failed narrative evidence validation.",
+      candidate: candidateText(narrative.sections.map(({ id, headline, summary, detail }) => ({ id, headline, summary, detail })))
+    });
+    return null;
+  }
   onProvenance?.(summarizeGenerationDiagnostics(provenance));
   return narrative;
 }
@@ -270,7 +391,7 @@ function eligibleEvidenceBySection(topics: TopicId[]): Map<string, PublicEvidenc
   return new Map(buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts]));
 }
 
-export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local"):
+export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local", diagnosticsEnabled = false):
 Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
   const fallback = assembleApprovedBenFactsNarrative(topics);
   const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
@@ -370,6 +491,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
     let framingStatus: GenerationStatus = "ai";
     let validationStatus: ValidationStatus | undefined;
     let diagnostics = fallbackDiagnostics;
+    const rejections: GenerationRejection[] | undefined = diagnosticsEnabled ? [] : undefined;
     let framedNarrative: Narrative | null = null;
     let upstreamStatus: number | undefined;
     if (!response.ok) {
@@ -392,7 +514,8 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
         try {
           framedNarrative = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection,
             (status) => { validationStatus = status; },
-            (value) => { diagnostics = value; });
+            (value) => { diagnostics = value; },
+            rejections ? (rejection) => { rejections.push(rejection); } : undefined);
         } catch {
           framedNarrative = null;
         }
@@ -418,10 +541,10 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
         : section)
     };
     if (!validateNarrativeEvidence(narrative, allowedIds) || !validateNarrativeProofProjects(narrative)) {
-      return { narrative: fallback, status: "invalid-output", diagnostics: fallbackDiagnostics, validationStatus: "narrative-evidence" };
+      return { narrative: fallback, status: "invalid-output", diagnostics: rejections ? { ...fallbackDiagnostics, rejections } : fallbackDiagnostics, validationStatus: "narrative-evidence" };
     }
     const status = framedNarrative || generatedProofCount ? "ai" : framingStatus;
-    return { narrative, status, diagnostics, upstreamStatus, validationStatus };
+    return { narrative, status, diagnostics: rejections ? { ...diagnostics, rejections } : diagnostics, upstreamStatus, validationStatus };
   } catch (error) {
     const status = error instanceof Error && error.name === "AbortError" ? "timeout" : "network-error";
     console.warn(`[generation:${requestId}] ${status}`);
@@ -445,7 +568,8 @@ export const handler: Handler = async (event) => {
   try { body = JSON.parse(event.body || "{}"); } catch { body = null; }
   const parsed = GenerateRequestSchema.safeParse(body);
   if (!parsed.success) return { statusCode: 400, headers: headersFor(corsOrigin), body: JSON.stringify({ error: "Invalid request", requestId }) };
-  const generation = await generateNarrativeWithStatus(parsed.data.topics, fetch, requestId);
+  const diagnosticsEnabled = event.queryStringParameters?.diagnostics === "1";
+  const generation = await generateNarrativeWithStatus(parsed.data.topics, fetch, requestId, diagnosticsEnabled);
   const narrative = generation.narrative;
   const relevantIds = new Set(narrative.sections.flatMap((section) => section.evidenceRefs));
   const evidence = publicApprovedBenFacts(relevantIds);
@@ -460,4 +584,3 @@ export const handler: Handler = async (event) => {
     body: JSON.stringify({ narrative: { ...narrative, requestId }, evidence, generation: generation.diagnostics, requestId })
   };
 };
-

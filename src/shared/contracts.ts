@@ -94,6 +94,14 @@ export const GenerationSectionDiagnosticsSchema = z.object({
     detail: GenerationFieldProvenanceSchema
   })
 });
+export const GenerationRejectionSchema = z.object({
+  sectionId: z.string().min(1).max(80).optional(),
+  field: z.string().min(1).max(80),
+  category: z.string().min(1).max(80),
+  reason: z.string().min(1).max(500),
+  candidate: z.string(),
+  context: z.record(z.string(), z.unknown()).optional()
+});
 export const GenerationDiagnosticsSchema = z.object({
   status: GenerationOutcomeSchema,
   generatedFields: z.number().int().min(0).max(12),
@@ -103,7 +111,8 @@ export const GenerationDiagnosticsSchema = z.object({
   mixedSections: z.number().int().min(0).max(4),
   fallbackSections: z.number().int().min(0).max(4),
   totalSections: z.literal(4),
-  sections: z.array(GenerationSectionDiagnosticsSchema).length(4)
+  sections: z.array(GenerationSectionDiagnosticsSchema).length(4),
+  rejections: z.array(GenerationRejectionSchema).optional()
 });
 
 export const GenerateRequestSchema = VisitorConfigurationSchema;
@@ -125,6 +134,7 @@ export type Attribution = PublicEvidence["attribution"];
 export type GroundingMode = z.infer<typeof GroundingModeSchema>;
 export type GenerationFieldProvenance = z.infer<typeof GenerationFieldProvenanceSchema>;
 export type GenerationSectionDiagnostics = z.infer<typeof GenerationSectionDiagnosticsSchema>;
+export type GenerationRejection = z.infer<typeof GenerationRejectionSchema>;
 export type GenerationDiagnostics = z.infer<typeof GenerationDiagnosticsSchema>;
 export type GenerateResponse = z.infer<typeof GenerateResponseSchema>;
 
