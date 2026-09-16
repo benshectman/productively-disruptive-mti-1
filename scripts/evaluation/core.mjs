@@ -72,8 +72,10 @@ export async function captureGeneration({ environment, topicConfiguration, repet
   let response;
   let rawText = "";
   let networkError = null;
+  const requestUrl = new URL(environment.endpoint);
+  requestUrl.searchParams.set("diagnostics", "1");
   try {
-    response = await fetcher(environment.endpoint, {
+    response = await fetcher(requestUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ designSystem: "astryx", theme: "neutral", topics: topicConfiguration.topics }),
@@ -88,6 +90,7 @@ export async function captureGeneration({ environment, topicConfiguration, repet
   const durationMs = Math.round(performance.now() - start);
   const rawResponse = safeJson(rawText);
   const generation = rawResponse?.generation || null;
+  const rejectionDiagnosticsAvailable = Array.isArray(generation?.rejections);
   const narrative = rawResponse?.narrative || null;
   const transportStatus = response?.status || 0;
   const generationStatus = headerValue(response?.headers, "x-portfolio-generation-status") || (networkError ? "network-error" : transportStatus === 200 ? "unknown" : "http-error");
@@ -95,7 +98,7 @@ export async function captureGeneration({ environment, topicConfiguration, repet
     runId: randomUUID(),
     environment: environment.name,
     environmentId: environment.id,
-    endpoint: environment.endpoint,
+    endpoint: requestUrl.toString(),
     topicConfigurationId: topicConfiguration.id,
     topicConfigurationLabel: topicConfiguration.label,
     selectedTopicIds: [...topicConfiguration.topics],
@@ -109,6 +112,8 @@ export async function captureGeneration({ environment, topicConfiguration, repet
     upstreamStatus: headerValue(response?.headers, "x-portfolio-upstream-status"),
     validationStatus: headerValue(response?.headers, "x-portfolio-validation-status"),
     diagnostics: generation,
+    rejectionDiagnosticsAvailable,
+    rejectionCount: rejectionDiagnosticsAvailable ? generation.rejections.length : null,
     totalGeneratedFields: generation?.generatedFields ?? null,
     totalFallbackFields: generation?.fallbackFields ?? null,
     aiSectionCount: generation?.aiSections ?? null,
@@ -164,6 +169,8 @@ export function aggregateReliability(runs, regressionConfig = {}) {
     const fullyFallbackSections = validDiagnostics.reduce((sum, run) => sum + run.fallbackSectionCount, 0);
     const sectionsWithAnyFallback = validDiagnostics.reduce((sum, run) => sum + run.fallbackSectionCount + (run.mixedSectionCount || 0), 0);
     const totalSections = validDiagnostics.reduce((sum, run) => sum + (run.diagnostics.totalSections || 0), 0);
+    const rejectionDiagnosticRuns = validDiagnostics.filter((run) => Array.isArray(run.diagnostics.rejections));
+    const rejections = rejectionDiagnosticRuns.flatMap((run) => run.diagnostics.rejections);
     const fallbackBySection = {};
     const fallbackByTopicConfiguration = {};
     for (const run of validDiagnostics) {
@@ -186,6 +193,12 @@ export function aggregateReliability(runs, regressionConfig = {}) {
       fallbackSectionRate: totalSections ? sectionsWithAnyFallback / totalSections : null,
       generationStatuses: countBy(selected, (run) => run.generationStatus),
       validationFailures: countBy(selected.filter((run) => run.validationStatus), (run) => run.validationStatus),
+      rejectionDiagnosticsAvailableRuns: rejectionDiagnosticRuns.length,
+      rejectionCount: rejections.length,
+      runsWithRejections: rejectionDiagnosticRuns.filter((run) => run.diagnostics.rejections.length > 0).length,
+      rejectionsByCategory: countBy(rejections, (rejection) => rejection.category),
+      rejectionsBySection: countBy(rejections, (rejection) => rejection.sectionId),
+      rejectionsByField: countBy(rejections, (rejection) => rejection.field),
       fallbackBySection,
       fallbackByTopicConfiguration,
       latencyMs: {

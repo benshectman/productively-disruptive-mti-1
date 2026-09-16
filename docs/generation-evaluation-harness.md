@@ -6,11 +6,11 @@ The evaluation harness is a development-only CLI for comparing portfolio generat
 
 The default matrix covers 11 configurations: no topics, each single topic, four representative pairs, one representative triple, and all topics. Three repetitions per configuration produce 66 generation requests across control and treatment.
 
-For every request, the harness retains the endpoint label, selected topics, repetition, request ID, latency, HTTP and generation status, validation headers, diagnostics, field provenance, prose, proof content, public evidence, and complete raw response.
+For every request, the harness enables `diagnostics=1` and retains the endpoint label, selected topics, repetition, request ID, latency, HTTP and generation status, validation headers, diagnostics, field provenance, prose, proof content, public evidence, and complete raw response. Detailed rejected candidates, reasons, and context remain in each run's `diagnostics.rejections` array.
 
 After capture, one evaluator-model request compares each like-for-like pair in normal comparison mode. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
 
-The JSON output is the audit artifact. The Markdown report summarizes reliability and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. Ben remains the final decision-maker.
+The JSON output is the audit artifact. The Markdown report summarizes reliability, rejection diagnostics by environment/category/section/field, and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. When an endpoint does not support rejection diagnostics, the report marks that coverage as unavailable rather than treating it as zero rejections. Ben remains the final decision-maker.
 
 ## Run a comparison
 

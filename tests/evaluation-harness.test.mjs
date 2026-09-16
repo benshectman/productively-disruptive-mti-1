@@ -44,6 +44,7 @@ function responseBody(label = "Example") {
       mixedSections: 0,
       fallbackSections: 0,
       totalSections: 4,
+      rejections: [],
       sections: sections.map((id) => ({ id, status: "ai", fields: { headline: "ai", summary: "ai", detail: "ai" } }))
     }
   };
@@ -88,18 +89,32 @@ describe("evaluation harness", () => {
 
   it("captures headers, diagnostics, provenance, prose, evidence, and the raw response", async () => {
     const body = responseBody("Captured");
+    body.generation.rejections = [{
+      sectionId: sections[0],
+      field: "headline",
+      category: "headline-acronym",
+      reason: "Acronym expansion is not present in the lead.",
+      candidate: "Building the XDMO model",
+      context: { rejectedAcronyms: ["XDMO"] }
+    }];
+    let requestedUrl;
     const captured = await captureGeneration({
       environment: { name: "control", id: "develop", endpoint: "https://example.test/.netlify/functions/generate" },
       topicConfiguration: { id: "leadership", label: "Leadership", topics: ["T-001"] },
       repetition: 2,
-      fetcher: async () => new Response(JSON.stringify(body), {
+      fetcher: async (url) => {
+        requestedUrl = new URL(url);
+        return new Response(JSON.stringify(body), {
         status: 200,
         headers: { "X-Portfolio-Generation-Status": "ai", "X-Portfolio-Validation-Status": "schema" }
-      })
+        });
+      }
     });
-    expect(captured).toMatchObject({ environment: "control", environmentId: "develop", requestId: "Captured-request", generationStatus: "ai", validationStatus: "schema", totalGeneratedFields: 12, totalFallbackFields: 0 });
+    expect(requestedUrl.searchParams.get("diagnostics")).toBe("1");
+    expect(captured).toMatchObject({ environment: "control", environmentId: "develop", requestId: "Captured-request", generationStatus: "ai", validationStatus: "schema", totalGeneratedFields: 12, totalFallbackFields: 0, rejectionDiagnosticsAvailable: true, rejectionCount: 1 });
     expect(captured.fieldProvenance).toHaveLength(12);
     expect(captured.prose.sections[0].headline).toBe("Captured headline 1");
+    expect(captured.diagnostics.rejections[0]).toMatchObject({ category: "headline-acronym", candidate: "Building the XDMO model" });
     expect(captured.rawResponse).toEqual(body);
   });
 
@@ -112,13 +127,28 @@ describe("evaluation harness", () => {
     fallbackDiagnostics.mixedSections = 1;
     fallbackDiagnostics.sections[0].status = "mixed";
     fallbackDiagnostics.sections[0].fields.headline = "fallback";
+    fallbackDiagnostics.rejections = [
+      { sectionId: sections[0], field: "headline", category: "headline-too-long", reason: "Too long", candidate: "A long headline" },
+      { sectionId: sections[0], field: "headline", category: "headline-word-count", reason: "Too many words", candidate: "A long headline" }
+    ];
+    const controlDiagnostics = structuredClone(responseBody().generation);
+    delete controlDiagnostics.rejections;
     const runs = [
-      run("control", "none", 1),
+      run("control", "none", 1, { diagnostics: controlDiagnostics }),
       run("treatment", "none", 1, { diagnostics: fallbackDiagnostics, totalFallbackFields: 1, fieldProvenance: [{ sectionId: sections[0], field: "headline", provenance: "fallback" }] })
     ];
     const result = aggregateReliability(runs, { minimumAdditionalFallbackFields: 1, minimumFallbackRateIncrease: 0.01 });
     expect(result.byEnvironment.control.fullyGeneratedRuns).toBe(1);
+    expect(result.byEnvironment.control.rejectionDiagnosticsAvailableRuns).toBe(0);
     expect(result.byEnvironment.treatment.fallbackBySection[`${sections[0]}.headline`]).toBe(1);
+    expect(result.byEnvironment.treatment).toMatchObject({
+      rejectionDiagnosticsAvailableRuns: 1,
+      rejectionCount: 2,
+      runsWithRejections: 1,
+      rejectionsByCategory: { "headline-too-long": 1, "headline-word-count": 1 },
+      rejectionsBySection: { [sections[0]]: 2 },
+      rejectionsByField: { headline: 2 }
+    });
     expect(result.comparison.materialRegression).toBe(true);
   });
 
@@ -217,7 +247,9 @@ describe("evaluation harness", () => {
   });
 
   it("renders reliability, qualitative evidence, and complete shortlisted prose", () => {
-    const runs = [run("control", "none", 1), run("treatment", "none", 1)];
+    const treatmentDiagnostics = structuredClone(responseBody().generation);
+    treatmentDiagnostics.rejections = [{ sectionId: sections[0], field: "headline", category: "headline-acronym", reason: "Unexplained acronym", candidate: "Building the XDMO model" }];
+    const runs = [run("control", "none", 1), run("treatment", "none", 1, { diagnostics: treatmentDiagnostics })];
     const pair = createBlindPairs(runs, "seed")[0];
     const raw = judgment("equivalent");
     const evaluation = { pair, judgment: raw, unblinded: unblindJudgment(raw, pair), shortlistReasons: ["no meaningful difference"] };
@@ -232,6 +264,9 @@ describe("evaluation harness", () => {
       sanity: null
     });
     expect(report).toContain("## Reliability summary");
+    expect(report).toContain("## Rejection diagnostics");
+    expect(report).toContain("Detailed rejected candidates, reasons, and context remain");
+    expect(report).toContain("headline-acronym: 1");
     expect(report).toContain("## Cases Ben should review");
     expect(report).toContain("control headline");
     expect(report).toContain("treatment headline");

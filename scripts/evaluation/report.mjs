@@ -29,6 +29,17 @@ function counts(value = {}) {
   return Object.entries(value).map(([key, count]) => `${key}: ${count}`).join(", ") || "none";
 }
 
+function rejectionSummary(environment) {
+  return {
+    availableRuns: environment.rejectionDiagnosticsAvailableRuns ?? 0,
+    count: environment.rejectionCount ?? 0,
+    affectedRuns: environment.runsWithRejections ?? 0,
+    byCategory: environment.rejectionsByCategory || {},
+    bySection: environment.rejectionsBySection || {},
+    byField: environment.rejectionsByField || {}
+  };
+}
+
 function proseMarkdown(label, run) {
   const output = [`#### ${label} (${run.environment})`, ""];
   for (const section of run.prose?.sections || []) {
@@ -63,6 +74,8 @@ export function buildMarkdownReport(bundle) {
   ];
   const control = reliability.byEnvironment.control;
   const treatment = reliability.byEnvironment.treatment;
+  const controlRejections = rejectionSummary(control);
+  const treatmentRejections = rejectionSummary(treatment);
   lines.push(
     `| Successful captures | ${control.successfulRuns}/${control.runs} | ${treatment.successfulRuns}/${treatment.runs} |`,
     `| Fully generated runs | ${control.fullyGeneratedRuns}/${control.runs} | ${treatment.fullyGeneratedRuns}/${treatment.runs} |`,
@@ -95,6 +108,24 @@ export function buildMarkdownReport(bundle) {
     `| Treatment | ${escapeCell(counts(treatment.fallbackBySection))} | ${escapeCell(counts(treatment.fallbackByTopicConfiguration))} |`,
     ""
   );
+
+  lines.push(
+    "## Rejection diagnostics",
+    "",
+    "Detailed rejected candidates, reasons, and context remain in each run’s `diagnostics.rejections` array in the companion JSON artifact.",
+    "",
+    "| Environment | Diagnostics available | Rejections | Runs affected | By category | By section | By field |",
+    "| --- | ---: | ---: | ---: | --- | --- | --- |",
+    `| Control | ${controlRejections.availableRuns}/${control.runs} | ${controlRejections.count} | ${controlRejections.affectedRuns} | ${escapeCell(counts(controlRejections.byCategory))} | ${escapeCell(counts(controlRejections.bySection))} | ${escapeCell(counts(controlRejections.byField))} |`,
+    `| Treatment | ${treatmentRejections.availableRuns}/${treatment.runs} | ${treatmentRejections.count} | ${treatmentRejections.affectedRuns} | ${escapeCell(counts(treatmentRejections.byCategory))} | ${escapeCell(counts(treatmentRejections.bySection))} | ${escapeCell(counts(treatmentRejections.byField))} |`,
+    ""
+  );
+  if (controlRejections.availableRuns < control.runs || treatmentRejections.availableRuns < treatment.runs) {
+    lines.push(
+      "> Rejection-diagnostics coverage is incomplete. Treat missing diagnostics as unavailable, not as zero rejections.",
+      ""
+    );
+  }
 
   lines.push("## Qualitative summary", "");
   if (!qualitative) {
