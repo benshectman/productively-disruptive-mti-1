@@ -6,6 +6,8 @@ import {
   captureGeneration,
   createBlindPairs,
   evaluatorRequest,
+  mirrorPair,
+  reconcileMirroredEvaluations,
   sanityAssessment,
   unblindJudgment,
   validateConfig
@@ -161,6 +163,35 @@ describe("evaluation harness", () => {
       largerBlindSideShare: 1,
       positionBiasPValue: 0.015625
     });
+  });
+
+  it("reconciles mirrored passes by underlying response instead of A/B label", () => {
+    const pair = createBlindPairs([run("control", "none", 1), run("treatment", "none", 1)], "seed")[0];
+    const mirroredPair = mirrorPair(pair);
+    const originalRaw = judgment("A_stronger");
+    const mirroredRaw = judgment("B_stronger");
+    const original = { pair, judgment: originalRaw, unblinded: unblindJudgment(originalRaw, pair), durationMs: 10, evaluatorModel: "test", startedAt: "now" };
+    const mirrored = { pair: mirroredPair, judgment: mirroredRaw, unblinded: unblindJudgment(mirroredRaw, mirroredPair), durationMs: 12, evaluatorModel: "test", startedAt: "now" };
+    const reconciled = reconcileMirroredEvaluations(original, mirrored);
+    expect(reconciled.mirrorAudit).toMatchObject({ positionSensitive: false, exactAgreement: true, criterionDisagreements: [] });
+    expect(reconciled.unblinded.overall.environmentResult).toBe(original.unblinded.overall.environmentResult);
+    expect(reconciled.judgment.confidence).toBe("moderate");
+  });
+
+  it("flags a label-following mirrored result instead of counting a winner", () => {
+    const pair = createBlindPairs([run("control", "none", 1), run("treatment", "none", 1)], "seed")[0];
+    const mirroredPair = mirrorPair(pair);
+    const originalRaw = judgment("B_stronger");
+    const mirroredRaw = judgment("B_stronger");
+    const original = { pair, judgment: originalRaw, unblinded: unblindJudgment(originalRaw, pair), durationMs: 10, evaluatorModel: "test", startedAt: "now" };
+    const mirrored = { pair: mirroredPair, judgment: mirroredRaw, unblinded: unblindJudgment(mirroredRaw, mirroredPair), durationMs: 12, evaluatorModel: "test", startedAt: "now" };
+    const reconciled = reconcileMirroredEvaluations(original, mirrored);
+    const qualitative = aggregateQualitative([reconciled]);
+    expect(reconciled.mirrorAudit.positionSensitive).toBe(true);
+    expect(reconciled.judgment.overall.judgment).toBe("low_confidence");
+    expect(qualitative.overall.low_confidence).toBe(1);
+    expect(qualitative.blindPosition).toMatchObject({ aOverallWins: 0, bOverallWins: 2 });
+    expect(sanityAssessment(qualitative, [pair])).toMatchObject({ mirroredEvaluationCompleted: true, positionSensitivePairs: 1 });
   });
 
   it("performs one structured evaluator pass and preserves its raw response", async () => {

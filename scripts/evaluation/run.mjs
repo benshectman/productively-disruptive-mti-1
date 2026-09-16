@@ -8,6 +8,8 @@ import {
   captureGeneration,
   chooseShortlist,
   createBlindPairs,
+  mirrorPair,
+  reconcileMirroredEvaluations,
   resolveEnvironment,
   sanityAssessment,
   validateConfig
@@ -51,7 +53,7 @@ Required for qualitative evaluation:
 Optional:
   EVAL_CONTROL_ID, EVAL_TREATMENT_ID, EVAL_MODEL
 
-Use --sanity with equivalent endpoints to add the A/B position-bias audit.`;
+Use --sanity with equivalent endpoints to run mirrored A/B evaluator passes and add the position-bias audit.`;
 }
 
 const delay = (milliseconds) => milliseconds > 0 ? new Promise((resolve) => setTimeout(resolve, milliseconds)) : Promise.resolve();
@@ -134,27 +136,48 @@ async function main() {
     };
   }
 
-  if (!options.reportOnly && !options.captureOnly && !bundle.evaluations?.length) {
+  const sanityMode = bundle.metadata.mode === "sanity" || options.sanity;
+  if (!options.reportOnly && !options.captureOnly) {
     const apiKey = process.env[config.evaluator.apiKeyEnv];
     if (!apiKey) throw new Error(`Set ${config.evaluator.apiKeyEnv}, or rerun with --capture-only`);
     const model = process.env[config.evaluator.modelEnv] || config.evaluator.defaultModel;
     const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
-    bundle.evaluations = [];
-    for (let index = 0; index < bundle.pairs.length; index += 1) {
-      console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${bundle.pairs[index].pairId}`);
-      bundle.evaluations.push(await evaluatePair({ pair: bundle.pairs[index], runsById, apiKey, model }));
-      await delay(config.requestDelayMs || 0);
+    if (!bundle.evaluations?.length) {
+      bundle.evaluations = [];
+      for (let index = 0; index < bundle.pairs.length; index += 1) {
+        console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${bundle.pairs[index].pairId} original`);
+        bundle.evaluations.push(await evaluatePair({ pair: bundle.pairs[index], runsById, apiKey, model }));
+        await delay(config.requestDelayMs || 0);
+      }
     }
+    if (sanityMode) {
+      const reconciled = [];
+      for (let index = 0; index < bundle.evaluations.length; index += 1) {
+        const original = bundle.evaluations[index];
+        if (original.evaluatorPasses || original.error) {
+          reconciled.push(original);
+          continue;
+        }
+        console.log(`[evaluator ${index + 1}/${bundle.evaluations.length}] ${original.pair.pairId} mirrored`);
+        const mirrored = await evaluatePair({ pair: mirrorPair(original.pair), runsById, apiKey, model });
+        reconciled.push(mirrored.error
+          ? { ...original, mirrorError: mirrored.error, failedMirrorPass: mirrored }
+          : reconcileMirroredEvaluations(original, mirrored));
+        await delay(config.requestDelayMs || 0);
+      }
+      bundle.evaluations = reconciled;
+    }
+    bundle.metadata.qualitativePassesPerPair = sanityMode ? 2 : 1;
   }
 
-  const successfulEvaluations = (bundle.evaluations || []).filter((evaluation) => !evaluation.error);
+  const successfulEvaluations = (bundle.evaluations || []).filter((evaluation) => !evaluation.error && !evaluation.mirrorError && (!sanityMode || evaluation.evaluatorPasses));
   if (successfulEvaluations.length) {
     const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
     bundle.qualitative = aggregateQualitative(successfulEvaluations);
     bundle.shortlist = chooseShortlist(successfulEvaluations, runsById, config.shortlist);
-    if (bundle.metadata.mode === "sanity" || options.sanity) bundle.sanity = sanityAssessment(bundle.qualitative, bundle.pairs);
+    if (sanityMode) bundle.sanity = sanityAssessment(bundle.qualitative, bundle.pairs);
   }
-  if ((bundle.metadata.mode === "sanity" || options.sanity) && !bundle.sanity) bundle.sanity = sanityAssessment(null, bundle.pairs || []);
+  if (sanityMode && !bundle.sanity) bundle.sanity = sanityAssessment(null, bundle.pairs || []);
   bundle.metadata.generatedAt = new Date().toISOString();
   const stem = `portfolio-generation-evaluation-${timestamp()}`;
   const written = await writeBundle(bundle, options.output, stem);

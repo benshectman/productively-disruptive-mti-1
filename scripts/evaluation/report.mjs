@@ -116,10 +116,19 @@ export function buildMarkdownReport(bundle) {
       `Blind-position audit: control appeared as A ${qualitative.blindPosition.controlAsA} times and B ${qualitative.blindPosition.controlAsB} times. A won ${qualitative.blindPosition.aOverallWins} decisive comparisons and B won ${qualitative.blindPosition.bOverallWins}.`,
       ""
     );
+    if (qualitative.mirrorAudit) {
+      lines.push(
+        `Mirrored-pass audit: ${qualitative.mirrorAudit.evaluatedPairs} pairs evaluated in both orientations; ${qualitative.mirrorAudit.positionSensitivePairs} position-sensitive overall results; ${qualitative.mirrorAudit.exactAgreementPairs} exact agreements across the overall judgment and every criterion; ${qualitative.mirrorAudit.pairsWithCriterionDisagreement} pairs with at least one criterion disagreement.`,
+        ""
+      );
+    }
   }
   if (sanity) {
     lines.push(
       "## Control-vs-control sanity check",
+      "",
+      `Mirrored qualitative evaluation completed: ${sanity.mirroredEvaluationCompleted ? `yes (${sanity.mirroredPairs} pairs)` : "no"}.`,
+      ...(sanity.positionSensitivePairs == null ? [] : [`Position-sensitive overall results: ${sanity.positionSensitivePairs}/${sanity.mirroredPairs}.`]),
       "",
       `Randomized mapping reasonably balanced: ${sanity.mappingIsReasonablyBalanced ? "yes" : "no"} (control as A ${sanity.controlAsA}, control as B ${sanity.controlAsB}).`,
       "",
@@ -146,6 +155,16 @@ export function buildMarkdownReport(bundle) {
       "",
       `Overall judgment: ${item.judgment.overall.judgment}. Confidence: ${item.judgment.confidence}.`,
       "",
+      ...(item.mirrorAudit ? [
+        `Mirrored evaluation: ${item.mirrorAudit.positionSensitive ? "position-sensitive overall result" : "overall result consistent across orientations"}. Original orientation resolved to ${item.mirrorAudit.originalOverall}; mirrored orientation resolved to ${item.mirrorAudit.mirroredOverall}.`,
+        "",
+        `Criterion disagreements: ${item.mirrorAudit.criterionDisagreements.length ? item.mirrorAudit.criterionDisagreements.map((criterion) => labels[criterion]).join(", ") : "none"}.`,
+        "",
+        `Original-pass rationale: ${item.evaluatorPasses.original.judgment.overall.rationale}`,
+        "",
+        `Mirrored-pass rationale: ${item.evaluatorPasses.mirrored.judgment.overall.rationale}`,
+        ""
+      ] : []),
       "| Criterion | Judgment | Rationale |",
       "| --- | --- | --- |",
       ...CRITERIA.map((criterion) => `| ${labels[criterion]} | ${item.judgment.criteria[criterion].judgment} | ${escapeCell(item.judgment.criteria[criterion].rationale)} |`),

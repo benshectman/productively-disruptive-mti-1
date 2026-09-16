@@ -8,7 +8,7 @@ The default matrix covers 11 configurations: no topics, each single topic, four 
 
 For every request, the harness retains the endpoint label, selected topics, repetition, request ID, latency, HTTP and generation status, validation headers, diagnostics, field provenance, prose, proof content, public evidence, and complete raw response.
 
-After capture, one evaluator-model request compares each like-for-like pair. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
+After capture, one evaluator-model request compares each like-for-like pair in normal comparison mode. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
 
 The JSON output is the audit artifact. The Markdown report summarizes reliability and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. Ben remains the final decision-maker.
 
@@ -69,7 +69,9 @@ OPENAI_API_KEY="..." \
 npm run eval:harness -- --sanity
 ```
 
-The report shows A/B assignment balance and flags an obvious blind-position preference when at least eight comparisons are decisive and one blind side wins 75% or more. This is a warning, not proof of bias.
+Sanity mode evaluates every pair twice. The second pass reverses A and B. A winner is retained only when both passes select the same underlying generation. If the conclusion changes with presentation order, the reconciled result becomes low confidence, is marked position-sensitive, and is prioritized for human review. Both raw passes remain in the JSON audit artifact.
+
+The report shows mirrored-pass agreement, A/B assignment balance, position-sensitive cases, and a two-sided exact binomial test of raw A/B winners. A probability of 0.05 or less is flagged as possible position bias. This is a warning, not proof of bias.
 
 ## Configuration
 

@@ -256,6 +256,16 @@ export function evaluatorRequest(pair, runsById) {
   };
 }
 
+export function mirrorPair(pair) {
+  return {
+    ...pair,
+    pairId: `${pair.pairId}-mirrored`,
+    mirroredFromPairId: pair.pairId,
+    blind: { A: pair.blind.B, B: pair.blind.A },
+    mapping: { A: pair.mapping.B, B: pair.mapping.A }
+  };
+}
+
 export function unblindJudgment(judgment, pair) {
   const translate = (value) => value === "A_stronger" ? pair.mapping.A : value === "B_stronger" ? pair.mapping.B : value;
   return {
@@ -272,11 +282,84 @@ export function unblindJudgment(judgment, pair) {
   };
 }
 
+function blindJudgment(environmentResult, pair) {
+  if (environmentResult === pair.mapping.A) return "A_stronger";
+  if (environmentResult === pair.mapping.B) return "B_stronger";
+  return environmentResult;
+}
+
+function lowerConfidence(left, right) {
+  const order = { high: 0, moderate: 1, low: 2 };
+  return order[left] >= order[right] ? left : right;
+}
+
+export function reconcileMirroredEvaluations(original, mirrored) {
+  if (original.error || mirrored.error) throw new Error("Cannot reconcile failed evaluator passes");
+  const pair = original.pair;
+  const criterionDisagreements = [];
+  const criteria = Object.fromEntries(CRITERIA.map((criterion) => {
+    const first = original.unblinded.criteria[criterion].environmentResult;
+    const second = mirrored.unblinded.criteria[criterion].environmentResult;
+    const agrees = first === second;
+    if (!agrees) criterionDisagreements.push(criterion);
+    return [criterion, {
+      judgment: agrees ? blindJudgment(first, pair) : "low_confidence",
+      rationale: agrees
+        ? `Mirrored passes agreed. ${original.judgment.criteria[criterion].rationale}`
+        : `Order-sensitive result. Original orientation: ${first}. Mirrored orientation: ${second}.`
+    }];
+  }));
+  const originalOverall = original.unblinded.overall.environmentResult;
+  const mirroredOverall = mirrored.unblinded.overall.environmentResult;
+  const positionSensitive = originalOverall !== mirroredOverall;
+  const concerns = [];
+  for (const [orientation, evaluation] of [["original", original], ["mirrored", mirrored]]) {
+    for (const concern of evaluation.unblinded.concerns) {
+      concerns.push({
+        type: concern.type,
+        responses: concern.environments.map((environment) => environment === pair.mapping.A ? "A" : "B"),
+        rationale: `${orientation} orientation: ${concern.rationale}`
+      });
+    }
+  }
+  const judgment = {
+    criteria,
+    overall: {
+      judgment: positionSensitive ? "low_confidence" : blindJudgment(originalOverall, pair),
+      rationale: positionSensitive
+        ? `Order-sensitive result. Original orientation: ${originalOverall}. Mirrored orientation: ${mirroredOverall}.`
+        : `Mirrored passes agreed on ${originalOverall}. ${original.judgment.overall.rationale}`
+    },
+    concerns,
+    confidence: positionSensitive || criterionDisagreements.length ? "low" : lowerConfidence(original.judgment.confidence, mirrored.judgment.confidence)
+  };
+  return {
+    pair,
+    startedAt: original.startedAt,
+    durationMs: original.durationMs + mirrored.durationMs,
+    evaluatorModel: original.evaluatorModel,
+    judgment,
+    unblinded: unblindJudgment(judgment, pair),
+    mirrorAudit: {
+      positionSensitive,
+      exactAgreement: !positionSensitive && criterionDisagreements.length === 0,
+      originalOverall,
+      mirroredOverall,
+      criterionDisagreements
+    },
+    evaluatorPasses: { original, mirrored }
+  };
+}
+
 export function aggregateQualitative(evaluations) {
   const criteria = {};
   for (const criterion of CRITERIA) {
     criteria[criterion] = countBy(evaluations, (evaluation) => evaluation.unblinded.criteria[criterion].environmentResult);
   }
+  const rawPasses = evaluations.flatMap((evaluation) => evaluation.evaluatorPasses
+    ? [evaluation.evaluatorPasses.original, evaluation.evaluatorPasses.mirrored]
+    : [evaluation]);
+  const mirroredEvaluations = evaluations.filter((evaluation) => evaluation.mirrorAudit);
   return {
     comparablePairs: evaluations.length,
     criteria,
@@ -287,11 +370,17 @@ export function aggregateQualitative(evaluations) {
       treatment: evaluations.filter((evaluation) => evaluation.unblinded.concerns.some((concern) => ["grounding", "attribution"].includes(concern.type) && concern.environments.includes("treatment"))).length
     },
     blindPosition: {
-      controlAsA: evaluations.filter((evaluation) => evaluation.pair.mapping.A === "control").length,
-      controlAsB: evaluations.filter((evaluation) => evaluation.pair.mapping.B === "control").length,
-      aOverallWins: evaluations.filter((evaluation) => evaluation.judgment.overall.judgment === "A_stronger").length,
-      bOverallWins: evaluations.filter((evaluation) => evaluation.judgment.overall.judgment === "B_stronger").length
-    }
+      controlAsA: rawPasses.filter((evaluation) => evaluation.pair.mapping.A === "control").length,
+      controlAsB: rawPasses.filter((evaluation) => evaluation.pair.mapping.B === "control").length,
+      aOverallWins: rawPasses.filter((evaluation) => evaluation.judgment.overall.judgment === "A_stronger").length,
+      bOverallWins: rawPasses.filter((evaluation) => evaluation.judgment.overall.judgment === "B_stronger").length
+    },
+    mirrorAudit: mirroredEvaluations.length ? {
+      evaluatedPairs: mirroredEvaluations.length,
+      positionSensitivePairs: mirroredEvaluations.filter((evaluation) => evaluation.mirrorAudit.positionSensitive).length,
+      exactAgreementPairs: mirroredEvaluations.filter((evaluation) => evaluation.mirrorAudit.exactAgreement).length,
+      pairsWithCriterionDisagreement: mirroredEvaluations.filter((evaluation) => evaluation.mirrorAudit.criterionDisagreements.length).length
+    } : null
   };
 }
 
@@ -305,6 +394,8 @@ export function chooseShortlist(evaluations, runsById, limits = {}) {
     if (result === "control") reasons.push("apparent regression");
     if (result === "equivalent") reasons.push("no meaningful difference");
     if (evaluation.judgment.confidence === "low") reasons.push("low evaluator confidence");
+    if (evaluation.mirrorAudit?.positionSensitive) reasons.push("position-sensitive evaluator result");
+    else if (evaluation.mirrorAudit?.criterionDisagreements.length) reasons.push("mirrored evaluator disagreement");
     if (evaluation.unblinded.concerns.length) reasons.push(...evaluation.unblinded.concerns.map((item) => `${item.type} concern`));
     const a = runsById.get(evaluation.pair.blind.A);
     const b = runsById.get(evaluation.pair.blind.B);
@@ -316,6 +407,8 @@ export function chooseShortlist(evaluations, runsById, limits = {}) {
     reasons: reasonsFor(evaluation),
     priority: (evaluation.unblinded.concerns.length * 20)
       + (evaluation.judgment.confidence === "low" ? 12 : 0)
+      + (evaluation.mirrorAudit?.positionSensitive ? 18 : 0)
+      + (evaluation.mirrorAudit?.criterionDisagreements.length || 0)
       + (evaluation.unblinded.overall.environmentResult === "control" ? 10 : 0)
       + (evaluation.unblinded.overall.environmentResult === "treatment" ? 6 : 0)
       + (evaluation.unblinded.overall.environmentResult === "equivalent" ? 2 : 0)
@@ -331,6 +424,8 @@ export function chooseShortlist(evaluations, runsById, limits = {}) {
   add((item) => item.reasons.includes("fallback case"));
   add((item) => item.reasons.some((reason) => reason.includes("grounding") || reason.includes("attribution")));
   add((item) => item.reasons.includes("low evaluator confidence"));
+  add((item) => item.reasons.includes("position-sensitive evaluator result"));
+  add((item) => item.reasons.includes("mirrored evaluator disagreement"));
   add((item) => item.reasons.includes("no meaningful difference"));
   for (const item of ranked) if (chosen.length < minimum && !chosen.includes(item)) chosen.push(item);
   return chosen.slice(0, maximum).map(({ evaluation, reasons }) => ({ ...evaluation, shortlistReasons: reasons }));
@@ -355,6 +450,9 @@ export function sanityAssessment(qualitative, pairs = []) {
   const mappingDifference = Math.abs(controlAsA - controlAsB);
   return {
     qualitativeEvaluationCompleted: Boolean(qualitative),
+    mirroredEvaluationCompleted: Boolean(qualitative?.mirrorAudit),
+    mirroredPairs: qualitative?.mirrorAudit?.evaluatedPairs ?? 0,
+    positionSensitivePairs: qualitative?.mirrorAudit?.positionSensitivePairs ?? null,
     controlAsA,
     controlAsB,
     mappingIsReasonablyBalanced: mappingDifference <= 1,
