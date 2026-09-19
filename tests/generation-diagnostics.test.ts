@@ -5,10 +5,13 @@ import { assembleNarrative } from "../src/shared/narrative";
 import type { GenerationDiagnostics, GenerationRejection } from "../src/shared/contracts";
 
 const originalApiKey = process.env.OPENAI_API_KEY;
+const originalModel = process.env.OPENAI_MODEL;
 
 afterEach(() => {
   if (originalApiKey === undefined) delete process.env.OPENAI_API_KEY;
   else process.env.OPENAI_API_KEY = originalApiKey;
+  if (originalModel === undefined) delete process.env.OPENAI_MODEL;
+  else process.env.OPENAI_MODEL = originalModel;
 });
 
 describe("generation diagnostics", () => {
@@ -91,6 +94,7 @@ describe("generation diagnostics", () => {
 
   it("does not add rejection detail when diagnostics are off", async () => {
     process.env.OPENAI_API_KEY = "test-only";
+    process.env.OPENAI_MODEL = "test-model";
     const framing = validFraming();
     framing.sections[0].headline = "Tiny";
     const fakeFetch = async () => new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
@@ -99,10 +103,12 @@ describe("generation diagnostics", () => {
 
     expect(result.status).toBe("ai");
     expect(result.diagnostics).not.toHaveProperty("rejections");
+    expect(result.diagnostics).not.toHaveProperty("model");
   });
 
   it("captures a rejected headline candidate and specific reason when diagnostics are on", async () => {
     process.env.OPENAI_API_KEY = "test-only";
+    process.env.OPENAI_MODEL = "test-model";
     const framing = validFraming();
     framing.sections[0].headline = "Tiny";
     const fakeFetch = async () => new Response(JSON.stringify({ output_text: JSON.stringify(framing) }), { status: 200 });
@@ -118,6 +124,7 @@ describe("generation diagnostics", () => {
         reason: expect.stringContaining("minimum is 8")
       })
     ]));
+    expect(result.diagnostics.model).toBe("test-model");
   });
 
   it("captures acronym rejection detail and the lead used for validation", () => {
