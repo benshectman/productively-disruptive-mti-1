@@ -89,6 +89,7 @@ function Experience({ narrative, generationDiagnostics, diagnosticsEnabled, evid
     {diagnosticsEnabled && <aside className="validation-notice has-generation-diagnostics" role="note">
       {diagnosticsEnabled && <div className="generation-diagnostics" data-generation-status={generationDiagnostics.status}>
         <strong>Generation diagnostics</strong>
+        {generationDiagnostics.model && <span>Model: {generationDiagnostics.model}</span>}
         <span>{generationDiagnostics.generatedFields} of {generationDiagnostics.totalFields} fields generated · {generationDiagnostics.fallbackFields} fallback</span>
         <span>{generationDiagnostics.aiSections} AI sections · {generationDiagnostics.mixedSections} mixed · {generationDiagnostics.fallbackSections} fallback</span>
         <ul>{generationDiagnostics.sections.map((section) => <li key={section.id}>

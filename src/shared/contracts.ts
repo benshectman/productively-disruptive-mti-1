@@ -103,6 +103,7 @@ export const GenerationRejectionSchema = z.object({
   context: z.record(z.string(), z.unknown()).optional()
 });
 export const GenerationDiagnosticsSchema = z.object({
+  model: z.string().min(1).max(120).optional(),
   status: GenerationOutcomeSchema,
   generatedFields: z.number().int().min(0).max(12),
   fallbackFields: z.number().int().min(0).max(12),
