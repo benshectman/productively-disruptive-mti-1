@@ -395,6 +395,9 @@ export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: ty
 Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
   const fallback = assembleApprovedBenFactsNarrative(topics);
   const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const runtimeDiagnostics = (diagnostics: GenerationDiagnostics): GenerationDiagnostics =>
+    diagnosticsEnabled ? { ...diagnostics, model } : diagnostics;
   const allowedIds = approvedBenFactIds;
   if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key", diagnostics: fallbackDiagnostics };
   const evidenceBySection = eligibleEvidenceBySection(topics);
@@ -409,7 +412,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
       method: "POST", signal: controller.signal,
       headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 2800,
+        model, store: false, max_output_tokens: 2800,
         instructions: [
           "Write the headline, concise lead, and fuller detail for four sections of one continuous professional portfolio narrative.",
           "Return every supplied section ID exactly once. Do not change the section structure or add sections.",
@@ -455,7 +458,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
     const proofRequests = fallbackProofItems.map((item) => {
       const projectEvidence = buildEligibleProjectEvidence(item.project_id, topics);
       return requestStructured(fetcher, controller.signal, {
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, max_output_tokens: 1800,
+        model, store: false, max_output_tokens: 1800,
         instructions: [
           "Generate one mini-STAR evidence model for exactly one professional project.",
           "Use only the supplied evidence, which has already been restricted to one project_id. Do not use knowledge from any other project.",
@@ -541,14 +544,14 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
         : section)
     };
     if (!validateNarrativeEvidence(narrative, allowedIds) || !validateNarrativeProofProjects(narrative)) {
-      return { narrative: fallback, status: "invalid-output", diagnostics: rejections ? { ...fallbackDiagnostics, rejections } : fallbackDiagnostics, validationStatus: "narrative-evidence" };
+      return { narrative: fallback, status: "invalid-output", diagnostics: runtimeDiagnostics(rejections ? { ...fallbackDiagnostics, rejections } : fallbackDiagnostics), validationStatus: "narrative-evidence" };
     }
     const status = framedNarrative || generatedProofCount ? "ai" : framingStatus;
-    return { narrative, status, diagnostics: rejections ? { ...diagnostics, rejections } : diagnostics, upstreamStatus, validationStatus };
+    return { narrative, status, diagnostics: runtimeDiagnostics(rejections ? { ...diagnostics, rejections } : diagnostics), upstreamStatus, validationStatus };
   } catch (error) {
     const status = error instanceof Error && error.name === "AbortError" ? "timeout" : "network-error";
     console.warn(`[generation:${requestId}] ${status}`);
-    return { narrative: fallback, status, diagnostics: fallbackDiagnostics };
+    return { narrative: fallback, status, diagnostics: runtimeDiagnostics(fallbackDiagnostics) };
   }
   finally { clearTimeout(timeout); }
 }
