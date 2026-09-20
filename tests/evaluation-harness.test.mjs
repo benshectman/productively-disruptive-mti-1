@@ -240,6 +240,7 @@ describe("evaluation harness", () => {
     expect(criterion.properties.confidence.enum).toEqual(["high", "medium", "low"]);
     expect(body.instructions).toContain("A score of 5 should be uncommon");
     expect(body.instructions).toContain("Most competent portfolio content should fall around 3 or 4");
+    expect(body.instructions).toContain("Do not use 5 merely because there are no defects or concerns");
     expect(body.instructions).toContain("Do not reward verbosity, fact count, or length by themselves");
   });
 
