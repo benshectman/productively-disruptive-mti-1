@@ -1,0 +1,97 @@
+name: Portfolio Evaluation Harness
+
+run-name: Evaluate ${{ inputs.control_id }} vs ${{ inputs.treatment_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      control_url:
+        description: Control Netlify base URL
+        required: true
+        type: string
+        default: https://develop--portfolio-gpt.netlify.app
+
+      treatment_url:
+        description: Treatment Netlify base URL
+        required: true
+        type: string
+
+      control_id:
+        description: Label for the control environment
+        required: true
+        type: string
+        default: develop
+
+      treatment_id:
+        description: Label for the treatment environment
+        required: true
+        type: string
+
+      evaluator_model:
+        description: OpenAI model used to judge the generated responses
+        required: true
+        type: string
+        default: gpt-4.1-mini
+
+      sanity:
+        description: Run mirrored control-vs-control sanity evaluation
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    name: Run evaluation harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run evaluation harness
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EVAL_CONTROL_URL: ${{ inputs.control_url }}
+          EVAL_TREATMENT_URL: ${{ inputs.treatment_url }}
+          EVAL_CONTROL_ID: ${{ inputs.control_id }}
+          EVAL_TREATMENT_ID: ${{ inputs.treatment_id }}
+          EVAL_MODEL: ${{ inputs.evaluator_model }}
+          SANITY_MODE: ${{ inputs.sanity }}
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "The OPENAI_API_KEY repository secret is not configured."
+            exit 1
+          fi
+
+          extra_args=()
+
+          if [ "$SANITY_MODE" = "true" ]; then
+            extra_args+=(--sanity)
+          fi
+
+          npm run eval:harness -- \
+            --output "evaluation-results/run-${GITHUB_RUN_ID}" \
+            "${extra_args[@]}"
+
+      - name: Upload evaluation results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-evaluation-${{ github.run_id }}
+          path: evaluation-results/run-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
