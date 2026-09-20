@@ -126,7 +126,7 @@ export function buildIndependentAssessmentBody(request, model) {
     max_output_tokens: 3500,
     instructions: [
       "Assess one version of professional portfolio prose on its own merits. There is no competing response in this task.",
-      "Do not infer or speculate about the model, environment, or source of the response. Do not label the response as control or treatment.",
+      "Do not infer or speculate about the model, environment, or source of the response. Treat the supplied response as standalone material.",
       "Use only the selected topics, prose, proof items, and evidence supplied. Evaluate the complete narrative.",
       "For every criterion, use strong, adequate, weak, concern, or unclear. Use concern only for a concrete issue, especially an apparent grounding or attribution problem. Use unclear when the supplied material is insufficient.",
       "For overall quality, use strong, adequate, weak, concern, or low_confidence. Give a concise rationale. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",

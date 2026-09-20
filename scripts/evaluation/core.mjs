@@ -417,7 +417,10 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
   const treatmentOverall = assessmentOverall(treatmentAssessment);
   const overallResult = compareRating(controlOverall, treatmentOverall);
   const overallDirection = ["control_stronger", "treatment_stronger"].includes(overallResult) ? overallResult : null;
-  const lowConfidence = controlAssessment?.confidence === "low" || treatmentAssessment?.confidence === "low";
+  const overallLowConfidence = controlOverall === "low_confidence" || treatmentOverall === "low_confidence";
+  const lowConfidence = controlAssessment?.confidence === "low" || treatmentAssessment?.confidence === "low" || overallLowConfidence;
+  const criterionOpposesOverall = (overallDirection === "control_stronger" && treatmentCriterionWins > 0)
+    || (overallDirection === "treatment_stronger" && controlCriterionWins > 0);
   let classification = "equivalent";
   let reason = "The independent assessments are effectively tied across the overall and criterion-level ratings.";
   if (lowConfidence && (overallDirection || criterionDirection)) {
@@ -426,6 +429,9 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
   } else if (criteriaConflict) {
     classification = "unresolved";
     reason = "The criterion-level assessments point in opposite directions, so the pair is sent to arbitration.";
+  } else if (criterionOpposesOverall) {
+    classification = "unresolved";
+    reason = "The overall ratings and at least one criterion-level rating point in opposite directions, so the pair is sent to arbitration.";
   } else if (overallDirection && criterionDirection && overallDirection !== criterionDirection) {
     classification = "unresolved";
     reason = "The overall ratings and criterion-level ratings point in opposite directions, so the pair is sent to arbitration.";
@@ -452,6 +458,7 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
     criteria,
     criterionDirection,
     criteriaConflict,
+    criterionOpposesOverall,
     criterionCounts: { control: controlCriterionWins, treatment: treatmentCriterionWins, equivalent: CRITERIA.length - controlCriterionWins - treatmentCriterionWins },
     minimumCriterionLead
   };
