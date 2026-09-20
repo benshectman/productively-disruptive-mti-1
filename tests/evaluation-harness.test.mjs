@@ -244,6 +244,8 @@ describe("evaluation harness", () => {
     expect(body.instructions).toContain("Use 4 as the default high rating");
     expect(body.instructions).toContain("A normal competent response may have no 5 ratings");
     expect(body.instructions).toContain("Merely satisfying a criterion is not exceptional");
+    expect(body.instructions).toContain("no more than one or two ratings of 5 across the ten criteria");
+    expect(body.instructions).toContain("Overall quality should be 5 only when multiple criteria are genuinely exceptional");
     expect(body.instructions).toContain("Do not reward verbosity, fact count, or length by themselves");
   });
 
