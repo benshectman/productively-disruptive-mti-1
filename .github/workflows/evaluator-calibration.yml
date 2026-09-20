@@ -40,9 +40,9 @@ jobs:
 
     env:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
-      PAIR_COUNT: ${{ inputs.pair_count || '8' }}
+      PAIR_COUNT: ${{ inputs.pair_count || '32' }}
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
-      CALIBRATION_REVISION: v8
+      CALIBRATION_REVISION: v9
 
     steps:
       - name: Check out repository
