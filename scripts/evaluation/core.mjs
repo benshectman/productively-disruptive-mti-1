@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { buildDefaultEvaluatorEvidenceContext } from "./evidence-context.mjs";
 
 export const CRITERIA = [
   "topicRelevance",
@@ -303,9 +304,13 @@ export function createBlindPairs(runs, seed) {
 }
 
 export function independentAssessmentRequest(run, pair) {
+  const eligibleEvidence = buildDefaultEvaluatorEvidenceContext({
+    selectedTopicIds: pair.selectedTopicIds,
+    prose: run.prose
+  });
   return {
     topicConfiguration: { id: pair.topicConfigurationId, label: pair.topicConfigurationLabel, topics: pair.selectedTopicIds },
-    response: { prose: run.prose, evidence: run.evidence }
+    response: { prose: run.prose, citedEvidence: run.evidence, eligibleEvidence }
   };
 }
 

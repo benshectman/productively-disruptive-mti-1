@@ -20,7 +20,7 @@ import {
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
 import { buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
-import { buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
+import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
 import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
 import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata.ts";
@@ -154,6 +154,7 @@ describe("evaluator evidence context", () => {
     for (const item of narrative.sections.find((section) => section.id === "proof-to-scale").proof_items) {
       expect(context.eligibleEvidenceByProject[item.project_id]).toEqual(buildEligibleProjectEvidence(item.project_id, selectedTopicIds));
     }
+    expect(buildDefaultEvaluatorEvidenceContext({ selectedTopicIds, prose })).toEqual(context);
   });
 
   it("limits project pools to projects present in the assessed response", () => {
@@ -167,6 +168,21 @@ describe("evaluator evidence context", () => {
     expect(Object.keys(context.eligibleEvidenceByProject)).toEqual(["askgs"]);
     expect(context.eligibleEvidenceByProject.askgs.length).toBeGreaterThan(0);
     expect(context.eligibleEvidenceByProject.askgs.every((fact) => fact.project_id === "askgs")).toBe(true);
+  });
+
+  it("includes cited evidence and reconstructed eligible pools in independent assessment requests", () => {
+    const prose = { sections: [{ id: "proof-to-scale", proofItems: [{ projectId: "askgs" }] }] };
+    const citedEvidence = [{ id: "BF-C-051", claim: "Selected AskGS evidence", attribution: "leadership", topics: ["T-003"] }];
+    const request = independentAssessmentRequest(
+      { prose, evidence: citedEvidence },
+      { topicConfigurationId: "enterprise-ux", topicConfigurationLabel: "Enterprise UX", selectedTopicIds: ["T-003"] }
+    );
+
+    expect(request.response.citedEvidence).toEqual(citedEvidence);
+    expect(request.response.eligibleEvidence.eligibleEvidenceByProject.askgs).toEqual(buildEligibleProjectEvidence("askgs", ["T-003"]));
+    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"]).toEqual(
+      buildEligibleSectionEvidencePools(["T-003"]).find((pool) => pool.sectionId === "operating-model").facts
+    );
   });
 });
 
@@ -265,10 +281,16 @@ describe("evaluation harness", () => {
     const controlAsA = first.filter((pair) => pair.mapping.A === "control").length;
     expect(Math.abs(controlAsA - (first.length - controlAsA))).toBeLessThanOrEqual(1);
     const request = independentAssessmentRequest(runs[0], first[0]);
-    expect(JSON.stringify(request)).not.toContain("develop");
-    expect(JSON.stringify(request)).not.toContain("feature/example");
-    expect(JSON.stringify(request)).not.toContain("responseA");
-    expect(JSON.stringify(request)).not.toContain("responseB");
+    expect(Object.keys(request)).toEqual(["topicConfiguration", "response"]);
+    expect(request).not.toHaveProperty("environment");
+    expect(request.response).not.toHaveProperty("environment");
+    expect(request.response).not.toHaveProperty("environmentId");
+    expect(request).not.toHaveProperty("responseA");
+    expect(request).not.toHaveProperty("responseB");
+    expect(request.response.citedEvidence).toEqual(runs[0].evidence);
+    expect(request.response).not.toHaveProperty("evidence");
+    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"].length).toBeGreaterThan(runs[0].evidence.length);
+    expect(request.response.eligibleEvidence.eligibleEvidenceByProject).toEqual({});
     expect(arbitrationRequest(first[0], new Map(runs.map((item) => [item.runId, item])))).toHaveProperty("responseA");
   });
 

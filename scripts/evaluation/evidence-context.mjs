@@ -1,3 +1,5 @@
+import approvedCorpusJson from "../../src/content/approved/ben-facts.v1.json" with { type: "json" };
+
 const ALLOWED_ATTRIBUTIONS = new Set(["personal", "leadership", "team", "organization", "shared_leadership"]);
 
 const SECTION_ROLES = {
@@ -5,6 +7,20 @@ const SECTION_ROLES = {
   "operating-model": "recent_leadership",
   "institutionalized-capability": "throughline"
 };
+
+const FACT_IDS_BY_ROLE = {
+  about: ["BF-C-033", "BF-C-043", "BF-C-045", "BF-C-049", "BF-C-073", "BF-C-074", "BF-C-076"],
+  recent_leadership: ["BF-C-033", "BF-C-034", "BF-C-035", "BF-C-036", "BF-C-037", "BF-C-038", "BF-C-039", "BF-C-040", "BF-C-041", "BF-C-042", "BF-C-043", "BF-C-044", "BF-C-045", "BF-C-046", "BF-C-047", "BF-C-048", "BF-C-049", "BF-C-050", "BF-C-066", "BF-C-074", "BF-C-075"],
+  throughline: ["BF-C-075", "BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079", "BF-C-080", "BF-C-081", "BF-C-082", "BF-C-083"]
+};
+
+const DEFAULT_EDITORIAL_METADATA = Object.fromEntries(Object.entries(FACT_IDS_BY_ROLE).flatMap(([role, ids]) => ids.map((id) => [id, role]))
+  .reduce((map, [id, role]) => {
+    const current = map.get(id) || { narrativeRoles: [] };
+    current.narrativeRoles.push(role);
+    map.set(id, current);
+    return map;
+  }, new Map()));
 
 function publicEvidence(fact) {
   return {
@@ -51,4 +67,13 @@ export function buildEvaluatorEvidenceContext({ approvedFacts, editorialMetadata
   ]));
 
   return { eligibleEvidenceBySection, eligibleEvidenceByProject };
+}
+
+export function buildDefaultEvaluatorEvidenceContext({ selectedTopicIds = [], prose }) {
+  return buildEvaluatorEvidenceContext({
+    approvedFacts: approvedCorpusJson.facts,
+    editorialMetadata: DEFAULT_EDITORIAL_METADATA,
+    selectedTopicIds,
+    prose
+  });
 }
