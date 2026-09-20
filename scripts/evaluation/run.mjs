@@ -3,11 +3,14 @@ import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  ASSESSMENT_EXCEPTIONS,
+  ASSESSMENT_RATINGS,
   aggregateQualitative,
   aggregateReliability,
   captureGeneration,
   chooseShortlist,
   createBlindPairs,
+  CRITERIA,
   mirrorPair,
   reconcileMirroredArbitrations,
   resolveEnvironment,
@@ -109,7 +112,23 @@ function evaluationForPair(bundle, pairId) {
 }
 
 function hasIndependentAssessments(evaluation) {
-  return Boolean(evaluation?.independentAssessments?.control?.assessment && evaluation?.independentAssessments?.treatment?.assessment);
+  return ["control", "treatment"].every((environment) => {
+    const assessment = evaluation?.independentAssessments?.[environment]?.assessment;
+    return Boolean(
+      assessment
+      && ASSESSMENT_RATINGS.includes(assessment.overall?.rating)
+      && ASSESSMENT_EXCEPTIONS.includes(assessment.overall?.exception)
+      && ["high", "medium", "low"].includes(assessment.overall?.confidence)
+      && ["high", "medium", "low"].includes(assessment.confidence)
+      && CRITERIA.every((criterion) => {
+        const item = assessment.criteria?.[criterion];
+        return item
+          && ASSESSMENT_RATINGS.includes(item.rating)
+          && ASSESSMENT_EXCEPTIONS.includes(item.exception)
+          && ["high", "medium", "low"].includes(item.confidence);
+      })
+    );
+  });
 }
 
 function upsertEvaluation(bundle, pairId, evaluation) {

@@ -501,6 +501,39 @@ describe("evaluation harness", () => {
     expect(bundle.evaluations[0].independentAssessments).toBeTruthy();
   });
 
+  it("re-evaluates legacy categorical independent records", async () => {
+    const runs = [run("control", "one", 1), run("treatment", "one", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const legacyAssessment = {
+      criteria: Object.fromEntries(criteriaNames.map((criterion) => [criterion, { rating: "strong", rationale: `${criterion} rationale` }])),
+      overall: { rating: "strong", rationale: "Overall rationale" },
+      concerns: [],
+      confidence: "high"
+    };
+    const bundle = {
+      metadata: { mode: "comparison" },
+      runs,
+      pairs: [pair],
+      evaluations: [{ pair, qualitativeEligible: true, independentAssessments: { control: { assessment: legacyAssessment }, treatment: { assessment: legacyAssessment } } }]
+    };
+    let calls = 0;
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(true);
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: false,
+      evaluator: async ({ pair: evaluatedPair }) => {
+        calls += 1;
+        return completedEvaluation(evaluatedPair);
+      },
+      persist: async () => {}
+    });
+    expect(calls).toBe(1);
+    expect(bundle.evaluations[0].independentAssessments.control.assessment.overall.rating).toBe(3);
+  });
+
   it("keeps an equivalent control-vs-control sanity set out of arbitration and position-bias counts", async () => {
     const runs = [
       run("control", "one", 1), run("treatment", "one", 1),
