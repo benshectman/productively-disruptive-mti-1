@@ -258,3 +258,177 @@ export async function evaluateIndependentResponse({ run, pair, apiKey, model, fe
   const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertIndependentAssessment });
   return {
     runId: run.runId,
+    startedAt: result.startedAt,
+    durationMs: result.durationMs,
+    evaluatorModel: model,
+    assessment: result.judgment,
+    evaluatorRequest: request,
+    rawEvaluatorResponse: result.rawResponse,
+    ...(result.error ? { error: result.error, rawEvaluatorText: result.rawEvaluatorText } : {})
+  };
+}
+
+export async function evaluateArbitration({ pair, runsById, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
+  const request = arbitrationRequest(pair, runsById);
+  const body = buildArbitrationBody(request, model);
+  const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertArbitration });
+  if (result.error) {
+    return {
+      pair,
+      placement: { ...(pair.arbitrationPlacement || {}), mapping: { ...pair.mapping } },
+      startedAt: result.startedAt,
+      durationMs: result.durationMs,
+      evaluatorModel: model,
+      error: result.error,
+      rawEvaluatorText: result.rawEvaluatorText
+    };
+  }
+  return {
+    pair,
+    placement: { ...(pair.arbitrationPlacement || {}), mapping: { ...pair.mapping } },
+    startedAt: result.startedAt,
+    durationMs: result.durationMs,
+    evaluatorModel: model,
+    judgment: result.judgment,
+    unblinded: unblindJudgment(result.judgment, pair),
+    evaluatorRequest: request,
+    rawEvaluatorResponse: result.rawResponse
+  };
+}
+
+function classificationFromEnvironmentResult(result) {
+  if (result === "control") return "control_stronger";
+  if (result === "treatment") return "treatment_stronger";
+  if (result === "unresolved") return "unresolved";
+  return "equivalent";
+}
+
+function finalCriteriaFromUnblinded(unblinded) {
+  return Object.fromEntries(CRITERIA.map((criterion) => [criterion, {
+    environmentResult: unblinded.criteria[criterion].environmentResult,
+    judgment: unblinded.criteria[criterion].judgment,
+    controlException: unblinded.criteria[criterion].controlException,
+    treatmentException: unblinded.criteria[criterion].treatmentException,
+    rationale: unblinded.criteria[criterion].rationale
+  }]));
+}
+
+function combineConcerns(first, second) {
+  return [...(first || []), ...(second || [])];
+}
+
+export async function evaluatePair({
+  pair,
+  runsById,
+  apiKey,
+  model,
+  fetcher = fetch,
+  timeoutMs = 60_000,
+  assessor = evaluateIndependentResponse,
+  arbitrator = evaluateArbitration,
+  mirrorArbitration = false
+}) {
+  const controlPosition = pair.mapping.A === "control" ? "A" : "B";
+  const treatmentPosition = pair.mapping.A === "treatment" ? "A" : "B";
+  const controlRun = runsById.get(pair.controlRunId || pair.blind[controlPosition]);
+  const treatmentRun = runsById.get(pair.treatmentRunId || pair.blind[treatmentPosition]);
+  const eligibility = pair.eligibility || classifyPairEligibility(controlRun, treatmentRun);
+  if (!pair.eligibility) pair = { ...pair, eligibility };
+  if (!eligibility.qualitativeEligible) {
+    return {
+      pair,
+      excluded: true,
+      qualitativeEligible: false,
+      finalPairClassification: "excluded",
+      exclusion: eligibility,
+      exclusionReason: eligibility.reason || "Pair is not eligible for prose-quality comparison."
+    };
+  }
+  const [controlAssessment, treatmentAssessment] = await Promise.all([
+    assessor({ run: controlRun, pair, apiKey, model, fetcher, timeoutMs }),
+    assessor({ run: treatmentRun, pair, apiKey, model, fetcher, timeoutMs })
+  ]);
+  if (controlAssessment.error || treatmentAssessment.error) {
+    return {
+      pair,
+      qualitativeEligible: true,
+      evaluationStage: "independent-assessment",
+      independentAssessments: { control: controlAssessment, treatment: treatmentAssessment },
+      error: controlAssessment.error || treatmentAssessment.error
+    };
+  }
+  const deterministicComparison = compareIndependentAssessments(controlAssessment.assessment, treatmentAssessment.assessment);
+  const deterministicUnblinded = deterministicUnblindedOutcome(deterministicComparison, controlAssessment.assessment, treatmentAssessment.assessment);
+  const base = {
+    pair,
+    qualitativeEligible: true,
+    independentAssessments: { control: controlAssessment, treatment: treatmentAssessment },
+    deterministicComparison,
+    arbitrationRequired: deterministicComparison.classification === "unresolved",
+    arbitration: null,
+    arbitrationMirror: null,
+    final: {
+      source: "deterministic",
+      classification: deterministicComparison.classification,
+      confidence: deterministicComparison.confidence,
+      rationale: deterministicComparison.reason,
+      criteria: finalCriteriaFromUnblinded(deterministicUnblinded)
+    },
+    unblinded: deterministicUnblinded
+  };
+  if (!base.arbitrationRequired) return base;
+  const arbitration = await arbitrator({ pair, runsById, apiKey, model, fetcher, timeoutMs });
+  if (arbitration.error) {
+    return {
+      ...base,
+      evaluationStage: "arbitration",
+      error: arbitration.error,
+      arbitration
+    };
+  }
+  const unblinded = {
+    ...arbitration.unblinded,
+    concerns: combineConcerns(deterministicUnblinded.concerns, arbitration.unblinded.concerns)
+  };
+  const arbitrationResult = {
+    source: "arbitration",
+    classification: classificationFromEnvironmentResult(unblinded.overall.environmentResult),
+    confidence: arbitration.judgment.confidence,
+    rationale: arbitration.judgment.overall.rationale,
+    criteria: finalCriteriaFromUnblinded(unblinded),
+    instability: false
+  };
+  if (!mirrorArbitration) return { ...base, arbitration, final: arbitrationResult, unblinded };
+
+  const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model, fetcher, timeoutMs });
+  if (mirrored.error) {
+    return {
+      ...base,
+      arbitration,
+      arbitrationMirror: mirrored,
+      mirrorError: mirrored.error,
+      evaluationStage: "mirrored-arbitration",
+      error: mirrored.error
+    };
+  }
+  const reconciled = reconcileMirroredArbitrations(arbitration, mirrored);
+  const finalUnblinded = {
+    ...reconciled.unblinded,
+    concerns: combineConcerns(deterministicUnblinded.concerns, reconciled.unblinded.concerns)
+  };
+  return {
+    ...base,
+    arbitration,
+    arbitrationMirror: mirrored,
+    mirrorAudit: reconciled.mirrorAudit,
+    final: {
+      source: "mirrored-arbitration",
+      classification: classificationFromEnvironmentResult(finalUnblinded.overall.environmentResult),
+      confidence: reconciled.judgment.confidence,
+      rationale: reconciled.judgment.overall.rationale,
+      criteria: finalCriteriaFromUnblinded(finalUnblinded),
+      instability: reconciled.mirrorAudit.positionSensitive
+    },
+    unblinded: finalUnblinded
+  };
+}
