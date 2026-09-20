@@ -20,7 +20,12 @@ import {
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
 import { buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
+import { buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
 import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
+import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
+import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata.ts";
+import { assembleApprovedBenFactsNarrative } from "../src/shared/approved-benfacts.ts";
+import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence.ts";
 
 const sections = ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"];
 
@@ -125,6 +130,45 @@ function completedEvaluation(pair, control = assessment(), treatment = assessmen
     final: { classification: deterministicComparison.classification, confidence: deterministicComparison.confidence, criteria: unblinded.criteria }
   };
 }
+
+describe("evaluator evidence context", () => {
+  it("reconstructs the same eligible section and proof-project pools used by generation", () => {
+    const selectedTopicIds = ["T-003"];
+    const narrative = assembleApprovedBenFactsNarrative(selectedTopicIds);
+    const prose = {
+      sections: narrative.sections.map((section) => ({
+        id: section.id,
+        proofItems: (section.proof_items || []).map((item) => ({ projectId: item.project_id }))
+      }))
+    };
+    const context = buildEvaluatorEvidenceContext({
+      approvedFacts: approvedCorpusJson.facts,
+      editorialMetadata: approvedEditorialMetadata,
+      selectedTopicIds,
+      prose
+    });
+
+    for (const pool of buildEligibleSectionEvidencePools(selectedTopicIds)) {
+      expect(context.eligibleEvidenceBySection[pool.sectionId]).toEqual(pool.facts);
+    }
+    for (const item of narrative.sections.find((section) => section.id === "proof-to-scale").proof_items) {
+      expect(context.eligibleEvidenceByProject[item.project_id]).toEqual(buildEligibleProjectEvidence(item.project_id, selectedTopicIds));
+    }
+  });
+
+  it("limits project pools to projects present in the assessed response", () => {
+    const context = buildEvaluatorEvidenceContext({
+      approvedFacts: approvedCorpusJson.facts,
+      editorialMetadata: approvedEditorialMetadata,
+      selectedTopicIds: ["T-003"],
+      prose: { sections: [{ proofItems: [{ projectId: "askgs" }] }] }
+    });
+
+    expect(Object.keys(context.eligibleEvidenceByProject)).toEqual(["askgs"]);
+    expect(context.eligibleEvidenceByProject.askgs.length).toBeGreaterThan(0);
+    expect(context.eligibleEvidenceByProject.askgs.every((fact) => fact.project_id === "askgs")).toBe(true);
+  });
+});
 
 function arbitrationPass(pair, judgment, confidence = "medium") {
   const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { judgment, rationale: `${criterion} rationale` }]));
