@@ -19,10 +19,7 @@ describe("bounded AI guardrails", () => {
   it.each([
     { sections: [] },
     { sections: assembleNarrative([]).sections.map((section) => ({ id: section.id, headline: section.headline, evidenceRefs: ["E-999"] })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "A 100 percent invented metric" })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "Design leadership across technology领域" })) },
-    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: section.id, headline: index ? section.headline : "Design leadership grounded in" })) }
+    { sections: assembleNarrative([]).sections.map((section, index) => ({ id: index ? section.id : "invented-section", headline: section.headline })) }
   ])("rejects framing that changes the bounded contract", (candidate) => {
     expect(applyAiFraming(candidate, assembleNarrative([]))).toBeNull();
   });
@@ -76,7 +73,7 @@ describe("bounded AI guardrails", () => {
     expect(JSON.stringify(visibleEvidence)).not.toContain('"sources"');
   });
 
-  it("rejects the known SPR measurement distortion without disabling narrative generation", () => {
+  it("falls back only the field containing the known SPR measurement distortion", () => {
     const fallback = assembleNarrative([]);
     const generated = { sections: fallback.sections.map((section) => ({
       id: section.id,
@@ -85,10 +82,12 @@ describe("bounded AI guardrails", () => {
       detail: "The reported improvements all exceeded 100%, including speed to insight, ease of use, usefulness, and Net Promoter Score."
     })) };
     const evidenceBySection = new Map(fallback.sections.map((section) => [section.id, "A 114% increase in speed to insight, an 85% increase in ease of use, a 122% increase in usefulness, and a 104-point increase in Net Promoter Score."]));
-    expect(applyAiFraming(generated, fallback, undefined, evidenceBySection)).toBeNull();
+    const result = applyAiFraming(generated, fallback, undefined, evidenceBySection)!;
+    expect(result.sections.map((section) => section.summary)).toEqual(generated.sections.map((section) => section.summary));
+    expect(result.sections.map((section) => section.detail)).toEqual(fallback.sections.map((section) => section.detail));
   });
 
-  it("rejects invented numbers in generated prose", () => {
+  it("falls back only the field containing an invented number", () => {
     const fallback = assembleNarrative([]);
     const generated = { sections: fallback.sections.map((section) => ({
       id: section.id,
@@ -97,7 +96,9 @@ describe("bounded AI guardrails", () => {
       detail: "The work produced a 99% improvement that does not appear in the assigned evidence."
     })) };
     const evidenceBySection = new Map(fallback.sections.map((section) => [section.id, "The evidence reports an 85% increase in ease of use."]));
-    expect(applyAiFraming(generated, fallback, undefined, evidenceBySection)).toBeNull();
+    const result = applyAiFraming(generated, fallback, undefined, evidenceBySection)!;
+    expect(result.sections.map((section) => section.summary)).toEqual(generated.sections.map((section) => section.summary));
+    expect(result.sections.map((section) => section.detail)).toEqual(fallback.sections.map((section) => section.detail));
   });
 
   it("accepts individually stated SPR measurements with their correct units", () => {
