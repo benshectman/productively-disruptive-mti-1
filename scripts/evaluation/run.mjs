@@ -9,12 +9,12 @@ import {
   chooseShortlist,
   createBlindPairs,
   mirrorPair,
-  reconcileMirroredEvaluations,
+  reconcileMirroredArbitrations,
   resolveEnvironment,
   sanityAssessment,
   validateConfig
 } from "./core.mjs";
-import { evaluatePair, preflightEvaluator } from "./evaluator.mjs";
+import { evaluateArbitration, evaluatePair, preflightEvaluator } from "./evaluator.mjs";
 import { buildMarkdownReport } from "./report.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -57,7 +57,7 @@ Optional:
 
 The combined command runs an evaluator preflight before capture, writes an atomic capture checkpoint before qualitative evaluation, and saves evaluator progress after every pair.
 
-Use --sanity with equivalent endpoints to run mirrored A/B evaluator passes and add the position-bias audit.`;
+Use --sanity with equivalent endpoints to add the control-vs-control audit. Only unresolved pairs receive blinded arbitration, and sanity mode mirrors those arbitration placements.`;
 }
 
 const delay = (milliseconds) => milliseconds > 0 ? new Promise((resolve) => setTimeout(resolve, milliseconds)) : Promise.resolve();
@@ -119,18 +119,43 @@ export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?
   return (bundle.pairs || []).some((pair) => {
     const evaluation = evaluationForPair(bundle, pair.pairId);
     if (!evaluation || evaluation.error) return true;
-    return sanityMode && (!evaluation.evaluatorPasses || evaluation.mirrorError);
+    if (pair.eligibility && !pair.eligibility.qualitativeEligible) return false;
+    if (evaluation.arbitrationRequired && !evaluation.arbitration) return true;
+    return sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError;
   });
 }
 
-export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode, evaluator = evaluatePair, persist = async () => {} }) {
+function evaluationComplete(evaluation, pair, sanityMode) {
+  if (!evaluation || evaluation.error) return false;
+  if (pair.eligibility && !pair.eligibility.qualitativeEligible) return true;
+  if (evaluation.arbitrationRequired && !evaluation.arbitration) return false;
+  return !(sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError);
+}
+
+function finalClassification(environmentResult) {
+  if (environmentResult === "control") return "control_stronger";
+  if (environmentResult === "treatment") return "treatment_stronger";
+  if (environmentResult === "unresolved") return "unresolved";
+  return "equivalent";
+}
+
+function finalCriteria(unblinded) {
+  return Object.fromEntries(Object.entries(unblinded.criteria || {}).map(([criterion, item]) => [criterion, {
+    environmentResult: item.environmentResult,
+    judgment: item.judgment,
+    rationale: item.rationale
+  }]));
+}
+
+export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode, evaluator = evaluatePair, arbitrator = evaluateArbitration, persist = async () => {} }) {
   const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
   for (let index = 0; index < bundle.pairs.length; index += 1) {
     const pair = bundle.pairs[index];
     const existing = evaluationForPair(bundle, pair.pairId);
-    if (existing && !existing.error) continue;
-    console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} original`);
+    if (evaluationComplete(existing, pair, false)) continue;
+    console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} independent assessment`);
     const evaluation = await evaluator({ pair, runsById, apiKey, model });
+    if (!pair.eligibility && evaluation.pair?.eligibility) pair.eligibility = evaluation.pair.eligibility;
     upsertEvaluation(bundle, pair.pairId, evaluation);
     await persist(bundle);
     await delay(config.requestDelayMs || 0);
@@ -139,21 +164,41 @@ export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode
     for (let index = 0; index < bundle.pairs.length; index += 1) {
       const pair = bundle.pairs[index];
       const existing = evaluationForPair(bundle, pair.pairId);
-      if (!existing || existing.error || (existing.evaluatorPasses && !existing.mirrorError)) continue;
-      const original = existing.evaluatorPasses?.original || existing;
-      console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} mirrored`);
-      const mirrored = await evaluator({ pair: mirrorPair(pair), runsById, apiKey, model });
-      const evaluation = mirrored.error
-        ? { ...original, mirrorError: mirrored.error, failedMirrorPass: mirrored }
-        : reconcileMirroredEvaluations(original, mirrored);
-      upsertEvaluation(bundle, pair.pairId, evaluation);
+      if (!existing || existing.error || !existing.arbitrationRequired || !existing.arbitration || existing.mirrorAudit || existing.mirrorError) continue;
+      console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} mirrored arbitration`);
+      const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model });
+      if (mirrored.error) {
+        upsertEvaluation(bundle, pair.pairId, { ...existing, mirrorError: mirrored.error, failedMirrorPass: mirrored });
+      } else {
+        const reconciled = reconcileMirroredArbitrations(existing.arbitration, mirrored);
+        const independentConcerns = (existing.unblinded?.concerns || []).filter((concern) => concern.response);
+        const unblinded = {
+          ...reconciled.unblinded,
+          concerns: [...independentConcerns, ...reconciled.unblinded.concerns]
+        };
+        upsertEvaluation(bundle, pair.pairId, {
+          ...existing,
+          arbitrationMirror: mirrored,
+          mirrorAudit: reconciled.mirrorAudit,
+          final: {
+            source: "mirrored-arbitration",
+            classification: finalClassification(unblinded.overall.environmentResult),
+            confidence: reconciled.judgment.confidence,
+            rationale: reconciled.judgment.overall.rationale,
+            criteria: finalCriteria(unblinded)
+          },
+          unblinded
+        });
+      }
       await persist(bundle);
       await delay(config.requestDelayMs || 0);
     }
   }
   const order = new Map(bundle.pairs.map((pair, index) => [pair.pairId, index]));
   bundle.evaluations.sort((left, right) => (order.get(left.pair?.pairId) ?? Number.MAX_SAFE_INTEGER) - (order.get(right.pair?.pairId) ?? Number.MAX_SAFE_INTEGER));
-  bundle.metadata.qualitativePassesPerPair = sanityMode ? 2 : 1;
+  bundle.metadata.evaluationFlow = "independent-assessment -> deterministic-comparison -> unresolved-only-blinded-arbitration";
+  bundle.metadata.independentAssessmentsPerEligiblePair = 2;
+  bundle.metadata.mirroredArbitrationPasses = sanityMode ? "unresolved-pairs-only" : "not-run";
   return bundle;
 }
 
@@ -203,6 +248,7 @@ async function main() {
         topicConfigurationCount: config.topicConfigurations.length,
         repetitions: config.repetitions,
         pairingSeed: config.pairingSeed,
+        evaluationFlow: "independent-assessment -> deterministic-comparison -> unresolved-only-blinded-arbitration",
         evaluatorPreflight
       },
       config,
@@ -241,7 +287,7 @@ async function main() {
     }
   }
 
-  const successfulEvaluations = (bundle.evaluations || []).filter((evaluation) => !evaluation.error && !evaluation.mirrorError && (!sanityMode || evaluation.evaluatorPasses));
+  const successfulEvaluations = (bundle.evaluations || []).filter((evaluation) => !evaluation.error && !evaluation.mirrorError);
   if (successfulEvaluations.length) {
     const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
     bundle.qualitative = aggregateQualitative(successfulEvaluations);

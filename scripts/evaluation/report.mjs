@@ -40,8 +40,28 @@ function rejectionSummary(environment) {
   };
 }
 
+function classificationLabel(classification) {
+  return {
+    control_stronger: "control stronger",
+    treatment_stronger: "treatment stronger",
+    equivalent: "equivalent",
+    unresolved: "unresolved"
+  }[classification] || classification || "not available";
+}
+
+function environmentResultLabel(result) {
+  return {
+    control: "control stronger",
+    treatment: "treatment stronger",
+    equivalent: "equivalent",
+    unresolved: "unresolved",
+    concern: "concern"
+  }[result] || result || "not available";
+}
+
 function proseMarkdown(label, run) {
-  const output = [`#### ${label} (${run.environment})`, ""];
+  const output = [`#### ${label}${run?.environment ? ` (${run.environment})` : ""}`, ""];
+  if (!run) return output.concat("Response was not captured.", "").join("\n");
   for (const section of run.prose?.sections || []) {
     output.push(`##### ${section.eyebrow || section.id}`, "", `**${section.headline}**`, "", section.summary, "", section.detail, "");
     for (const proof of section.proofItems || []) {
@@ -54,12 +74,38 @@ function proseMarkdown(label, run) {
   return output.join("\n");
 }
 
+function assessmentMarkdown(label, record) {
+  const assessment = record?.assessment;
+  if (!assessment) return [`#### Independent ${label} assessment`, "", "Assessment unavailable.", ""];
+  return [
+    `#### Independent ${label} assessment`,
+    "",
+    `Overall rating: **${assessment.overall.rating}**. Confidence: **${assessment.confidence}**.`,
+    "",
+    `Overall rationale: ${assessment.overall.rationale}`,
+    "",
+    `Concerns: ${assessment.concerns?.length ? assessment.concerns.map((concern) => `${concern.type}: ${concern.rationale}`).join("; ") : "none"}.`,
+    ""
+  ];
+}
+
+function rate(value) {
+  return value || "n/a";
+}
+
+function arbitrationPlacement(pair) {
+  const placement = pair.arbitrationPlacement || {};
+  return `strategy ${placement.strategy || "not recorded"}; A = ${pair.mapping?.A || "n/a"}, B = ${pair.mapping?.B || "n/a"}`;
+}
+
 export function buildMarkdownReport(bundle) {
   const { metadata, reliability, qualitative, shortlist = [], runs, sanity } = bundle;
   const lines = [
     "# Portfolio generation evaluation",
     "",
     `Generated: ${metadata.generatedAt}`,
+    "",
+    `Evaluator flow: \`${metadata.evaluationFlow || metadata.evaluatorFlow || "not recorded"}\``,
     "",
     `Control: \`${metadata.environments.control.id}\``,
     "",
@@ -131,25 +177,54 @@ export function buildMarkdownReport(bundle) {
   if (!qualitative) {
     lines.push("Qualitative evaluation was not run. The JSON artifact retains all captured generations for later evaluation.", "");
   } else {
-    lines.push(`Comparable pairs: ${qualitative.comparablePairs}.`, "", "| Criterion | Treatment stronger | Control stronger | Equivalent | Concern | Low confidence |", "| --- | ---: | ---: | ---: | ---: | ---: |");
+    const excluded = qualitative.excludedPairs || {};
+    lines.push(
+      `Eligible generated-vs-generated pairs: ${qualitative.comparablePairs}.`,
+      `Excluded from prose-quality comparison: ${counts(excluded)}.`,
+      "",
+      "| Criterion | Control stronger | Treatment stronger | Equivalent | Unresolved | Concern |",
+      "| --- | ---: | ---: | ---: | ---: | ---: |"
+    );
     for (const criterion of CRITERIA) {
       const result = qualitative.criteria[criterion] || {};
-      lines.push(`| ${labels[criterion]} | ${result.treatment || 0} | ${result.control || 0} | ${result.equivalent || 0} | ${result.concern || 0} | ${result.low_confidence || 0} |`);
+      lines.push(`| ${labels[criterion]} | ${result.control || 0} | ${result.treatment || 0} | ${result.equivalent || 0} | ${result.unresolved || 0} | ${result.concern || 0} |`);
     }
+    const overall = qualitative.overall || {};
     lines.push(
       "",
-      `Overall: ${counts(qualitative.overall)}.`,
+      `Final pair classification: control stronger ${overall.control_stronger || 0}; treatment stronger ${overall.treatment_stronger || 0}; equivalent ${overall.equivalent || 0}; unresolved ${overall.unresolved || 0}.`,
       "",
       `Grounding or attribution concerns by affected environment: control ${qualitative.concerns.control}, treatment ${qualitative.concerns.treatment}.`,
       "",
       `Evaluator confidence: ${counts(qualitative.confidence)}.`,
       "",
-      `Blind-position audit: control appeared as A ${qualitative.blindPosition.controlAsA} times and B ${qualitative.blindPosition.controlAsB} times. A won ${qualitative.blindPosition.aOverallWins} decisive comparisons and B won ${qualitative.blindPosition.bOverallWins}.`,
+      `Arbitration required: ${qualitative.arbitrationRequiredCount || 0}. Arbitration instability: ${qualitative.arbitrationInstabilityCount || 0}.`,
       ""
     );
+    const audit = qualitative.positionBiasAudit;
+    if (audit) {
+      const position = audit.byPresentedPosition || {};
+      const environment = audit.byEnvironmentPlacement || {};
+      lines.push(
+        "### Position-bias audit",
+        "",
+        `Arbitration passes retained: ${audit.arbitrationPassCount || 0}. Original arbitration passes: ${audit.arbitrationCompletedCount || 0}.`,
+        "",
+        "| Presented position | Appeared | Wins | Equivalent | Unresolved | Win rate when presented |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+        `| A | ${position.A?.appeared || 0} | ${position.A?.wins || 0} | ${position.A?.equivalent || 0} | ${position.A?.unresolved || 0} | ${percent(position.A?.appeared ? position.A.wins / position.A.appeared : null)} |`,
+        `| B | ${position.B?.appeared || 0} | ${position.B?.wins || 0} | ${position.B?.equivalent || 0} | ${position.B?.unresolved || 0} | ${percent(position.B?.appeared ? position.B.wins / position.B.appeared : null)} |`,
+        "",
+        "| Environment placement | Appeared as A | Appeared as B | Wins as A | Wins as B |",
+        "| --- | ---: | ---: | ---: | ---: |",
+        `| Control | ${environment.control?.asA || 0} | ${environment.control?.asB || 0} | ${environment.control?.winsAsA || 0} | ${environment.control?.winsAsB || 0} |`,
+        `| Treatment | ${environment.treatment?.asA || 0} | ${environment.treatment?.asB || 0} | ${environment.treatment?.winsAsA || 0} | ${environment.treatment?.winsAsB || 0} |`,
+        ""
+      );
+    }
     if (qualitative.mirrorAudit) {
       lines.push(
-        `Mirrored-pass audit: ${qualitative.mirrorAudit.evaluatedPairs} pairs evaluated in both orientations; ${qualitative.mirrorAudit.positionSensitivePairs} position-sensitive overall results; ${qualitative.mirrorAudit.exactAgreementPairs} exact agreements across the overall judgment and every criterion; ${qualitative.mirrorAudit.pairsWithCriterionDisagreement} pairs with at least one criterion disagreement.`,
+        `Mirrored-arbitration audit: ${qualitative.mirrorAudit.evaluatedPairs} pairs evaluated in both orientations; ${qualitative.mirrorAudit.positionSensitivePairs} unstable overall results; ${qualitative.mirrorAudit.exactAgreementPairs} exact agreements across the overall judgment and every criterion; ${qualitative.mirrorAudit.pairsWithCriterionDisagreement} pairs with at least one criterion disagreement.`,
         ""
       );
     }
@@ -158,51 +233,73 @@ export function buildMarkdownReport(bundle) {
     lines.push(
       "## Control-vs-control sanity check",
       "",
-      `Mirrored qualitative evaluation completed: ${sanity.mirroredEvaluationCompleted ? `yes (${sanity.mirroredPairs} pairs)` : "no"}.`,
+      `Mirrored arbitration completed: ${sanity.mirroredEvaluationCompleted ? `yes (${sanity.mirroredPairs} pairs)` : "no unresolved pairs required mirrored arbitration"}.`,
       ...(sanity.positionSensitivePairs == null ? [] : [`Position-sensitive overall results: ${sanity.positionSensitivePairs}/${sanity.mirroredPairs}.`]),
       "",
       `Randomized mapping reasonably balanced: ${sanity.mappingIsReasonablyBalanced ? "yes" : "no"} (control as A ${sanity.controlAsA}, control as B ${sanity.controlAsB}).`,
       "",
+      `Position-bias audit evaluated: ${sanity.positionBiasEvaluated ? "yes" : "no arbitration decisions were available"}.`,
       `Obvious A/B position bias detected: ${sanity.obviousPositionBias == null ? "not evaluated because the qualitative pass was not run" : sanity.obviousPositionBias ? "yes" : "no"}.`,
-      ...(sanity.positionBiasPValue == null ? [] : [`Two-sided exact binomial p-value for the blind-position split: ${sanity.positionBiasPValue.toFixed(4)} (${sanity.decisiveComparisons} decisive comparisons).`]),
+      ...(sanity.positionBiasPValue == null ? [] : [`Two-sided exact binomial p-value for the blind-position split: ${sanity.positionBiasPValue.toFixed(4)} (${sanity.decisiveComparisons} decisive arbitration comparisons).`]),
       ""
     );
   }
+
   lines.push("## Cases Ben should review", "");
   if (!shortlist.length) lines.push("No qualitative shortlist is available yet.", "");
   const runMap = new Map(runs.map((run) => [run.runId, run]));
   shortlist.forEach((item, index) => {
     const pair = item.pair;
-    const a = runMap.get(pair.blind.A);
-    const b = runMap.get(pair.blind.B);
+    const controlRun = runMap.get(pair.controlRunId) || runMap.get(pair.blind?.A);
+    const treatmentRun = runMap.get(pair.treatmentRunId) || runMap.get(pair.blind?.B);
+    const deterministic = item.deterministicComparison;
+    const final = item.final || {};
     lines.push(
       `### ${index + 1}. ${pair.topicConfigurationLabel}, repetition ${pair.repetition}`,
       "",
-      `Why shortlisted: ${item.shortlistReasons.join(", ") || "representative comparison"}.`,
+      `Why shortlisted: ${item.shortlistReasons?.join(", ") || "representative comparison"}.`,
       "",
-      `Mapping after evaluation: A = ${pair.mapping.A}, B = ${pair.mapping.B}.`,
+      `Final pair classification: **${classificationLabel(final.classification)}**. Confidence: **${final.confidence || "not recorded"}**.`,
       "",
-      `Evaluator conclusion: ${item.judgment.overall.rationale}`,
+      `Deterministic comparison: **${classificationLabel(deterministic?.classification)}**. ${deterministic?.reason || "Not recorded."}`,
       "",
-      `Overall judgment: ${item.judgment.overall.judgment}. Confidence: ${item.judgment.confidence}.`,
-      "",
-      ...(item.mirrorAudit ? [
-        `Mirrored evaluation: ${item.mirrorAudit.positionSensitive ? "position-sensitive overall result" : "overall result consistent across orientations"}. Original orientation resolved to ${item.mirrorAudit.originalOverall}; mirrored orientation resolved to ${item.mirrorAudit.mirroredOverall}.`,
+      `Arbitration required: ${item.arbitrationRequired ? "yes" : "no"}.`,
+      ""
+    );
+    if (item.arbitration) {
+      lines.push(
+        `Arbitration placement: ${arbitrationPlacement(pair)}.`,
+        "",
+        `Arbitration result before mapping: **${item.arbitration.judgment.overall.judgment}**.`,
+        "",
+        `Arbitration result after mapping: **${environmentResultLabel(item.arbitration.unblinded.overall.environmentResult)}**.`,
+        ""
+      );
+    }
+    if (item.mirrorAudit) {
+      lines.push(
+        `Instability flag: ${item.mirrorAudit.positionSensitive ? "unstable, result changed with A/B placement" : "stable overall result across mirrored placement"}.`,
+        "",
+        `Mirrored arbitration outcomes: original ${item.mirrorAudit.originalOverall}; mirrored ${item.mirrorAudit.mirroredOverall}.`,
         "",
         `Criterion disagreements: ${item.mirrorAudit.criterionDisagreements.length ? item.mirrorAudit.criterionDisagreements.map((criterion) => labels[criterion]).join(", ") : "none"}.`,
-        "",
-        `Original-pass rationale: ${item.evaluatorPasses.original.judgment.overall.rationale}`,
-        "",
-        `Mirrored-pass rationale: ${item.evaluatorPasses.mirrored.judgment.overall.rationale}`,
         ""
-      ] : []),
-      "| Criterion | Judgment | Rationale |",
-      "| --- | --- | --- |",
-      ...CRITERIA.map((criterion) => `| ${labels[criterion]} | ${item.judgment.criteria[criterion].judgment} | ${escapeCell(item.judgment.criteria[criterion].rationale)} |`),
+      );
+    }
+    lines.push(
+      ...assessmentMarkdown("control", item.independentAssessments?.control),
+      ...assessmentMarkdown("treatment", item.independentAssessments?.treatment),
+      "| Criterion | Control rating | Treatment rating | Deterministic comparison | Final result |",
+      "| --- | --- | --- | --- | --- |",
+      ...CRITERIA.map((criterion) => {
+        const comparison = deterministic?.criteria?.[criterion] || {};
+        const finalCriterion = final.criteria?.[criterion] || {};
+        return `| ${labels[criterion]} | ${rate(comparison.controlRating)} | ${rate(comparison.treatmentRating)} | ${classificationLabel(comparison.result)} | ${environmentResultLabel(finalCriterion.environmentResult)} |`;
+      }),
       "",
-      proseMarkdown("Response A", a),
+      proseMarkdown("Control response", controlRun),
       "",
-      proseMarkdown("Response B", b),
+      proseMarkdown("Treatment response", treatmentRun),
       ""
     );
   });
@@ -210,7 +307,7 @@ export function buildMarkdownReport(bundle) {
     "## Raw results",
     "",
     qualitative
-      ? "The companion JSON artifact contains every request mapping, response payload, diagnostic field, evaluator request, evaluator response, and unblinded judgment. No source prose was discarded."
+      ? "The companion JSON artifact contains every request mapping, independent control and treatment assessment, deterministic comparison, arbitration request and response when required, placement metadata, diagnostic field, evaluator response, and final classification. No source prose was discarded."
       : "The companion JSON artifact contains every request mapping, response payload, diagnostic field, and source prose. Qualitative evaluator records will be added when that pass runs. No source prose was discarded.",
     ""
   );

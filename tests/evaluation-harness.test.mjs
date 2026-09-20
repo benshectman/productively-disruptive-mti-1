@@ -6,13 +6,16 @@ import path from "node:path";
 import {
   aggregateQualitative,
   aggregateReliability,
+  arbitrationRequest,
   captureGeneration,
+  classifyPairEligibility,
+  compareIndependentAssessments,
   createBlindPairs,
-  evaluatorRequest,
+  deterministicUnblindedOutcome,
+  independentAssessmentRequest,
   mirrorPair,
-  reconcileMirroredEvaluations,
+  reconcileMirroredArbitrations,
   sanityAssessment,
-  unblindJudgment,
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
@@ -78,11 +81,39 @@ function run(environment, configuration, repetition, overrides = {}) {
   };
 }
 
-function judgment(overall = "B_stronger") {
-  const criteria = Object.fromEntries([
-    "topicRelevance", "selectivity", "synthesis", "coherence", "nonRepetition", "specificity", "groundedness", "attributionDiscipline", "readability", "evidenceEconomy"
-  ].map((criterion) => [criterion, { judgment: overall, rationale: `${criterion} rationale` }]));
-  return { criteria, overall: { judgment: overall, rationale: "Overall rationale" }, concerns: [], confidence: "moderate" };
+const criteriaNames = ["topicRelevance", "selectivity", "synthesis", "coherence", "nonRepetition", "specificity", "groundedness", "attributionDiscipline", "readability", "evidenceEconomy"];
+
+function assessment(rating = "adequate", overrides = {}) {
+  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { rating, rationale: `${criterion} rationale` }]));
+  for (const [criterion, value] of Object.entries(overrides.criteria || {})) criteria[criterion] = { rating: value, rationale: `${criterion} override` };
+  return { criteria, overall: { rating: overrides.overall || rating, rationale: "Overall rationale" }, concerns: overrides.concerns || [], confidence: overrides.confidence || "moderate" };
+}
+
+function completedEvaluation(pair, control = assessment(), treatment = assessment()) {
+  const deterministicComparison = compareIndependentAssessments(control, treatment);
+  const unblinded = deterministicUnblindedOutcome(deterministicComparison, control, treatment);
+  return {
+    pair,
+    independentAssessments: { control: { assessment: control }, treatment: { assessment: treatment } },
+    deterministicComparison,
+    arbitrationRequired: false,
+    unblinded,
+    judgment: { confidence: deterministicComparison.confidence },
+    final: { classification: deterministicComparison.classification, confidence: deterministicComparison.confidence, criteria: unblinded.criteria }
+  };
+}
+
+function arbitrationPass(pair, judgment, confidence = "moderate") {
+  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { judgment, rationale: `${criterion} rationale` }]));
+  const raw = { criteria, overall: { judgment, rationale: "Arbitration rationale" }, concerns: [], confidence };
+  const translate = (value) => value === "A_stronger" ? pair.mapping.A : value === "B_stronger" ? pair.mapping.B : value;
+  const unblinded = {
+    ...raw,
+    criteria: Object.fromEntries(criteriaNames.map((criterion) => [criterion, { ...criteria[criterion], environmentResult: translate(judgment) }])),
+    overall: { ...raw.overall, environmentResult: translate(judgment) },
+    concerns: []
+  };
+  return { pair, durationMs: 1, judgment: raw, unblinded, evaluatorModel: "test", startedAt: "now" };
 }
 
 describe("evaluation harness", () => {
@@ -156,7 +187,7 @@ describe("evaluation harness", () => {
     expect(result.comparison.materialRegression).toBe(true);
   });
 
-  it("creates deterministic, balanced blind pairs without exposing environment labels to the evaluator", () => {
+  it("creates deterministic, balanced arbitration placement while keeping independent prompts unlabeled", () => {
     const runs = [];
     for (let index = 0; index < 11; index += 1) {
       runs.push(run("control", `config-${index}`, 1), run("treatment", `config-${index}`, 1));
@@ -166,73 +197,72 @@ describe("evaluation harness", () => {
     expect(first).toEqual(second);
     const controlAsA = first.filter((pair) => pair.mapping.A === "control").length;
     expect(Math.abs(controlAsA - (first.length - controlAsA))).toBeLessThanOrEqual(1);
-    const request = evaluatorRequest(first[0], new Map(runs.map((item) => [item.runId, item])));
+    const request = independentAssessmentRequest(runs[0], first[0]);
     expect(JSON.stringify(request)).not.toContain("develop");
     expect(JSON.stringify(request)).not.toContain("feature/example");
+    expect(JSON.stringify(request)).not.toContain("responseA");
+    expect(JSON.stringify(request)).not.toContain("responseB");
+    expect(arbitrationRequest(first[0], new Map(runs.map((item) => [item.runId, item])))).toHaveProperty("responseA");
   });
 
-  it("unblinds comparative judgments and audits A/B position bias", () => {
+  it("classifies identical structured assessments as equivalent", () => {
+    expect(compareIndependentAssessments(assessment(), assessment())).toMatchObject({ classification: "equivalent" });
+  });
+
+  it("classifies a clearly stronger control assessment", () => {
+    expect(compareIndependentAssessments(assessment("strong"), assessment("adequate"))).toMatchObject({ classification: "control_stronger" });
+  });
+
+  it("classifies a clearly stronger treatment assessment", () => {
+    expect(compareIndependentAssessments(assessment("adequate"), assessment("strong"))).toMatchObject({ classification: "treatment_stronger" });
+  });
+
+  it("leaves mixed criterion signals unresolved", () => {
+    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
+    const treatment = assessment("adequate", { criteria: { readability: "strong" } });
+    expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criteriaConflict: true });
+  });
+
+  it("treats one isolated criterion difference as effectively equivalent", () => {
+    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
+    expect(compareIndependentAssessments(control, assessment("adequate"))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
+  });
+
+  it("excludes generated-vs-fallback and fallback-vs-fallback from prose comparison", () => {
+    const generated = run("control", "none", 1);
+    const fallback = run("treatment", "none", 1, { totalFallbackFields: 1 });
+    expect(classifyPairEligibility(generated, fallback)).toMatchObject({ qualitativeEligible: false, kind: "generated-vs-fallback" });
+    expect(classifyPairEligibility({ ...generated, totalFallbackFields: 1 }, fallback)).toMatchObject({ qualitativeEligible: false, kind: "fallback-vs-fallback" });
+  });
+
+  it("maps arbitration A/B results back to the environment", () => {
     const pair = createBlindPairs([run("control", "none", 1), run("treatment", "none", 1)], "seed")[0];
-    const raw = judgment("A_stronger");
-    const unblinded = unblindJudgment(raw, pair);
-    const evaluation = { pair, judgment: raw, unblinded };
-    const qualitative = aggregateQualitative([evaluation]);
-    expect(["control", "treatment"]).toContain(unblinded.overall.environmentResult);
-    expect(sanityAssessment(qualitative, [pair]).obviousPositionBias).toBe(false);
-    expect(sanityAssessment(null, [pair])).toMatchObject({ qualitativeEvaluationCompleted: false, mappingIsReasonablyBalanced: true, obviousPositionBias: null });
+    expect(arbitrationPass(pair, "A_stronger").unblinded.overall.environmentResult).toBe(pair.mapping.A);
+    expect(arbitrationPass(pair, "B_stronger").unblinded.overall.environmentResult).toBe(pair.mapping.B);
   });
 
-  it("flags a statistically unusual blind-position split even with seven decisive comparisons", () => {
-    const qualitative = {
-      blindPosition: {
-        controlAsA: 17,
-        controlAsB: 16,
-        aOverallWins: 0,
-        bOverallWins: 7
-      }
-    };
-    expect(sanityAssessment(qualitative)).toMatchObject({
-      obviousPositionBias: true,
-      decisiveComparisons: 7,
-      largerBlindSideShare: 1,
-      positionBiasPValue: 0.015625
-    });
-  });
-
-  it("reconciles mirrored passes by underlying response instead of A/B label", () => {
+  it("retains position metadata and accepts mirrored agreement on the underlying response", () => {
     const pair = createBlindPairs([run("control", "none", 1), run("treatment", "none", 1)], "seed")[0];
-    const mirroredPair = mirrorPair(pair);
-    const originalRaw = judgment("A_stronger");
-    const mirroredRaw = judgment("B_stronger");
-    const original = { pair, judgment: originalRaw, unblinded: unblindJudgment(originalRaw, pair), durationMs: 10, evaluatorModel: "test", startedAt: "now" };
-    const mirrored = { pair: mirroredPair, judgment: mirroredRaw, unblinded: unblindJudgment(mirroredRaw, mirroredPair), durationMs: 12, evaluatorModel: "test", startedAt: "now" };
-    const reconciled = reconcileMirroredEvaluations(original, mirrored);
-    expect(reconciled.mirrorAudit).toMatchObject({ positionSensitive: false, exactAgreement: true, criterionDisagreements: [] });
-    expect(reconciled.unblinded.overall.environmentResult).toBe(original.unblinded.overall.environmentResult);
-    expect(reconciled.judgment.confidence).toBe("moderate");
+    const mirrored = mirrorPair(pair);
+    const originalJudgment = pair.mapping.A === "control" ? "A_stronger" : "B_stronger";
+    const mirroredJudgment = mirrored.mapping.A === "control" ? "A_stronger" : "B_stronger";
+    const result = reconcileMirroredArbitrations(arbitrationPass(pair, originalJudgment), arbitrationPass(mirrored, mirroredJudgment));
+    expect(result.mirrorAudit).toMatchObject({ positionSensitive: false, originalOverall: "control", mirroredOverall: "control" });
+    expect(result.evaluatorPasses.original.pair.mapping).toEqual(pair.mapping);
   });
 
-  it("flags a label-following mirrored result instead of counting a winner", () => {
+  it("marks mirrored position-following arbitration unstable and unresolved", () => {
     const pair = createBlindPairs([run("control", "none", 1), run("treatment", "none", 1)], "seed")[0];
-    const mirroredPair = mirrorPair(pair);
-    const originalRaw = judgment("B_stronger");
-    const mirroredRaw = judgment("B_stronger");
-    const original = { pair, judgment: originalRaw, unblinded: unblindJudgment(originalRaw, pair), durationMs: 10, evaluatorModel: "test", startedAt: "now" };
-    const mirrored = { pair: mirroredPair, judgment: mirroredRaw, unblinded: unblindJudgment(mirroredRaw, mirroredPair), durationMs: 12, evaluatorModel: "test", startedAt: "now" };
-    const reconciled = reconcileMirroredEvaluations(original, mirrored);
-    const qualitative = aggregateQualitative([reconciled]);
-    expect(reconciled.mirrorAudit.positionSensitive).toBe(true);
-    expect(reconciled.judgment.overall.judgment).toBe("low_confidence");
-    expect(qualitative.overall.low_confidence).toBe(1);
-    expect(qualitative.blindPosition).toMatchObject({ aOverallWins: 0, bOverallWins: 2 });
-    expect(sanityAssessment(qualitative, [pair])).toMatchObject({ mirroredEvaluationCompleted: true, positionSensitivePairs: 1 });
+    const result = reconcileMirroredArbitrations(arbitrationPass(pair, "B_stronger"), arbitrationPass(mirrorPair(pair), "B_stronger"));
+    expect(result.mirrorAudit.positionSensitive).toBe(true);
+    expect(result.unblinded.overall.environmentResult).toBe("unresolved");
+    expect(result.judgment.confidence).toBe("low");
   });
 
-  it("performs one structured evaluator pass and preserves its raw response", async () => {
+  it("performs two isolated assessments without A/B framing when they resolve deterministically", async () => {
     const runs = [run("control", "none", 1), run("treatment", "none", 1)];
     const pair = createBlindPairs(runs, "seed")[0];
     let calls = 0;
-    const raw = judgment("B_stronger");
     const result = await evaluatePair({
       pair,
       runsById: new Map(runs.map((item) => [item.runId, item])),
@@ -241,13 +271,56 @@ describe("evaluation harness", () => {
       fetcher: async (_url, init) => {
         calls += 1;
         expect(init.headers.Authorization).toBe("Bearer test-key");
-        return new Response(JSON.stringify({ output_text: JSON.stringify(raw), id: "evaluation-response" }), { status: 200 });
+        const body = JSON.parse(init.body);
+        expect(body.instructions).toContain("There is no competing response");
+        expect(body.input).not.toContain("responseA");
+        return new Response(JSON.stringify({ output_text: JSON.stringify(assessment()), id: `assessment-${calls}` }), { status: 200 });
       }
     });
-    expect(calls).toBe(1);
+    expect(calls).toBe(2);
     expect(result.error).toBeUndefined();
-    expect(result.rawEvaluatorResponse.id).toBe("evaluation-response");
-    expect(["control", "treatment"]).toContain(result.unblinded.overall.environmentResult);
+    expect(result.final.classification).toBe("equivalent");
+    expect(result.arbitrationRequired).toBe(false);
+    expect(result.final.confidence).toBe("moderate");
+  });
+
+  it("uses blinded arbitration only after conflicting independent assessments", async () => {
+    const runs = [run("control", "none", 1), run("treatment", "none", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const responses = [
+      assessment("adequate", { criteria: { synthesis: "strong" } }),
+      assessment("adequate", { criteria: { readability: "strong" } }),
+      arbitrationPass(pair, "B_stronger").judgment,
+      arbitrationPass(mirrorPair(pair), "B_stronger").judgment
+    ];
+    let calls = 0;
+    const result = await evaluatePair({
+      pair,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async () => new Response(JSON.stringify({ output_text: JSON.stringify(responses[calls++]) }), { status: 200 })
+    });
+    expect(calls).toBe(3);
+    expect(result.arbitrationRequired).toBe(true);
+    expect(result.arbitration).toBeTruthy();
+    expect(result.arbitrationMirror).toBeNull();
+  });
+
+  it("does not call the evaluator for a fallback-containing pair", async () => {
+    const runs = [run("control", "none", 1), run("treatment", "none", 1, { totalFallbackFields: 1 })];
+    const pair = createBlindPairs(runs, "seed")[0];
+    let calls = 0;
+    const result = await evaluatePair({
+      pair,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async () => { calls += 1; return new Response(); }
+    });
+    expect(calls).toBe(0);
+    expect(result).toMatchObject({ qualitativeEligible: false, finalPairClassification: "excluded" });
+    expect(result.exclusionReason).toContain("reliability event");
   });
 
   it("preflights evaluator access without sending portfolio or evidence data", async () => {
@@ -283,8 +356,7 @@ describe("evaluation harness", () => {
       run("control", "two", 1), run("treatment", "two", 1)
     ];
     const pairs = createBlindPairs(runs, "seed");
-    const completedRaw = judgment("equivalent");
-    const completed = { pair: pairs[0], judgment: completedRaw, unblinded: unblindJudgment(completedRaw, pairs[0]) };
+    const completed = completedEvaluation(pairs[0]);
     const bundle = { metadata: { mode: "comparison" }, runs, pairs, evaluations: [completed] };
     const evaluated = [];
     let persisted = 0;
@@ -297,8 +369,7 @@ describe("evaluation harness", () => {
       sanityMode: false,
       evaluator: async ({ pair }) => {
         evaluated.push(pair.pairId);
-        const raw = judgment("B_stronger");
-        return { pair, judgment: raw, unblinded: unblindJudgment(raw, pair) };
+        return completedEvaluation(pair, assessment("adequate"), assessment("strong"));
       },
       persist: async () => { persisted += 1; }
     });
@@ -313,8 +384,7 @@ describe("evaluation harness", () => {
     treatmentDiagnostics.rejections = [{ sectionId: sections[0], field: "headline", category: "headline-acronym", reason: "Unexplained acronym", candidate: "Building the XDMO model" }];
     const runs = [run("control", "none", 1), run("treatment", "none", 1, { diagnostics: treatmentDiagnostics })];
     const pair = createBlindPairs(runs, "seed")[0];
-    const raw = judgment("equivalent");
-    const evaluation = { pair, judgment: raw, unblinded: unblindJudgment(raw, pair), shortlistReasons: ["no meaningful difference"] };
+    const evaluation = { ...completedEvaluation(pair), shortlistReasons: ["no meaningful difference"] };
     const reliability = aggregateReliability(runs);
     const qualitative = aggregateQualitative([evaluation]);
     const report = buildMarkdownReport({
@@ -330,7 +400,40 @@ describe("evaluation harness", () => {
     expect(report).toContain("Detailed rejected candidates, reasons, and context remain");
     expect(report).toContain("headline-acronym: 1");
     expect(report).toContain("## Cases Ben should review");
+    expect(report).toContain("Independent control assessment");
+    expect(report).toContain("Arbitration required: 0");
     expect(report).toContain("control headline");
     expect(report).toContain("treatment headline");
+  });
+
+  it("aggregates equivalent, unresolved, arbitration, and position-audit outcomes", () => {
+    const runs = [
+      run("control", "one", 1), run("treatment", "one", 1),
+      run("control", "two", 1), run("treatment", "two", 1)
+    ];
+    const pairs = createBlindPairs(runs, "seed");
+    const equivalent = completedEvaluation(pairs[0]);
+    const mixed = completedEvaluation(
+      pairs[1],
+      assessment("adequate", { criteria: { synthesis: "strong" } }),
+      assessment("adequate", { criteria: { readability: "strong" } })
+    );
+    const original = arbitrationPass(pairs[1], "B_stronger");
+    const mirrored = arbitrationPass(mirrorPair(pairs[1]), "B_stronger");
+    const reconciled = reconcileMirroredArbitrations(original, mirrored);
+    const unresolved = {
+      ...mixed,
+      arbitrationRequired: true,
+      arbitration: original,
+      arbitrationMirror: mirrored,
+      mirrorAudit: reconciled.mirrorAudit,
+      judgment: reconciled.judgment,
+      unblinded: reconciled.unblinded,
+      final: { classification: "unresolved", confidence: "low", criteria: reconciled.unblinded.criteria }
+    };
+    const aggregate = aggregateQualitative([equivalent, unresolved]);
+    expect(aggregate.overall).toMatchObject({ equivalent: 1, unresolved: 1 });
+    expect(aggregate).toMatchObject({ arbitrationRequiredCount: 1, arbitrationInstabilityCount: 1 });
+    expect(aggregate.positionBiasAudit).toMatchObject({ arbitrationPassCount: 2, bOverallWins: 2 });
   });
 });
