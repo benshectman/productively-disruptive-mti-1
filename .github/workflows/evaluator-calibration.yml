@@ -42,7 +42,7 @@ jobs:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
       PAIR_COUNT: ${{ inputs.pair_count || '8' }}
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
-      CALIBRATION_REVISION: v4
+      CALIBRATION_REVISION: v5
 
     steps:
       - name: Check out repository
