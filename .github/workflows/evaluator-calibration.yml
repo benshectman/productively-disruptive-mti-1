@@ -1,0 +1,131 @@
+name: Evaluator Calibration
+
+run-name: Calibrate evaluator on saved response pairs
+
+on:
+  push:
+    branches:
+      - experiment/gpt-5-6-luna-comparison-2026-09-20
+    paths:
+      - .github/workflows/evaluator-calibration.yml
+  workflow_dispatch:
+    inputs:
+      artifact_id:
+        description: Existing GitHub Actions artifact containing a capture JSON
+        required: true
+        type: string
+        default: "10599295492"
+
+      pair_count:
+        description: Number of saved eligible pairs to evaluate
+        required: true
+        type: number
+        default: 8
+
+      evaluator_model:
+        description: OpenAI model used for independent qualitative assessment
+        required: true
+        type: string
+        default: gpt-4.1-mini
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  calibrate:
+    name: Evaluate saved response pairs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
+      PAIR_COUNT: ${{ inputs.pair_count || '8' }}
+      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download saved capture artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "The GitHub Actions token is unavailable."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --location \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
+            --output saved-capture.zip
+          mkdir -p saved-capture
+          unzip -q saved-capture.zip -d saved-capture
+
+      - name: Select calibration pairs
+        shell: bash
+        run: |
+          capture_path="$(find saved-capture -type f -name 'portfolio-generation-capture-*.json' -print -quit)"
+          if [ -z "$capture_path" ]; then
+            echo "No portfolio generation capture JSON was found in the artifact."
+            exit 1
+          fi
+
+          node --input-type=module - "$capture_path" calibration-input.json "$PAIR_COUNT" <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+
+          const [inputPath, outputPath, countText] = process.argv.slice(2);
+          const source = JSON.parse(readFileSync(inputPath, "utf8"));
+          const count = Number.parseInt(countText, 10);
+          if (!Number.isInteger(count) || count < 1) throw new Error("PAIR_COUNT must be a positive integer");
+
+          const pairs = source.pairs.filter((pair) => pair.eligibility?.qualitativeEligible !== false).slice(0, count);
+          if (pairs.length !== count) throw new Error(`Only ${pairs.length} eligible pairs were available`);
+          const runIds = new Set(pairs.flatMap((pair) => [pair.controlRunId, pair.treatmentRunId]));
+
+          const sample = {
+            ...source,
+            pairs,
+            runs: source.runs.filter((run) => runIds.has(run.runId)),
+            evaluations: [],
+            qualitative: null,
+            shortlist: [],
+            sanity: null
+          };
+
+          writeFileSync(outputPath, `${JSON.stringify(sample, null, 2)}\n`, "utf8");
+          console.log(`Selected ${pairs.length} pairs and ${sample.runs.length} runs from ${inputPath}`);
+          NODE
+
+      - name: Run evaluator calibration
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "The OPENAI_API_KEY repository secret is not configured."
+            exit 1
+          fi
+
+          npm run eval:evaluate -- calibration-input.json --output calibration-results
+
+      - name: Upload calibration results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: evaluator-calibration-${{ github.run_id }}
+          path: calibration-results
+          if-no-files-found: warn
+          retention-days: 30
