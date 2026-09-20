@@ -19,7 +19,14 @@ import {
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
-import { buildArbitrationBody, buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
+import {
+  buildArbitrationBody,
+  buildIndependentAssessmentBody,
+  evaluatePair,
+  INDEPENDENT_CRITERION_RUBRICS,
+  INDEPENDENT_OVERALL_RUBRIC,
+  preflightEvaluator
+} from "../scripts/evaluation/evaluator.mjs";
 import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
 import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
@@ -306,19 +313,24 @@ describe("evaluation harness", () => {
     expect(criterion.properties.confidence.enum).toEqual(["high", "medium", "low"]);
     expect(body.instructions).toContain("A score of 5 should be uncommon");
     expect(body.instructions).toContain("Most competent portfolio content should fall around 3 or 4");
-    expect(body.instructions).toContain("Do not use 5 merely because there are no defects or concerns");
-    expect(body.instructions).toContain("Use 4 as the default high rating");
-    expect(body.instructions).toContain("A normal competent response may have no 5 ratings");
-    expect(body.instructions).toContain("Merely satisfying a criterion is not exceptional");
-    expect(body.instructions).toContain("no more than one or two ratings of 5 across the ten criteria");
-    expect(body.instructions).toContain("Overall quality should be 5 only when multiple criteria are genuinely exceptional");
-    expect(body.instructions).toContain("Do not reward verbosity, fact count, or length by themselves");
+    expect(body.instructions).toContain("Do not impose a numerical cap on 5 ratings");
+    expect(body.instructions).toContain("If a criterion rationale identifies a meaningful improvement, that criterion cannot receive 5");
+    expect(body.instructions).toContain("Absence of a problem normally supports 3");
+    expect(body.instructions).toContain("Overall is not a mathematical average");
+    expect(body.instructions).toContain("any materially important criterion rationale identifies a meaningful improvement");
     expect(body.instructions).toContain("citedEvidence contains the evidence returned with the finished narrative");
     expect(body.instructions).toContain("eligibleEvidence field contains the section and project evidence pools that were available for selection");
     expect(body.instructions).toContain("Considering both the eligible evidence and the final prose");
     expect(body.instructions).toContain("choose the strongest and most discriminating evidence from the eligible pool");
     expect(body.instructions).toContain("avoid using additional evidence when fewer, stronger facts would make the point more effectively");
+    for (const criterionName of criteriaNames) {
+      expect(Object.keys(INDEPENDENT_CRITERION_RUBRICS[criterionName])).toEqual(["1", "2", "3", "4", "5"]);
+      for (const rating of [1, 2, 3, 4, 5]) expect(body.instructions).toContain(INDEPENDENT_CRITERION_RUBRICS[criterionName][rating]);
+    }
+    expect(Object.keys(INDEPENDENT_OVERALL_RUBRIC)).toEqual(["1", "2", "3", "4", "5"]);
+    for (const rating of [1, 2, 3, 4, 5]) expect(body.instructions).toContain(INDEPENDENT_OVERALL_RUBRIC[rating]);
     expect(buildArbitrationBody({}, "test-model").instructions).not.toContain("eligible evidence and the final prose");
+    expect(buildArbitrationBody({}, "test-model").instructions).not.toContain("Criterion-specific rating anchors");
   });
 
   it.each([1, 2, 3, 4, 5])("parses and reports rating %i without using exception states", (rating) => {

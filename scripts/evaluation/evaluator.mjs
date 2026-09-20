@@ -131,6 +131,87 @@ const independentDefinitions = {
   evidenceEconomy: "Does each included fact contribute meaningfully, and does the response avoid using additional evidence when fewer, stronger facts would make the point more effectively?"
 };
 
+export const INDEPENDENT_CRITERION_RUBRICS = {
+  topicRelevance: {
+    1: "The response is substantially unrelated to the selected topics or emphasizes evidence that does not advance them.",
+    2: "It addresses some selected topics but misses major aspects, gives tangential evidence too much prominence, or handles multiple topics unevenly.",
+    3: "It clearly addresses the selected topics using reasonably relevant evidence. The emphasis is appropriate but not especially discerning or insightful.",
+    4: "It maintains sharp topical focus and gives the most relevant evidence appropriate prominence, with little tangential material.",
+    5: "It makes unusually discerning topic-to-evidence choices, especially across competing or overlapping topics. The rationale identifies the non-obvious prioritization that makes the framing exceptional."
+  },
+  selectivity: {
+    1: "Evidence choices are arbitrary, weak, substantially irrelevant, or omit the strongest available material.",
+    2: "Some useful evidence is chosen, but stronger alternatives are missed or weaker, redundant, or tangential facts materially dilute the response.",
+    3: "The selected evidence is reasonable and supports the response. Some stronger choices or tighter exclusions may have been possible.",
+    4: "The response prioritizes high-value, discriminating evidence and excludes most weaker or redundant alternatives.",
+    5: "The response demonstrates exceptional editorial judgment across a genuinely meaningful choice set. The rationale identifies specific strong choices and plausible alternatives appropriately excluded or subordinated."
+  },
+  synthesis: {
+    1: "Evidence remains disconnected, contradictory, or assembled without a coherent idea.",
+    2: "The response primarily lists or paraphrases facts, with limited connection among them.",
+    3: "Related evidence is combined into coherent claims or themes, although some seams or fact-by-fact construction remain visible.",
+    4: "Evidence is integrated into clear higher-order ideas, relationships, or arguments that add meaning beyond the individual facts.",
+    5: "The response produces an unusually insightful, precise, and fully grounded interpretation or relationship that is not obvious from the facts individually."
+  },
+  coherence: {
+    1: "The response lacks a discernible argument, sequence, or narrative logic.",
+    2: "The main point can be inferred, but sections or ideas feel fragmented, poorly ordered, or weakly connected.",
+    3: "The response has a clear and understandable progression. Most sections and transitions support the main point.",
+    4: "The ordering, section roles, and transitions form a deliberate progression that strengthens the argument.",
+    5: "The narrative architecture is exceptionally effective. Each section materially advances the argument, and the sequence creates meaning or persuasive force that a merely logical arrangement would not."
+  },
+  nonRepetition: {
+    1: "Substantial ideas, claims, or evidence are repeated without adding value.",
+    2: "Repetition is noticeable across leads, details, or sections and weakens momentum or economy.",
+    3: "The response avoids material redundancy. Minor repetition may remain but does not significantly impair the narrative.",
+    4: "Each section and disclosure layer contributes distinct value, with repetition used only when it serves orientation or emphasis.",
+    5: "The response handles substantially overlapping evidence with exceptional differentiation and compression. Similar material is assigned distinct roles without redundancy or loss of clarity; merely having no repetition earns no more than 4."
+  },
+  specificity: {
+    1: "The response relies primarily on generic assertions, abstractions, or unsupported leadership language.",
+    2: "Some concrete detail appears, but important claims remain vague, generalized, or detached from meaningful evidence.",
+    3: "The response includes enough concrete evidence, examples, roles, and outcomes to make its claims credible and understandable.",
+    4: "Specific details are consistently well chosen and connected to claims. Metrics, scope, roles, and outcomes retain their meaning without unnecessary detail.",
+    5: "The response achieves unusual precision throughout. Details are discriminating, correctly bounded, and exceptionally effective at clarifying contribution and impact without creating clutter."
+  },
+  groundedness: {
+    1: "Multiple or central claims are unsupported, contradicted, or materially exceed the supplied evidence; concern will usually also apply.",
+    2: "One or more important claims involve unsupported inference, distorted scope, or weak evidentiary support; concern may apply when concrete.",
+    3: "Claims are generally supported by the supplied evidence, with ordinary paraphrasing and no material unsupported leap.",
+    4: "Claims are carefully bounded to what the evidence supports. Metrics, causation, scope, and contextual qualifications are preserved with notable discipline.",
+    5: "Complex or potentially ambiguous evidence is handled with exceptional precision. Fine distinctions, limitations, and evidentiary boundaries are preserved throughout; merely finding no unsupported claim earns no more than 3 or 4."
+  },
+  attributionDiscipline: {
+    1: "The response repeatedly or materially converts team, organizational, shared-leadership, or leadership work into unsupported personal execution; concern will usually also apply.",
+    2: "Ownership is frequently ambiguous or at least one important contribution is attributed more personally than the evidence supports.",
+    3: "Attribution is generally consistent with the supplied evidence, with no material distortion of Ben's role.",
+    4: "The response consistently distinguishes personal action, leadership accountability, team execution, shared leadership, and organizational outcomes with notable precision.",
+    5: "The response handles genuinely complex or mixed ownership exceptionally well, communicating Ben's contribution clearly without either overstating or obscuring it; merely avoiding an attribution error earns no more than 3 or 4."
+  },
+  readability: {
+    1: "The prose is difficult to understand because of structure, wording, density, jargon, or grammatical problems.",
+    2: "Meaning is recoverable, but awkward phrasing, excessive density, weak transitions, or mechanical construction materially impede reading.",
+    3: "The prose is clear, professional, and understandable. It communicates the content effectively without a notable stylistic strength or weakness.",
+    4: "The prose is engaging, controlled, and easy to follow. Sentence structure, pacing, transitions, and vocabulary support the meaning effectively.",
+    5: "Complex material feels unusually clear and effortless. Voice, pacing, and structure reinforce meaning throughout, with no meaningful opportunity to tighten or clarify the prose."
+  },
+  evidenceEconomy: {
+    1: "Evidence is mechanically accumulated, substantially redundant, or so poorly proportioned that the main point is obscured.",
+    2: "The response contains too much low-value detail, repeats similar proof, or gives evidence disproportionate space relative to its contribution.",
+    3: "The amount of evidence is appropriate. Most included facts contribute, although some pruning or rebalancing may improve focus.",
+    4: "Evidence is deployed deliberately and proportionately. The response achieves strong depth and credibility without unnecessary accumulation.",
+    5: "The response achieves exceptional evidentiary efficiency. Every included fact performs a distinct, high-value role, and the rationale explains why the chosen amount and combination are materially better than plausible leaner or fuller alternatives."
+  }
+};
+
+export const INDEPENDENT_OVERALL_RUBRIC = {
+  1: "Material failures across several criteria make the response ineffective.",
+  2: "The response has some competent elements but is materially limited by multiple weaknesses or one major weakness.",
+  3: "The response is professionally competent and acceptable overall. Strengths and weaknesses are limited or roughly balanced.",
+  4: "The response is clearly strong overall, with several criterion-level strengths and no major deficiency.",
+  5: "The response is exceptional as a whole. Multiple criteria must genuinely reach 5, the strengths must reinforce one another, and no meaningful criterion-level improvement may remain."
+};
+
 export function buildIndependentAssessmentBody(request, model) {
   return {
     model,
@@ -145,17 +226,16 @@ export function buildIndependentAssessmentBody(request, model) {
       "Use this rating scale: 1 Poor means the criterion fails basic expectations and has material deficiencies; 2 Weak means it partially meets expectations but clear shortcomings materially limit the result; 3 Meets Expectations means it is competent and acceptable without notable strengths or deficiencies; 4 Strong means it clearly exceeds baseline expectations with meaningful quality, judgment, or effectiveness beyond competence; 5 Excellent means exceptional execution with unusually strong synthesis, judgment, precision, or effectiveness and little meaningful room for improvement.",
       "A score of 5 should be uncommon. 5 means exceptional, not merely polished or professional. Most competent portfolio content should fall around 3 or 4.",
       "Do not avoid using 2 or 3 simply because writing is grammatically correct or professionally presented. Evaluate the specific criterion, not overall polish alone.",
-      "Calibrate the upper end strictly: polished, complete, specific, well-grounded, or professional execution normally earns 4 at most for a criterion unless it shows unusual criterion-specific excellence. A 5 requires a rationale that names what makes the criterion exceptional beyond a 4 and shows little meaningful room for improvement. Do not use 5 merely because there are no defects or concerns. If the rationale could describe many competent portfolio responses, use 3 or 4 instead.",
-      "Use 4 as the default high rating for a clearly above-baseline but not exceptional criterion. A normal competent response may have no 5 ratings or only a small number of them across all criteria; do not assign 5 to most criteria in one assessment. For groundedness or attribution discipline, the absence of a violation is normally a 3 or 4, not a 5.",
-      "Calibration examples: polished, specific, well-grounded prose with ordinary professional synthesis is generally 4 for relevant criteria; competent prose that meets the requirement without a distinctive strength is 3; use 5 only for an unusually precise, insightful, or effective criterion-level performance that clearly exceeds those examples.",
-      "Merely satisfying a criterion is not exceptional: topic alignment, factual grounding, appropriate attribution, readability, specificity, non-repetition, complete coverage, and efficient evidence use normally top out at 4 even when done well. A 5 for one of these requires an unusually difficult, nuanced, or precise achievement that is clearly described in the rationale.",
-      "As a calibration heuristic, a typical high-quality assessment should contain no more than one or two ratings of 5 across the ten criteria. Exceed that only when several distinct criteria each have concrete, criterion-specific evidence of exceptional execution. Overall quality should be 5 only when multiple criteria are genuinely exceptional and there is little meaningful room for improvement; otherwise a strong professional response is 4 overall.",
-      "Do not reward verbosity, fact count, or length by themselves.",
+      "Apply ratings independently. A strong impression in one dimension must not elevate unrelated dimensions. Do not impose a numerical cap on 5 ratings, but every 5 must independently satisfy its criterion-specific anchor.",
+      "If a criterion rationale identifies a meaningful improvement, that criterion cannot receive 5. A 5 rationale must identify an observable exceptional feature rather than merely restating the criterion. Absence of a problem normally supports 3; notably disciplined execution may support 4. Polished, professional, clear, specific, or well-supported work normally earns 3 or 4 unless the criterion-specific 5 anchor is actually met.",
+      "Do not reward complexity, verbosity, evidence count, metric count, fact count, or length by themselves.",
       "Set exception to concern only for a concrete issue that may invalidate normal qualitative comparison or materially undermine the response, especially an apparent grounding, attribution, contradiction, or integrity problem. Set exception to unclear only when the supplied material is insufficient to assess the criterion confidently. Otherwise set exception to null.",
-      "For overall quality, also return rating, exception, confidence, and rationale. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",
-      "Do not reward length or fact count by itself. Strong synthesis and evidence economy may be shorter while retaining specificity.",
+      "Exceptions remain separate from ratings. When using concern or unclear, still return the best numeric estimate and low confidence when appropriate; deterministic comparison handles the exception separately.",
+      "For overall quality, also return rating, exception, confidence, and rationale. Overall is not a mathematical average. Overall 5 requires multiple genuine criterion-level 5 ratings whose strengths reinforce one another, and it is invalid if the overall rationale or any materially important criterion rationale identifies a meaningful improvement. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",
       "A groundedness concern requires a specific apparent mismatch with supplied evidence. An attribution concern requires a specific shift from team, organization, shared leadership, or leadership attribution into unsupported personal execution.",
-      `Criteria definitions: ${JSON.stringify(independentDefinitions)}`
+      `Criteria definitions: ${JSON.stringify(independentDefinitions)}`,
+      `Criterion-specific rating anchors: ${JSON.stringify(INDEPENDENT_CRITERION_RUBRICS)}`,
+      `Overall rating anchors: ${JSON.stringify(INDEPENDENT_OVERALL_RUBRIC)}`
     ].join(" "),
     input: JSON.stringify(request),
     text: { format: { type: "json_schema", name: "portfolio_generation_response_assessment", strict: true, schema: independentAssessmentSchema } }
