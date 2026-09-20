@@ -10,7 +10,9 @@ For every request, the harness enables `diagnostics=1` and retains the endpoint 
 
 Before capture, the combined workflow makes a minimal evaluator preflight request containing no portfolio or evidence data. This verifies the API credential, network path, and evaluator model before the 66 generation requests begin.
 
-After capture, the harness atomically writes a `portfolio-generation-capture-*.json` checkpoint before qualitative evaluation starts. One evaluator-model request then compares each like-for-like pair in normal comparison mode. Evaluator progress is written back to the checkpoint after every pair, so an interrupted evaluation can resume without repeating completed generation or evaluation work. A seeded mapping assigns control and treatment to A or B in randomized order, balanced to within one pair. The evaluator sees only A, B, selected topics, prose, and evidence. The environment mapping is preserved separately for unblinding and audit.
+After capture, the harness atomically writes a `portfolio-generation-capture-*.json` checkpoint before qualitative evaluation starts. For each generated-vs-generated pair, the evaluator first assesses each response independently, without A/B or environment labels. Ordinary code then compares the structured ratings. Only unresolved pairs proceed to blinded arbitration, using a seeded, balanced placement, and results are mapped back to environments only after judging. Sanity mode adds the reversed A/B arbitration pass needed to expose placement instability. Evaluator progress is written back after every pair, so an interrupted run can resume.
+
+Generated-vs-fallback pairs remain reliability events and are excluded from prose-quality comparison. Fallback-vs-fallback pairs are also excluded.
 
 The JSON output is the audit artifact. The Markdown report summarizes reliability, rejection diagnostics by environment/category/section/field, and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. When an endpoint does not support rejection diagnostics, the report marks that coverage as unavailable rather than treating it as zero rejections. Ben remains the final decision-maker.
 
@@ -75,9 +77,9 @@ OPENAI_API_KEY="..." \
 npm run eval:harness -- --sanity
 ```
 
-Sanity mode evaluates every pair twice. The second pass reverses A and B. A winner is retained only when both passes select the same underlying generation. If the conclusion changes with presentation order, the reconciled result becomes low confidence, is marked position-sensitive, and is prioritized for human review. Both raw passes remain in the JSON audit artifact.
+Sanity mode uses the same independent-assessment flow against equivalent endpoints. Any unresolved pair is arbitrated twice, with the second pass reversing A and B. A winner is retained only when both passes select the same underlying generation. If the conclusion changes with presentation order, the final result is unresolved, marked unstable, and prioritized for human review. Both raw passes remain in the JSON audit artifact.
 
-The report shows mirrored-pass agreement, A/B assignment balance, position-sensitive cases, and a two-sided exact binomial test of raw A/B winners. A probability of 0.05 or less is flagged as possible position bias. This is a warning, not proof of bias.
+The report shows independent assessments, the deterministic comparison, arbitration placement and outcomes, unstable cases, A/B assignment balance, and a two-sided exact binomial test of arbitration A/B winners. A probability of 0.05 or less is flagged as possible position bias. This is a warning, not proof of bias.
 
 ## Configuration
 
@@ -97,6 +99,6 @@ The default reliability flag requires both at least two additional treatment fal
 
 ## Interpreting the output
 
-Objective reliability is calculated only from response data and headers. Qualitative evaluation uses comparative categories instead of a composite score: A stronger, B stronger, roughly equivalent, concern, or low confidence.
+Objective reliability is calculated only from response data and headers. Independent qualitative assessments use strong, adequate, weak, concern, or unclear ratings. Deterministic comparison uses explicit dominance and effective-tie rules, without a weighted composite score. A tied overall rating requires at least three criteria favoring one response and none favoring the other before it is classified as stronger. Final classifications are control stronger, treatment stronger, equivalent, or unresolved.
 
 The evaluator assesses topic relevance, selectivity, synthesis, coherence, non-repetition, specificity, groundedness, attribution discipline, readability, and evidence economy. Its judgments are evidence organization for human review, not an approval decision.
