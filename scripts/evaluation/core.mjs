@@ -445,7 +445,9 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
   }
   const confidence = classification === "unresolved"
     ? "low"
-    : lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence);
+    : criterionResults.includes("unresolved")
+      ? lowestConfidence(lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence), "moderate")
+      : lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence);
   return {
     classification,
     confidence,
@@ -459,6 +461,7 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
     criterionDirection,
     criteriaConflict,
     criterionOpposesOverall,
+    unclearCriteriaCount: criterionResults.filter((result) => result === "unresolved").length,
     criterionCounts: { control: controlCriterionWins, treatment: treatmentCriterionWins, equivalent: CRITERIA.length - controlCriterionWins - treatmentCriterionWins },
     minimumCriterionLead
   };

@@ -223,6 +223,12 @@ describe("evaluation harness", () => {
     expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criteriaConflict: true });
   });
 
+  it("does not let an opposing criterion disappear behind a stronger overall rating", () => {
+    const control = assessment("adequate", { overall: "strong", criteria: { synthesis: "weak" } });
+    const treatment = assessment("adequate");
+    expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criterionOpposesOverall: true });
+  });
+
   it("treats one isolated criterion difference as effectively equivalent", () => {
     const control = assessment("adequate", { criteria: { synthesis: "strong" } });
     expect(compareIndependentAssessments(control, assessment("adequate"))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
@@ -377,6 +383,46 @@ describe("evaluation harness", () => {
     expect(persisted).toBe(1);
     expect(bundle.evaluations).toHaveLength(2);
     expect(needsQualitativeEvaluation(bundle, false)).toBe(false);
+  });
+
+  it("keeps an equivalent control-vs-control sanity set out of arbitration and position-bias counts", async () => {
+    const runs = [
+      run("control", "one", 1), run("treatment", "one", 1),
+      run("control", "two", 1), run("treatment", "two", 1)
+    ];
+    const pairs = createBlindPairs(runs, "sanity-seed");
+    const bundle = { metadata: { mode: "sanity" }, runs, pairs, evaluations: [] };
+    let evaluatorCalls = 0;
+    let arbitrationCalls = 0;
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: true,
+      evaluator: async ({ pair }) => {
+        evaluatorCalls += 1;
+        return completedEvaluation(pair);
+      },
+      arbitrator: async () => {
+        arbitrationCalls += 1;
+        throw new Error("arbitration should not be called for equivalent assessments");
+      },
+      persist: async () => {}
+    });
+    const qualitative = aggregateQualitative(bundle.evaluations);
+    const sanity = sanityAssessment(qualitative, pairs);
+    expect(evaluatorCalls).toBe(2);
+    expect(arbitrationCalls).toBe(0);
+    expect(qualitative.overall).toMatchObject({ equivalent: 2 });
+    expect(sanity).toMatchObject({
+      qualitativeEvaluationCompleted: true,
+      mappingIsReasonablyBalanced: true,
+      positionBiasEvaluated: false,
+      obviousPositionBias: false,
+      arbitrationRequiredCount: 0,
+      arbitrationInstabilityCount: 0
+    });
   });
 
   it("renders reliability, qualitative evidence, and complete shortlisted prose", () => {

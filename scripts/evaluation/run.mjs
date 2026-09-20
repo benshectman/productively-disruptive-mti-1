@@ -118,7 +118,7 @@ function upsertEvaluation(bundle, pairId, evaluation) {
 export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?.mode === "sanity") {
   return (bundle.pairs || []).some((pair) => {
     const evaluation = evaluationForPair(bundle, pair.pairId);
-    if (!evaluation || evaluation.error) return true;
+    if (!evaluation || evaluation.error || evaluation.mirrorError) return true;
     if (pair.eligibility && !pair.eligibility.qualitativeEligible) return false;
     if (evaluation.arbitrationRequired && !evaluation.arbitration) return true;
     return sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError;
