@@ -64,9 +64,9 @@ const generatedProseSchema = (minimum: number, maximum: number) => z.string().mi
 
 const WireFramingSectionSchema = z.object({
   id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
-  headline: z.string(),
-  summary: z.string(),
-  detail: z.string()
+  headline: z.unknown().optional(),
+  summary: z.unknown().optional(),
+  detail: z.unknown().optional()
 }).strict();
 const WireFramingSchema = z.object({ sections: z.array(WireFramingSectionSchema).length(4) }).strict();
 const GeneratedSummarySchema = generatedProseSchema(40, 900)
@@ -179,21 +179,22 @@ function generatedTextIsGrounded(generatedText: string, evidenceText: string): b
   return !unsupportedAggregate.test(generatedText);
 }
 
-function generatedProseIsGrounded(generated: { summary: string; detail: string }, evidenceText: string): boolean {
-  return generatedTextIsGrounded(`${generated.summary} ${generated.detail}`, evidenceText);
-}
-
 function candidateText(value: unknown): string {
   if (typeof value === "string") return value;
-  try { return JSON.stringify(value); } catch { return String(value); }
+  try { return JSON.stringify(value) ?? String(value); } catch { return String(value); }
 }
 
-function headlineRejections(sectionId: string, candidate: string, leadUsed: string): GenerationRejection[] {
+function headlineRejections(sectionId: string, value: unknown, leadUsed: string): GenerationRejection[] {
   const rejections: GenerationRejection[] = [];
+  const candidate = candidateText(value);
   const words = candidate.trim().split(/\s+/).filter(Boolean);
   const add = (category: string, reason: string, context?: GenerationRejection["context"]) => {
-    rejections.push({ sectionId, field: "headline", category, reason, candidate, ...(context ? { context } : {}) });
+    rejections.push({ sectionId, field: "headline", category, reason, candidate, context: { fallbackApplied: true, ...context } });
   };
+  if (typeof value !== "string") {
+    add("headline-schema", "headline must be a string.");
+    return rejections;
+  }
   if (candidate.length < 8) add("headline-too-short", `Headline is ${candidate.length} characters; minimum is 8.`);
   if (candidate.length > HEADLINE_MAX_CHARACTERS) add("headline-too-long", `Headline is ${candidate.length} characters; maximum is ${HEADLINE_MAX_CHARACTERS}.`);
   if (words.length < HEADLINE_MIN_WORDS || words.length > HEADLINE_MAX_WORDS) {
@@ -220,11 +221,16 @@ function headlineRejections(sectionId: string, candidate: string, leadUsed: stri
   return rejections;
 }
 
-function proseRejections(sectionId: string, field: "summary" | "detail", candidate: string): GenerationRejection[] {
+function proseRejections(sectionId: string, field: "summary" | "detail", value: unknown): GenerationRejection[] {
   const minimum = field === "summary" ? 40 : 80;
   const maximum = field === "summary" ? 900 : 1600;
   const rejections: GenerationRejection[] = [];
-  const add = (category: string, reason: string) => rejections.push({ sectionId, field, category, reason, candidate });
+  const candidate = candidateText(value);
+  const add = (category: string, reason: string) => rejections.push({ sectionId, field, category, reason, candidate, context: { fallbackApplied: true } });
+  if (typeof value !== "string") {
+    add("prose-schema", `${field} must be a string.`);
+    return rejections;
+  }
   if (candidate.length < minimum) add("prose-too-short", `${field} is ${candidate.length} characters; minimum is ${minimum}.`);
   if (candidate.length > maximum) add("prose-too-long", `${field} is ${candidate.length} characters; maximum is ${maximum}.`);
   if (field === "summary") {
@@ -240,19 +246,19 @@ function proseRejections(sectionId: string, field: "summary" | "detail", candida
   return rejections;
 }
 
-function numericGroundingRejection(sectionId: string, generatedText: string, evidenceText: string): GenerationRejection {
+function numericGroundingRejection(sectionId: string, field: "summary" | "detail", generatedText: string, evidenceText: string): GenerationRejection {
   const evidenceNumbers = new Set(numericTokens(evidenceText).map(normalizedNumericToken));
   const offendingNumericTokens = numericTokens(generatedText).filter((token) => !evidenceNumbers.has(normalizedNumericToken(token)));
   const unsupportedAggregate = /\b(all|each|every|both)\b[^.!?]{0,120}\b(over|above|exceed(?:ed|ing)?|more than|greater than|at least)\b[^.!?]{0,30}\d/i.test(generatedText);
   return {
     sectionId,
-    field: "summary+detail",
+    field,
     category: "numeric-grounding",
     reason: unsupportedAggregate
       ? "Generated prose makes an unsupported aggregate numeric comparison."
       : `Generated prose contains numeric token${offendingNumericTokens.length === 1 ? "" : "s"} not present in the section evidence.`,
     candidate: generatedText,
-    context: { offendingNumericTokens, unsupportedAggregate }
+    context: { offendingNumericTokens, unsupportedAggregate, fallbackApplied: true }
   };
 }
 
@@ -312,6 +318,7 @@ export function applyAiFraming(
     return null;
   }
   const provenance: Array<{ id: string; fields: GenerationSectionDiagnostics["fields"] }> = [];
+  let numericGroundingFailed = false;
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
@@ -319,44 +326,33 @@ export function applyAiFraming(
       const framing = framingById.get(section.id as typeof result.data.sections[number]["id"])!;
       const summaryResult = GeneratedSummarySchema.safeParse(framing.summary);
       const detailResult = GeneratedDetailSchema.safeParse(framing.detail);
-      const summary = summaryResult.success ? summaryResult.data : section.summary;
-      const detail = detailResult.success ? detailResult.data : section.detail;
+      const evidenceText = evidenceTextBySection?.get(section.id) || "";
+      const summaryIsGrounded = summaryResult.success && (!evidenceTextBySection || generatedTextIsGrounded(summaryResult.data, evidenceText));
+      const detailIsGrounded = detailResult.success && (!evidenceTextBySection || generatedTextIsGrounded(detailResult.data, evidenceText));
+      const summary = summaryIsGrounded ? summaryResult.data : section.summary;
+      const detail = detailIsGrounded ? detailResult.data : section.detail;
       const headlineResult = GeneratedHeadlineSchema.safeParse(framing.headline);
       const headlineIsAi = headlineResult.success && headlineAcronymsAreExplained(headlineResult.data, summary);
       if (onRejectionDetail) {
         if (!summaryResult.success) proseRejections(section.id, "summary", framing.summary).forEach(onRejectionDetail);
         if (!detailResult.success) proseRejections(section.id, "detail", framing.detail).forEach(onRejectionDetail);
+        if (summaryResult.success && !summaryIsGrounded) onRejectionDetail(numericGroundingRejection(section.id, "summary", summaryResult.data, evidenceText));
+        if (detailResult.success && !detailIsGrounded) onRejectionDetail(numericGroundingRejection(section.id, "detail", detailResult.data, evidenceText));
         if (!headlineIsAi) headlineRejections(section.id, framing.headline, summary).forEach(onRejectionDetail);
       }
+      if ((summaryResult.success && !summaryIsGrounded) || (detailResult.success && !detailIsGrounded)) numericGroundingFailed = true;
       const headline = headlineIsAi
-        ? framing.headline
+        ? headlineResult.data
         : section.headline;
       provenance.push({ id: section.id, fields: {
         headline: headlineIsAi ? "ai" : "fallback",
-        summary: summaryResult.success ? "ai" : "fallback",
-        detail: detailResult.success ? "ai" : "fallback"
+        summary: summaryIsGrounded ? "ai" : "fallback",
+        detail: detailIsGrounded ? "ai" : "fallback"
       } });
       return { ...section, headline, summary, detail };
     })
   };
-  if (evidenceTextBySection) {
-    const sectionIsUngrounded = (section: Narrative["sections"][number]) => !generatedProseIsGrounded(
-      { summary: section.summary, detail: section.detail || "" }, evidenceTextBySection.get(section.id) || ""
-    );
-    if (!onRejectionDetail && narrative.sections.some(sectionIsUngrounded)) {
-      onReject?.("numeric-grounding");
-      return null;
-    }
-    const ungroundedSections = onRejectionDetail ? narrative.sections.filter(sectionIsUngrounded) : [];
-    if (ungroundedSections.length) {
-      onReject?.("numeric-grounding");
-      if (onRejectionDetail) ungroundedSections.forEach((section) => {
-        const generatedText = `${section.summary} ${section.detail || ""}`;
-        onRejectionDetail(numericGroundingRejection(section.id, generatedText, evidenceTextBySection.get(section.id) || ""));
-      });
-      return null;
-    }
-  }
+  if (numericGroundingFailed) onReject?.("numeric-grounding");
   if (!validateNarrativeEvidence(narrative, allowedIds)) {
     onReject?.("narrative-evidence");
     onRejectionDetail?.({

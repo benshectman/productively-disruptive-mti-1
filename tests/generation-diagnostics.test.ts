@@ -92,6 +92,65 @@ describe("generation diagnostics", () => {
     expect(diagnostics.sections.find((section) => section.id === framing.sections[2].id)?.fields.detail).toBe("fallback");
   });
 
+  it.each([
+    ["headline only", ["headline"], { generatedFields: 11, fallbackFields: 1, mixedSections: 1, fallbackSections: 0 }],
+    ["summary only", ["summary"], { generatedFields: 11, fallbackFields: 1, mixedSections: 1, fallbackSections: 0 }],
+    ["detail only", ["detail"], { generatedFields: 11, fallbackFields: 1, mixedSections: 1, fallbackSections: 0 }],
+    ["headline and summary", ["headline", "summary"], { generatedFields: 10, fallbackFields: 2, mixedSections: 1, fallbackSections: 0 }],
+    ["summary and detail", ["summary", "detail"], { generatedFields: 10, fallbackFields: 2, mixedSections: 1, fallbackSections: 0 }],
+    ["all three", ["headline", "summary", "detail"], { generatedFields: 9, fallbackFields: 3, mixedSections: 0, fallbackSections: 1 }]
+  ])("localizes %s schema failures", (_label, invalidFields, expected) => {
+    const fallback = assembleNarrative([]);
+    const framing = validFraming();
+    for (const field of invalidFields as Array<"headline" | "summary" | "detail">) framing.sections[0][field] = "Tiny";
+
+    let diagnostics: GenerationDiagnostics | undefined;
+    const narrative = applyAiFraming(framing, fallback, undefined, undefined, undefined, (value) => { diagnostics = value; })!;
+
+    for (const field of ["headline", "summary", "detail"] as const) {
+      expect(narrative.sections[0][field]).toBe(invalidFields.includes(field) ? fallback.sections[0][field] : framing.sections[0][field]);
+    }
+    for (const generatedSection of framing.sections.slice(1)) {
+      const actual = narrative.sections.find((section) => section.id === generatedSection.id);
+      expect(actual).toMatchObject({
+        headline: generatedSection.headline,
+        summary: generatedSection.summary,
+        detail: generatedSection.detail
+      });
+    }
+    expect(diagnostics).toMatchObject({ status: "mixed", ...expected });
+  });
+
+  it("falls back all fields when every generated field fails", () => {
+    const fallback = assembleNarrative([]);
+    const framing = validFraming();
+    for (const section of framing.sections) {
+      section.headline = "Tiny";
+      section.summary = "Tiny";
+      section.detail = "Tiny";
+    }
+
+    let diagnostics: GenerationDiagnostics | undefined;
+    const narrative = applyAiFraming(framing, fallback, undefined, undefined, undefined, (value) => { diagnostics = value; });
+
+    expect(narrative).toEqual({ ...fallback, mode: "ai" });
+    expect(diagnostics).toMatchObject({ status: "fallback", generatedFields: 0, fallbackFields: 12, fallbackSections: 4 });
+  });
+
+  it("falls back a malformed or missing field while preserving valid siblings", () => {
+    const fallback = assembleNarrative([]);
+    const framing: { sections: Array<Record<string, unknown>> } = validFraming();
+    delete framing.sections[0].detail;
+    framing.sections[1].summary = { malformed: true };
+
+    const narrative = applyAiFraming(framing, fallback)!;
+
+    expect(narrative.sections[0].detail).toBe(fallback.sections[0].detail);
+    expect(narrative.sections[0].summary).toBe(framing.sections[0].summary);
+    expect(narrative.sections[1].summary).toBe(fallback.sections[1].summary);
+    expect(narrative.sections[1].detail).toBe(framing.sections[1].detail);
+  });
+
   it("does not add rejection detail when diagnostics are off", async () => {
     process.env.OPENAI_API_KEY = "test-only";
     process.env.OPENAI_MODEL = "test-model";
@@ -179,22 +238,34 @@ describe("generation diagnostics", () => {
     }
   });
 
-  it("captures offending numeric tokens and numeric-grounding reason", () => {
+  it("captures offending numeric tokens and falls back only the affected field", () => {
     const framing = validFraming();
     framing.sections[0].detail = `${framing.sections[0].detail} The work produced a 99% improvement.`;
     const evidenceBySection = new Map(framing.sections.map((section) => [section.id, "The assigned evidence reports an 85% improvement."]));
 
     const { narrative, rejections } = validateWithRejections(framing, evidenceBySection);
 
-    expect(narrative).toBeNull();
+    expect(narrative).not.toBeNull();
+    expect(narrative?.sections[0].summary).toBe(framing.sections[0].summary);
+    expect(narrative?.sections[0].detail).toBe(assembleNarrative([]).sections[0].detail);
+    expect(narrative?.sections[1].detail).toBe(framing.sections[1].detail);
     expect(rejections).toEqual(expect.arrayContaining([
       expect.objectContaining({
         sectionId: "system-behind-design",
-        field: "summary+detail",
+        field: "detail",
         category: "numeric-grounding",
-        context: expect.objectContaining({ offendingNumericTokens: ["99%"], unsupportedAggregate: false })
+        context: expect.objectContaining({ offendingNumericTokens: ["99%"], unsupportedAggregate: false, fallbackApplied: true })
       })
     ]));
+  });
+
+  it("retains broad fallback for a generation-level API failure", async () => {
+    process.env.OPENAI_API_KEY = "test-only";
+    const result = await generateNarrativeWithStatus([], async () => new Response("failure", { status: 500 }));
+
+    expect(result.status).toBe("upstream-error");
+    expect(result.narrative).toEqual(assembleNarrative([]));
+    expect(result.diagnostics).toMatchObject({ generatedFields: 0, fallbackFields: 12, fallbackSections: 4 });
   });
 
   it("does not create false rejection records for successful generated fields", () => {
