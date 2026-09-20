@@ -124,6 +124,13 @@ const definitions = {
   evidenceEconomy: "Does it use only the evidence necessary to make the point rather than mechanically consuming the available fact pool?"
 };
 
+const independentDefinitions = {
+  ...definitions,
+  topicRelevance: "Considering both the eligible evidence and the final prose, did the response select and emphasize evidence that most directly advances the selected topics?",
+  selectivity: "Did the response choose the strongest and most discriminating evidence from the eligible pool, while excluding weaker, redundant, or tangential alternatives?",
+  evidenceEconomy: "Does each included fact contribute meaningfully, and does the response avoid using additional evidence when fewer, stronger facts would make the point more effectively?"
+};
+
 export function buildIndependentAssessmentBody(request, model) {
   return {
     model,
@@ -133,6 +140,7 @@ export function buildIndependentAssessmentBody(request, model) {
       "Assess one version of professional portfolio prose on its own merits. There is no competing response in this task.",
       "Do not infer or speculate about the model, environment, or source of the response. Treat the supplied response as standalone material.",
       "Use only the selected topics, prose, proof items, and evidence supplied. Evaluate the complete narrative.",
+      "The response field citedEvidence contains the evidence returned with the finished narrative. The eligibleEvidence field contains the section and project evidence pools that were available for selection. When assessing topic relevance, selectivity, and evidence economy, compare the finished prose and cited evidence with those eligible alternatives.",
       "For every criterion, return an integer quality rating from 1 to 5, a separate exception value, confidence, and concise rationale.",
       "Use this rating scale: 1 Poor means the criterion fails basic expectations and has material deficiencies; 2 Weak means it partially meets expectations but clear shortcomings materially limit the result; 3 Meets Expectations means it is competent and acceptable without notable strengths or deficiencies; 4 Strong means it clearly exceeds baseline expectations with meaningful quality, judgment, or effectiveness beyond competence; 5 Excellent means exceptional execution with unusually strong synthesis, judgment, precision, or effectiveness and little meaningful room for improvement.",
       "A score of 5 should be uncommon. 5 means exceptional, not merely polished or professional. Most competent portfolio content should fall around 3 or 4.",
@@ -147,7 +155,7 @@ export function buildIndependentAssessmentBody(request, model) {
       "For overall quality, also return rating, exception, confidence, and rationale. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",
       "Do not reward length or fact count by itself. Strong synthesis and evidence economy may be shorter while retaining specificity.",
       "A groundedness concern requires a specific apparent mismatch with supplied evidence. An attribution concern requires a specific shift from team, organization, shared leadership, or leadership attribution into unsupported personal execution.",
-      `Criteria definitions: ${JSON.stringify(definitions)}`
+      `Criteria definitions: ${JSON.stringify(independentDefinitions)}`
     ].join(" "),
     input: JSON.stringify(request),
     text: { format: { type: "json_schema", name: "portfolio_generation_response_assessment", strict: true, schema: independentAssessmentSchema } }

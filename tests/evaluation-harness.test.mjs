@@ -19,7 +19,7 @@ import {
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
-import { buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
+import { buildArbitrationBody, buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
 import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
 import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
@@ -313,6 +313,12 @@ describe("evaluation harness", () => {
     expect(body.instructions).toContain("no more than one or two ratings of 5 across the ten criteria");
     expect(body.instructions).toContain("Overall quality should be 5 only when multiple criteria are genuinely exceptional");
     expect(body.instructions).toContain("Do not reward verbosity, fact count, or length by themselves");
+    expect(body.instructions).toContain("citedEvidence contains the evidence returned with the finished narrative");
+    expect(body.instructions).toContain("eligibleEvidence field contains the section and project evidence pools that were available for selection");
+    expect(body.instructions).toContain("Considering both the eligible evidence and the final prose");
+    expect(body.instructions).toContain("choose the strongest and most discriminating evidence from the eligible pool");
+    expect(body.instructions).toContain("avoid using additional evidence when fewer, stronger facts would make the point more effectively");
+    expect(buildArbitrationBody({}, "test-model").instructions).not.toContain("eligible evidence and the final prose");
   });
 
   it.each([1, 2, 3, 4, 5])("parses and reports rating %i without using exception states", (rating) => {
