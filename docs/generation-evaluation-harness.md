@@ -14,7 +14,7 @@ After capture, the harness atomically writes a `portfolio-generation-capture-*.j
 
 Generated-vs-fallback pairs remain reliability events and are excluded from prose-quality comparison. Fallback-vs-fallback pairs are also excluded.
 
-The JSON output is the audit artifact. The Markdown report summarizes reliability, rejection diagnostics by environment/category/section/field, and qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. When an endpoint does not support rejection diagnostics, the report marks that coverage as unavailable rather than treating it as zero rejections. Ben remains the final decision-maker.
+The JSON output is the audit artifact. The Markdown report summarizes reliability, rejection diagnostics by environment/category/section/field, five-point rating distributions by criterion and environment, separate concern and unclear counts, and deterministic qualitative comparisons, then includes the full prose for a 5–10 item human-review shortlist. When an endpoint does not support rejection diagnostics, the report marks that coverage as unavailable rather than treating it as zero rejections. Ben remains the final decision-maker.
 
 ## Run a comparison
 
@@ -99,6 +99,6 @@ The default reliability flag requires both at least two additional treatment fal
 
 ## Interpreting the output
 
-Objective reliability is calculated only from response data and headers. Independent qualitative assessments use strong, adequate, weak, concern, or unclear ratings. Deterministic comparison uses explicit dominance and effective-tie rules, without a weighted composite score. A tied overall rating requires at least three criteria favoring one response and none favoring the other before it is classified as stronger. Final classifications are control stronger, treatment stronger, equivalent, or unresolved.
+Objective reliability is calculated only from response data and headers. Independent qualitative assessments use 1 to 5 criterion ratings, with concern and unclear recorded as separate exception states. Deterministic comparison uses explicit criterion-level wins, rating-difference magnitude, exception handling, and effective-tie rules, without a weighted composite score. Isolated or trivial one-point differences are not enough to force a winner. Final classifications are control stronger, treatment stronger, equivalent, or unresolved.
 
 The evaluator assesses topic relevance, selectivity, synthesis, coherence, non-repetition, specificity, groundedness, attribution discipline, readability, and evidence economy. Its judgments are evidence organization for human review, not an approval decision.

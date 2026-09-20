@@ -1,4 +1,5 @@
 import {
+  ASSESSMENT_EXCEPTIONS,
   ASSESSMENT_RATINGS,
   CRITERIA,
   arbitrationRequest,
@@ -14,9 +15,11 @@ import {
 const assessmentCriterionSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["rating", "rationale"],
+  required: ["rating", "exception", "confidence", "rationale"],
   properties: {
-    rating: { type: "string", enum: ASSESSMENT_RATINGS },
+    rating: { type: "integer", enum: ASSESSMENT_RATINGS },
+    exception: { enum: ASSESSMENT_EXCEPTIONS },
+    confidence: { type: "string", enum: ["high", "medium", "low"] },
     rationale: { type: "string", minLength: 1, maxLength: 500 }
   }
 };
@@ -35,9 +38,11 @@ const independentAssessmentSchema = {
     overall: {
       type: "object",
       additionalProperties: false,
-      required: ["rating", "rationale"],
+      required: ["rating", "exception", "confidence", "rationale"],
       properties: {
-        rating: { type: "string", enum: ["strong", "adequate", "weak", "concern", "low_confidence"] },
+        rating: { type: "integer", enum: ASSESSMENT_RATINGS },
+        exception: { enum: ASSESSMENT_EXCEPTIONS },
+        confidence: { type: "string", enum: ["high", "medium", "low"] },
         rationale: { type: "string", minLength: 1, maxLength: 800 }
       }
     },
@@ -54,7 +59,7 @@ const independentAssessmentSchema = {
         }
       }
     },
-    confidence: { type: "string", enum: ["high", "moderate", "low"] }
+    confidence: { type: "string", enum: ["high", "medium", "low"] }
   }
 };
 
@@ -102,7 +107,7 @@ const arbitrationSchema = {
         }
       }
     },
-    confidence: { type: "string", enum: ["high", "moderate", "low"] }
+    confidence: { type: "string", enum: ["high", "medium", "low"] }
   }
 };
 
@@ -128,8 +133,13 @@ export function buildIndependentAssessmentBody(request, model) {
       "Assess one version of professional portfolio prose on its own merits. There is no competing response in this task.",
       "Do not infer or speculate about the model, environment, or source of the response. Treat the supplied response as standalone material.",
       "Use only the selected topics, prose, proof items, and evidence supplied. Evaluate the complete narrative.",
-      "For every criterion, use strong, adequate, weak, concern, or unclear. Use concern only for a concrete issue, especially an apparent grounding or attribution problem. Use unclear when the supplied material is insufficient.",
-      "For overall quality, use strong, adequate, weak, concern, or low_confidence. Give a concise rationale. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",
+      "For every criterion, return an integer quality rating from 1 to 5, a separate exception value, confidence, and concise rationale.",
+      "Use this rating scale: 1 Poor means the criterion fails basic expectations and has material deficiencies; 2 Weak means it partially meets expectations but clear shortcomings materially limit the result; 3 Meets Expectations means it is competent and acceptable without notable strengths or deficiencies; 4 Strong means it clearly exceeds baseline expectations with meaningful quality, judgment, or effectiveness beyond competence; 5 Excellent means exceptional execution with unusually strong synthesis, judgment, precision, or effectiveness and little meaningful room for improvement.",
+      "A score of 5 should be uncommon. 5 means exceptional, not merely polished or professional. Most competent portfolio content should fall around 3 or 4.",
+      "Do not avoid using 2 or 3 simply because writing is grammatically correct or professionally presented. Evaluate the specific criterion, not overall polish alone.",
+      "Do not reward verbosity, fact count, or length by themselves.",
+      "Set exception to concern only for a concrete issue that may invalidate normal qualitative comparison or materially undermine the response, especially an apparent grounding, attribution, contradiction, or integrity problem. Set exception to unclear only when the supplied material is insufficient to assess the criterion confidently. Otherwise set exception to null.",
+      "For overall quality, also return rating, exception, confidence, and rationale. Confidence describes how reliable this independent assessment is, not whether an answer was returned.",
       "Do not reward length or fact count by itself. Strong synthesis and evidence economy may be shorter while retaining specificity.",
       "A groundedness concern requires a specific apparent mismatch with supplied evidence. An attribution concern requires a specific shift from team, organization, shared leadership, or leadership attribution into unsupported personal execution.",
       `Criteria definitions: ${JSON.stringify(definitions)}`
@@ -170,8 +180,10 @@ function responseText(result) {
 function assertIndependentAssessment(value) {
   if (!value || !value.criteria || !value.overall || !Array.isArray(value.concerns)) throw new Error("Independent evaluator response is missing required fields");
   for (const criterion of CRITERIA) {
-    if (!value.criteria[criterion]?.rating || !value.criteria[criterion]?.rationale) throw new Error(`Independent evaluator response is missing ${criterion}`);
+    const item = value.criteria[criterion];
+    if (!item || !Number.isInteger(item.rating) || !ASSESSMENT_RATINGS.includes(item.rating) || !ASSESSMENT_EXCEPTIONS.includes(item.exception) || !["high", "medium", "low"].includes(item.confidence) || !item.rationale) throw new Error(`Independent evaluator response is missing or invalid ${criterion}`);
   }
+  if (!Number.isInteger(value.overall.rating) || !ASSESSMENT_RATINGS.includes(value.overall.rating) || !ASSESSMENT_EXCEPTIONS.includes(value.overall.exception) || !["high", "medium", "low"].includes(value.overall.confidence) || !value.overall.rationale || !["high", "medium", "low"].includes(value.confidence)) throw new Error("Independent evaluator response is missing or invalid overall quality fields");
   return value;
 }
 
@@ -294,6 +306,8 @@ function finalCriteriaFromUnblinded(unblinded) {
   return Object.fromEntries(CRITERIA.map((criterion) => [criterion, {
     environmentResult: unblinded.criteria[criterion].environmentResult,
     judgment: unblinded.criteria[criterion].judgment,
+    controlException: unblinded.criteria[criterion].controlException,
+    treatmentException: unblinded.criteria[criterion].treatmentException,
     rationale: unblinded.criteria[criterion].rationale
   }]));
 }

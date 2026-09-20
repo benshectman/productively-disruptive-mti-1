@@ -80,7 +80,7 @@ function assessmentMarkdown(label, record) {
   return [
     `#### Independent ${label} assessment`,
     "",
-    `Overall rating: **${assessment.overall.rating}**. Confidence: **${assessment.confidence}**.`,
+    `Overall rating: **${assessment.overall.rating}**. Exception: **${assessment.overall.exception ?? "none"}**. Confidence: **${assessment.overall.confidence || assessment.confidence}**.`,
     "",
     `Overall rationale: ${assessment.overall.rationale}`,
     "",
@@ -91,6 +91,10 @@ function assessmentMarkdown(label, record) {
 
 function rate(value) {
   return value || "n/a";
+}
+
+function exception(value) {
+  return value ?? "none";
 }
 
 function arbitrationPlacement(pair) {
@@ -201,6 +205,38 @@ export function buildMarkdownReport(bundle) {
       `Arbitration required: ${qualitative.arbitrationRequiredCount || 0}. Arbitration instability: ${qualitative.arbitrationInstabilityCount || 0}.`,
       ""
     );
+    lines.push(
+      "### Independent rating distributions",
+      "",
+      "| Rating | Count |",
+      "| ---: | ---: |",
+      ...[1, 2, 3, 4, 5].map((rating) => `| ${rating} | ${qualitative.ratingDistribution?.[rating] || 0} |`),
+      "",
+      "Overall rating distribution:",
+      "",
+      "| Rating | Count |",
+      "| ---: | ---: |",
+      ...[1, 2, 3, 4, 5].map((rating) => `| ${rating} | ${qualitative.overallRatingDistribution?.[rating] || 0} |`),
+      "",
+      `Exception counts: concern ${qualitative.exceptionCounts?.concern || 0}; unclear ${qualitative.exceptionCounts?.unclear || 0}.`,
+      `Overall exception counts: concern ${qualitative.overallExceptionCounts?.concern || 0}; unclear ${qualitative.overallExceptionCounts?.unclear || 0}.`,
+      "",
+      "| Criterion | 1 | 2 | 3 | 4 | 5 | Concern | Unclear |",
+      "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    );
+    for (const criterion of CRITERIA) {
+      const scores = qualitative.criterionScoreDistributions?.[criterion] || {};
+      const exceptions = qualitative.criterionExceptionCounts?.[criterion] || {};
+      lines.push(`| ${labels[criterion]} | ${scores[1] || 0} | ${scores[2] || 0} | ${scores[3] || 0} | ${scores[4] || 0} | ${scores[5] || 0} | ${exceptions.concern || 0} | ${exceptions.unclear || 0} |`);
+    }
+    lines.push(
+      "",
+      "| Environment | 1 | 2 | 3 | 4 | 5 |",
+      "| --- | ---: | ---: | ---: | ---: | ---: |",
+      `| Control | ${qualitative.environmentScoreDistributions?.control?.[1] || 0} | ${qualitative.environmentScoreDistributions?.control?.[2] || 0} | ${qualitative.environmentScoreDistributions?.control?.[3] || 0} | ${qualitative.environmentScoreDistributions?.control?.[4] || 0} | ${qualitative.environmentScoreDistributions?.control?.[5] || 0} |`,
+      `| Treatment | ${qualitative.environmentScoreDistributions?.treatment?.[1] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[2] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[3] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[4] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[5] || 0} |`,
+      ""
+    );
     const audit = qualitative.positionBiasAudit;
     if (audit) {
       const position = audit.byPresentedPosition || {};
@@ -289,12 +325,12 @@ export function buildMarkdownReport(bundle) {
     lines.push(
       ...assessmentMarkdown("control", item.independentAssessments?.control),
       ...assessmentMarkdown("treatment", item.independentAssessments?.treatment),
-      "| Criterion | Control rating | Treatment rating | Deterministic comparison | Final result |",
-      "| --- | --- | --- | --- | --- |",
+      "| Criterion | Control rating | Control exception | Control confidence | Control rationale | Treatment rating | Treatment exception | Treatment confidence | Treatment rationale | Difference | Deterministic comparison | Final result |",
+      "| --- | ---: | --- | --- | --- | ---: | --- | --- | --- | ---: | --- | --- |",
       ...CRITERIA.map((criterion) => {
         const comparison = deterministic?.criteria?.[criterion] || {};
         const finalCriterion = final.criteria?.[criterion] || {};
-        return `| ${labels[criterion]} | ${rate(comparison.controlRating)} | ${rate(comparison.treatmentRating)} | ${classificationLabel(comparison.result)} | ${environmentResultLabel(finalCriterion.environmentResult)} |`;
+        return `| ${labels[criterion]} | ${rate(comparison.controlRating)} | ${exception(comparison.controlException)} | ${rate(comparison.controlConfidence)} | ${escapeCell(comparison.controlRationale || "n/a")} | ${rate(comparison.treatmentRating)} | ${exception(comparison.treatmentException)} | ${rate(comparison.treatmentConfidence)} | ${escapeCell(comparison.treatmentRationale || "n/a")} | ${comparison.ratingDifference ?? "n/a"} | ${classificationLabel(comparison.result)} | ${environmentResultLabel(finalCriterion.environmentResult)} |`;
       }),
       "",
       proseMarkdown("Control response", controlRun),

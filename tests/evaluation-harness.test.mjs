@@ -19,7 +19,7 @@ import {
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
-import { evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
+import { buildIndependentAssessmentBody, evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
 import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 
 const sections = ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"];
@@ -83,10 +83,33 @@ function run(environment, configuration, repetition, overrides = {}) {
 
 const criteriaNames = ["topicRelevance", "selectivity", "synthesis", "coherence", "nonRepetition", "specificity", "groundedness", "attributionDiscipline", "readability", "evidenceEconomy"];
 
-function assessment(rating = "adequate", overrides = {}) {
-  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { rating, rationale: `${criterion} rationale` }]));
-  for (const [criterion, value] of Object.entries(overrides.criteria || {})) criteria[criterion] = { rating: value, rationale: `${criterion} override` };
-  return { criteria, overall: { rating: overrides.overall || rating, rationale: "Overall rationale" }, concerns: overrides.concerns || [], confidence: overrides.confidence || "moderate" };
+function criterionAssessment(criterion, value) {
+  if (typeof value === "object") {
+    return {
+      rating: value.rating,
+      exception: value.exception ?? null,
+      confidence: value.confidence || "medium",
+      rationale: `${criterion} override`
+    };
+  }
+  return { rating: value, exception: null, confidence: "medium", rationale: `${criterion} rationale` };
+}
+
+function assessment(rating = 3, overrides = {}) {
+  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, criterionAssessment(criterion, rating)]));
+  for (const [criterion, value] of Object.entries(overrides.criteria || {})) criteria[criterion] = criterionAssessment(criterion, value);
+  const overallValue = typeof overrides.overall === "object" ? overrides.overall : { rating: overrides.overall || rating };
+  return {
+    criteria,
+    overall: {
+      rating: overallValue.rating,
+      exception: overallValue.exception ?? null,
+      confidence: overallValue.confidence || "medium",
+      rationale: "Overall rationale"
+    },
+    concerns: overrides.concerns || [],
+    confidence: overrides.confidence || "medium"
+  };
 }
 
 function completedEvaluation(pair, control = assessment(), treatment = assessment()) {
@@ -103,7 +126,7 @@ function completedEvaluation(pair, control = assessment(), treatment = assessmen
   };
 }
 
-function arbitrationPass(pair, judgment, confidence = "moderate") {
+function arbitrationPass(pair, judgment, confidence = "medium") {
   const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { judgment, rationale: `${criterion} rationale` }]));
   const raw = { criteria, overall: { judgment, rationale: "Arbitration rationale" }, concerns: [], confidence };
   const translate = (value) => value === "A_stronger" ? pair.mapping.A : value === "B_stronger" ? pair.mapping.B : value;
@@ -209,29 +232,95 @@ describe("evaluation harness", () => {
     expect(compareIndependentAssessments(assessment(), assessment())).toMatchObject({ classification: "equivalent" });
   });
 
+  it("defines the independent five-point schema and calibration guidance", () => {
+    const body = buildIndependentAssessmentBody({}, "test-model");
+    const criterion = body.text.format.schema.properties.criteria.properties.topicRelevance;
+    expect(criterion.properties.rating).toMatchObject({ type: "integer", enum: [1, 2, 3, 4, 5] });
+    expect(criterion.properties.exception.enum).toEqual([null, "concern", "unclear"]);
+    expect(criterion.properties.confidence.enum).toEqual(["high", "medium", "low"]);
+    expect(body.instructions).toContain("A score of 5 should be uncommon");
+    expect(body.instructions).toContain("Most competent portfolio content should fall around 3 or 4");
+    expect(body.instructions).toContain("Do not reward verbosity, fact count, or length by themselves");
+  });
+
+  it.each([1, 2, 3, 4, 5])("parses and reports rating %i without using exception states", (rating) => {
+    const result = compareIndependentAssessments(assessment(rating), assessment(rating));
+    expect(result).toMatchObject({ classification: "equivalent" });
+    expect(result.criteria.topicRelevance).toMatchObject({
+      controlRating: rating,
+      treatmentRating: rating,
+      controlException: null,
+      treatmentException: null,
+      result: "equivalent"
+    });
+  });
+
+  it("keeps concern separate from numeric ratings", () => {
+    const control = assessment(4, { criteria: { groundedness: { rating: 4, exception: "concern" } } });
+    const result = compareIndependentAssessments(control, assessment(4));
+    expect(result).toMatchObject({ classification: "unresolved", concernCriteriaCount: 1 });
+    expect(result.criteria.groundedness).toMatchObject({ controlRating: 4, controlException: "concern", result: "concern" });
+    expect(deterministicUnblindedOutcome(result, control, assessment(4)).criteria.groundedness).toMatchObject({
+      environmentResult: "unresolved",
+      controlException: "concern",
+      treatmentException: null
+    });
+  });
+
+  it("keeps unclear separate from numeric ratings", () => {
+    const treatment = assessment(3, { criteria: { specificity: { rating: 3, exception: "unclear" } } });
+    const result = compareIndependentAssessments(assessment(3), treatment);
+    expect(result).toMatchObject({ classification: "equivalent", unclearCriteriaCount: 1 });
+    expect(result.criteria.specificity).toMatchObject({ treatmentRating: 3, treatmentException: "unclear", result: "unresolved" });
+  });
+
   it("classifies a clearly stronger control assessment", () => {
-    expect(compareIndependentAssessments(assessment("strong"), assessment("adequate"))).toMatchObject({ classification: "control_stronger" });
+    expect(compareIndependentAssessments(assessment(5), assessment(3))).toMatchObject({ classification: "control_stronger" });
   });
 
   it("classifies a clearly stronger treatment assessment", () => {
-    expect(compareIndependentAssessments(assessment("adequate"), assessment("strong"))).toMatchObject({ classification: "treatment_stronger" });
+    expect(compareIndependentAssessments(assessment(3), assessment(5))).toMatchObject({ classification: "treatment_stronger" });
   });
 
   it("leaves mixed criterion signals unresolved", () => {
-    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
-    const treatment = assessment("adequate", { criteria: { readability: "strong" } });
+    const control = assessment(3, { criteria: { synthesis: 4 } });
+    const treatment = assessment(3, { criteria: { readability: 4 } });
     expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criteriaConflict: true });
   });
 
   it("does not let an opposing criterion disappear behind a stronger overall rating", () => {
-    const control = assessment("adequate", { overall: "strong", criteria: { synthesis: "weak" } });
-    const treatment = assessment("adequate");
+    const control = assessment(3, { overall: 5, criteria: { synthesis: 2 } });
+    const treatment = assessment(3);
     expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criterionOpposesOverall: true });
   });
 
   it("treats one isolated criterion difference as effectively equivalent", () => {
-    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
-    expect(compareIndependentAssessments(control, assessment("adequate"))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
+    const control = assessment(3, { criteria: { synthesis: 4 } });
+    expect(compareIndependentAssessments(control, assessment(3))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
+  });
+
+  it("does not force a winner from a trivial one-point overall difference", () => {
+    expect(compareIndependentAssessments(assessment(3, { overall: 4 }), assessment(3))).toMatchObject({ classification: "equivalent" });
+  });
+
+  it("does not resolve a numeric lead when an assessment is low confidence", () => {
+    expect(compareIndependentAssessments(assessment(5, { confidence: "low" }), assessment(3))).toMatchObject({ classification: "unresolved", confidence: "low" });
+  });
+
+  it("preserves exception states through comparison and reporting aggregates", () => {
+    const runs = [run("control", "none", 1), run("treatment", "none", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const evaluation = completedEvaluation(
+      pair,
+      assessment(4, { criteria: { groundedness: { rating: 4, exception: "concern" } } }),
+      assessment(4, { criteria: { specificity: { rating: 4, exception: "unclear" } } })
+    );
+    const aggregate = aggregateQualitative([evaluation]);
+    expect(aggregate.exceptionCounts).toMatchObject({ concern: 1, unclear: 1 });
+    expect(aggregate.overallRatingDistribution[4]).toBe(2);
+    expect(aggregate.overallExceptionCounts).toMatchObject({ concern: 0, unclear: 0 });
+    expect(aggregate.criterionExceptionCounts.groundedness.concern).toBe(1);
+    expect(aggregate.criterionExceptionCounts.specificity.unclear).toBe(1);
   });
 
   it("excludes generated-vs-fallback and fallback-vs-fallback from prose comparison", () => {
@@ -287,15 +376,15 @@ describe("evaluation harness", () => {
     expect(result.error).toBeUndefined();
     expect(result.final.classification).toBe("equivalent");
     expect(result.arbitrationRequired).toBe(false);
-    expect(result.final.confidence).toBe("moderate");
+    expect(result.final.confidence).toBe("medium");
   });
 
   it("uses blinded arbitration only after conflicting independent assessments", async () => {
     const runs = [run("control", "none", 1), run("treatment", "none", 1)];
     const pair = createBlindPairs(runs, "seed")[0];
     const responses = [
-      assessment("adequate", { criteria: { synthesis: "strong" } }),
-      assessment("adequate", { criteria: { readability: "strong" } }),
+      assessment(3, { criteria: { synthesis: 4 } }),
+      assessment(3, { criteria: { readability: 4 } }),
       arbitrationPass(pair, "B_stronger").judgment,
       arbitrationPass(mirrorPair(pair), "B_stronger").judgment
     ];
@@ -375,7 +464,7 @@ describe("evaluation harness", () => {
       sanityMode: false,
       evaluator: async ({ pair }) => {
         evaluated.push(pair.pairId);
-        return completedEvaluation(pair, assessment("adequate"), assessment("strong"));
+        return completedEvaluation(pair, assessment(3), assessment(5));
       },
       persist: async () => { persisted += 1; }
     });
@@ -383,6 +472,33 @@ describe("evaluation harness", () => {
     expect(persisted).toBe(1);
     expect(bundle.evaluations).toHaveLength(2);
     expect(needsQualitativeEvaluation(bundle, false)).toBe(false);
+  });
+
+  it("re-evaluates legacy direct-comparison records with the new independent schema", async () => {
+    const runs = [run("control", "one", 1), run("treatment", "one", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const bundle = {
+      metadata: { mode: "comparison" },
+      runs,
+      pairs: [pair],
+      evaluations: [{ pair, judgment: { overall: { judgment: "equivalent" } }, qualitativeEligible: true }]
+    };
+    const evaluated = [];
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(true);
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: false,
+      evaluator: async ({ pair: evaluatedPair }) => {
+        evaluated.push(evaluatedPair.pairId);
+        return completedEvaluation(evaluatedPair);
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toEqual([pair.pairId]);
+    expect(bundle.evaluations[0].independentAssessments).toBeTruthy();
   });
 
   it("keeps an equivalent control-vs-control sanity set out of arbitration and position-bias counts", async () => {
@@ -446,6 +562,10 @@ describe("evaluation harness", () => {
     expect(report).toContain("Detailed rejected candidates, reasons, and context remain");
     expect(report).toContain("headline-acronym: 1");
     expect(report).toContain("## Cases Ben should review");
+    expect(report).toContain("### Independent rating distributions");
+    expect(report).toContain("Exception counts: concern 0; unclear 0.");
+    expect(report).toContain("Overall rating distribution:");
+    expect(report).toContain("| Criterion | Control rating | Control exception | Control confidence | Control rationale |");
     expect(report).toContain("Independent control assessment");
     expect(report).toContain("Arbitration required: 0");
     expect(report).toContain("control headline");
@@ -461,8 +581,8 @@ describe("evaluation harness", () => {
     const equivalent = completedEvaluation(pairs[0]);
     const mixed = completedEvaluation(
       pairs[1],
-      assessment("adequate", { criteria: { synthesis: "strong" } }),
-      assessment("adequate", { criteria: { readability: "strong" } })
+      assessment(3, { criteria: { synthesis: 4 } }),
+      assessment(3, { criteria: { readability: 4 } })
     );
     const original = arbitrationPass(pairs[1], "B_stronger");
     const mirrored = arbitrationPass(mirrorPair(pairs[1]), "B_stronger");

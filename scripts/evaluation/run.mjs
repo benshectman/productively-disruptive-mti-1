@@ -108,6 +108,10 @@ function evaluationForPair(bundle, pairId) {
   return (bundle.evaluations || []).find((evaluation) => evaluation.pair?.pairId === pairId);
 }
 
+function hasIndependentAssessments(evaluation) {
+  return Boolean(evaluation?.independentAssessments?.control?.assessment && evaluation?.independentAssessments?.treatment?.assessment);
+}
+
 function upsertEvaluation(bundle, pairId, evaluation) {
   bundle.evaluations ||= [];
   const index = bundle.evaluations.findIndex((item) => item.pair?.pairId === pairId);
@@ -120,6 +124,7 @@ export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?
     const evaluation = evaluationForPair(bundle, pair.pairId);
     if (!evaluation || evaluation.error || evaluation.mirrorError) return true;
     if (pair.eligibility && !pair.eligibility.qualitativeEligible) return false;
+    if (!hasIndependentAssessments(evaluation)) return true;
     if (evaluation.arbitrationRequired && !evaluation.arbitration) return true;
     return sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError;
   });
@@ -128,6 +133,7 @@ export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?
 function evaluationComplete(evaluation, pair, sanityMode) {
   if (!evaluation || evaluation.error) return false;
   if (pair.eligibility && !pair.eligibility.qualitativeEligible) return true;
+  if (!hasIndependentAssessments(evaluation)) return false;
   if (evaluation.arbitrationRequired && !evaluation.arbitration) return false;
   return !(sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError);
 }
@@ -143,6 +149,8 @@ function finalCriteria(unblinded) {
   return Object.fromEntries(Object.entries(unblinded.criteria || {}).map(([criterion, item]) => [criterion, {
     environmentResult: item.environmentResult,
     judgment: item.judgment,
+    controlException: item.controlException,
+    treatmentException: item.treatmentException,
     rationale: item.rationale
   }]));
 }
