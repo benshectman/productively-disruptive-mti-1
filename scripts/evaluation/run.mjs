@@ -250,7 +250,7 @@ function tournamentResultFor(bundle, comparisonId) {
 export function needsTournamentEvaluation(bundle, cohorts) {
   return cohorts.some((cohort) => cohort.comparisons.some((comparison) => {
     const result = tournamentResultFor(bundle, comparison.comparisonId);
-    return !result || Boolean(result.error);
+    return !result || Boolean(result.error) || Boolean(result.mirrorError);
   }));
 }
 
@@ -325,12 +325,14 @@ export async function evaluateTournamentBundle({
     explicitComparisonIds: explicitMirrorIds
   };
   for (const result of bundle.tournament.comparisons) {
-    if (result.error || result.mirror || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
+    if (result.error || (result.mirror && !result.mirrorError) || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
     console.log(`[tournament mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
     const mirror = await evaluator({ comparison: mirrorTournamentComparison(result.comparison), runsById, apiKey, model });
     result.mirror = mirror;
-    if (!mirror.error) result.mirrorAudit = reconcileTournamentMirror(result, mirror);
-    else result.mirrorError = mirror.error;
+    if (!mirror.error) {
+      result.mirrorAudit = reconcileTournamentMirror(result, mirror);
+      delete result.mirrorError;
+    } else result.mirrorError = mirror.error;
     await checkpoint();
     await delay(config.requestDelayMs || 0);
   }

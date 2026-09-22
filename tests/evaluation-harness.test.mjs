@@ -407,6 +407,16 @@ describe("relative-quality tournament", () => {
     expect(needsTournamentEvaluation(bundle, cohorts)).toBe(false);
   });
 
+  it("recognizes a failed selective mirror as resumable work", () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const comparisons = cohorts[0].comparisons.map((comparison) => result(comparison));
+    comparisons[0].mirror = { error: "Evaluator HTTP 429" };
+    comparisons[0].mirrorError = "Evaluator HTTP 429";
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons } };
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(true);
+  });
+
   it("renders a separated tournament summary and cohort ranking", () => {
     const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
     const results = cohort.comparisons.map((comparison) => result(comparison));

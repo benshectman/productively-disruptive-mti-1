@@ -14,7 +14,7 @@ on:
         description: Existing GitHub Actions artifact containing a capture JSON
         required: true
         type: string
-        default: "10599295492"
+        default: "10718309826"
 
       evaluator_model:
         description: OpenAI model used for independent qualitative assessment
@@ -39,11 +39,11 @@ jobs:
     timeout-minutes: 30
 
     env:
-      ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
+      ARTIFACT_ID: ${{ inputs.artifact_id || '10718309826' }}
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
       TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
       TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '11' }}
-      CALIBRATION_REVISION: tournament-full-corpus-gpt-4-1-mini-v1
+      CALIBRATION_REVISION: tournament-full-corpus-gpt-4-1-mini-resume-v1
 
     steps:
       - name: Check out repository
@@ -79,7 +79,7 @@ jobs:
       - name: Select calibration corpus
         shell: bash
         run: |
-          capture_path="$(find saved-capture -type f -name 'portfolio-generation-capture-*.json' -print -quit)"
+          capture_path="$(find saved-capture -type f \( -name 'portfolio-generation-evaluation-*.json' -o -name 'portfolio-generation-capture-*.json' \) -print -quit)"
           if [ -z "$capture_path" ]; then
             echo "No portfolio generation capture JSON was found in the artifact."
             exit 1
@@ -93,7 +93,12 @@ jobs:
 
           const sample = {
             ...source,
-            tournament: null
+            config: {
+              ...source.config,
+              requestDelayMs: 1000,
+              tournament: { ...source.config.tournament, concurrency: 1 }
+            },
+            tournament: source.tournament || null
           };
 
           writeFileSync(outputPath, `${JSON.stringify(sample, null, 2)}\n`, "utf8");
