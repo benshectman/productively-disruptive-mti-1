@@ -20,7 +20,7 @@ on:
         description: OpenAI model used for independent qualitative assessment
         required: true
         type: string
-        default: gpt-5.6-luna
+        default: gpt-4.1-mini
 
       tournament_cohorts:
         description: Number of complete topic cohorts to include in tournament calibration
@@ -40,10 +40,10 @@ jobs:
 
     env:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
-      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
-      TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
+      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
+      TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
       TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '11' }}
-      CALIBRATION_REVISION: tournament-full-corpus-v1
+      CALIBRATION_REVISION: tournament-full-corpus-gpt-4-1-mini-v1
 
     steps:
       - name: Check out repository
