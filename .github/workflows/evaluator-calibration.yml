@@ -43,7 +43,7 @@ jobs:
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
       TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
       TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '3' }}
-      CALIBRATION_REVISION: tournament-v1
+      CALIBRATION_REVISION: tournament-v2-evidence-context
 
     steps:
       - name: Check out repository

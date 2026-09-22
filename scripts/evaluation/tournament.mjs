@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { generationType } from "./core.mjs";
+import { buildDefaultEvaluatorEvidenceContext } from "./evidence-context.mjs";
 
 export const TOURNAMENT_WINNERS = ["A_stronger", "B_stronger", "unclear"];
 export const TOURNAMENT_MARGINS = ["slight", "clear", "substantial"];
@@ -95,10 +96,12 @@ export function createTournamentCohorts(runs, seed = "portfolio-tournament-v1") 
 export function tournamentRequest(comparison, runsById) {
   const a = runsById.get(comparison.blind.A);
   const b = runsById.get(comparison.blind.B);
+  const combinedProse = { sections: [...(a.prose?.sections || []), ...(b.prose?.sections || [])] };
   return {
     topicConfiguration: comparison.topicConfiguration,
-    responseA: { prose: a.prose, evidence: a.evidence },
-    responseB: { prose: b.prose, evidence: b.evidence }
+    evidenceContext: buildDefaultEvaluatorEvidenceContext({ selectedTopicIds: comparison.topicConfiguration.topics, prose: combinedProse }),
+    responseA: { prose: a.prose, citedEvidence: a.evidence },
+    responseB: { prose: b.prose, citedEvidence: b.evidence }
   };
 }
 

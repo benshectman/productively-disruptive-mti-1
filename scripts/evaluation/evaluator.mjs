@@ -290,6 +290,7 @@ export function buildTournamentBody(request, model) {
       "Both may be competent or high quality. If only one could be published, choose the stronger complete portfolio experience.",
       "A and B are arbitrary presentation labels. Never infer or speculate which model, system, branch, environment, or generation process produced either response.",
       "Evaluate each response as a whole. Section-level observations may support the rationale, but do not rank sections separately.",
+      "The shared evidenceContext contains the section and project evidence pools available for the selected topics and proof projects. Each response's citedEvidence contains the evidence returned with that finished narrative. Use both when assessing evidence selection, grounding, and attribution. Do not call a claim unsupported when the shared evidenceContext supports it.",
       "Prefer stronger editorial judgment, synthesis, framing, evidence use, clarity, coherence, concision and economy, articulation of Ben's contribution, and memorability without sacrificing grounding or attribution discipline.",
       "Do not reward verbosity, fact count, metric count, length, or complexity by itself.",
       "For a normal valid comparison, choose A_stronger or B_stronger even when the difference is slight. There is no ordinary equivalent option.",
@@ -441,7 +442,13 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, fetch
 export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
   const request = tournamentRequest(comparison, runsById);
   const body = buildTournamentBody(request, model);
-  const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertTournamentJudgment });
+  const attempts = [];
+  let result;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertTournamentJudgment });
+    attempts.push({ attempt, startedAt: result.startedAt, durationMs: result.durationMs, error: result.error || null });
+    if (!result.error) break;
+  }
   const base = {
     comparison,
     placement: {
@@ -452,7 +459,9 @@ export async function evaluateTournamentComparison({ comparison, runsById, apiKe
       }
     },
     startedAt: result.startedAt,
-    durationMs: result.durationMs,
+    durationMs: attempts.reduce((sum, attempt) => sum + attempt.durationMs, 0),
+    attemptCount: attempts.length,
+    attempts,
     evaluatorModel: model
   };
   if (result.error) return { ...base, error: result.error, rawEvaluatorText: result.rawEvaluatorText };

@@ -242,11 +242,15 @@ describe("relative-quality tournament", () => {
     const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
     const request = tournamentRequest(comparison, new Map(runs.map((item) => [item.runId, item])));
     const serialized = JSON.stringify(request);
-    expect(Object.keys(request)).toEqual(["topicConfiguration", "responseA", "responseB"]);
-    expect(serialized).not.toContain("environment");
-    expect(serialized).not.toContain("develop");
+    const collectKeys = (value) => value && typeof value === "object"
+      ? Object.entries(value).flatMap(([key, child]) => [key, ...collectKeys(child)]) : [];
+    expect(Object.keys(request)).toEqual(["topicConfiguration", "evidenceContext", "responseA", "responseB"]);
+    expect(collectKeys(request)).not.toEqual(expect.arrayContaining(["environment", "environmentId", "model", "evaluatorModel"]));
     expect(serialized).not.toContain("feature/example");
-    expect(serialized).not.toContain("model");
+    expect(serialized).not.toContain("gpt-4.1-mini");
+    expect(serialized).not.toContain("gpt-5.6-luna");
+    expect(request.evidenceContext.eligibleEvidenceBySection).toBeTruthy();
+    expect(request.responseA).toHaveProperty("citedEvidence");
   });
 
   it.each([["A_stronger", "A"], ["B_stronger", "B"]])("maps %s back to the correct candidate", (winner, position) => {
@@ -282,7 +286,10 @@ describe("relative-quality tournament", () => {
       model: "test-model",
       fetcher: async (_url, init) => {
         const body = JSON.parse(init.body);
-        expect(body.input).not.toContain("environment");
+        expect(body.input).not.toContain('"environment":');
+        expect(body.input).not.toContain('"environmentId":');
+        expect(body.input).not.toContain("feature/example");
+        expect(body.input).not.toContain("test-model");
         return new Response(JSON.stringify({ output_text: JSON.stringify({ winner: "B_stronger", margin: "substantial", confidence: "high", rationale: "Better synthesis." }), usage: { input_tokens: 100, output_tokens: 20, total_tokens: 120 } }), { status: 200 });
       }
     });
@@ -290,6 +297,27 @@ describe("relative-quality tournament", () => {
     expect(evaluated.judgment).toMatchObject({ margin: "substantial", confidence: "high" });
     expect(evaluated.placement.candidateMapping.B.candidateId).toBe(comparison.blind.B);
     expect(evaluated.usage.total_tokens).toBe(120);
+  });
+
+  it("retries one transient malformed tournament response", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async () => {
+        calls += 1;
+        const outputText = calls === 1 ? "{" : JSON.stringify({ winner: "A_stronger", margin: "clear", confidence: "high", rationale: "Better synthesis." });
+        return new Response(JSON.stringify({ output_text: outputText }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(2);
+    expect(evaluated.attemptCount).toBe(2);
+    expect(evaluated.attempts[0].error).toContain("SyntaxError");
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
   });
 
   it("maps a selective mirror and flags an order-sensitive reversal as unstable", () => {
@@ -390,7 +418,7 @@ describe("relative-quality tournament", () => {
     expect(report).toContain("## Relative-quality tournament");
     expect(report).toContain("Regression interpretation:");
     expect(report).toContain("| Rank | Candidate | Environment | W | L | Unresolved | Relative strength |");
-    expect(report).toContain("Calls: 15");
+    expect(report).toContain("API attempts: 15");
   });
 });
 

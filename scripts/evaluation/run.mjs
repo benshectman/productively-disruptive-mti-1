@@ -262,11 +262,13 @@ function sumTournamentUsage(results) {
       total.inputTokens += Number(usage.input_tokens || 0);
       total.outputTokens += Number(usage.output_tokens || 0);
       total.totalTokens += Number(usage.total_tokens || 0);
-      total.calls += record.judgment ? 1 : 0;
+      total.calls += Number(record.attemptCount || 1);
+      total.successfulCalls += record.judgment ? 1 : 0;
+      total.failedAttempts += (record.attempts || []).filter((attempt) => attempt.error).length;
       total.durationMs += Number(record.durationMs || 0);
     }
     return total;
-  }, { calls: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, durationMs: 0 });
+  }, { calls: 0, successfulCalls: 0, failedAttempts: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, durationMs: 0 });
 }
 
 export async function evaluateTournamentBundle({

@@ -293,7 +293,7 @@ export function buildMarkdownReport(bundle) {
       "",
       `${tournament.method}. ${tournament.caveat}`,
       "",
-      `Evaluator: \`${tournament.evaluatorModel || "not recorded"}\`. Calls: ${tournament.usage?.calls || 0}. Pairwise comparisons: ${summary.comparisonCount}; decisive: ${summary.decisiveComparisonCount}; mirrored: ${summary.mirroredComparisons}; unstable: ${summary.unstableComparisons?.length || 0}.`,
+      `Evaluator: \`${tournament.evaluatorModel || "not recorded"}\`. API attempts: ${tournament.usage?.calls || 0}; successful judgments: ${tournament.usage?.successfulCalls ?? tournament.usage?.calls ?? 0}; failed attempts: ${tournament.usage?.failedAttempts || 0}. Pairwise comparisons: ${summary.comparisonCount}; decisive: ${summary.decisiveComparisonCount}; mirrored: ${summary.mirroredComparisons}; unstable: ${summary.unstableComparisons?.length || 0}.`,
       "",
       "| Indicator | Control | Treatment |",
       "| --- | ---: | ---: |",
