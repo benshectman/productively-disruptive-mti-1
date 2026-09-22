@@ -258,9 +258,19 @@ export function aggregateTournament(cohorts, results) {
       if (candidate.rank === cohort.ranking.length) placement[candidate.environment].bottom += 1;
     }
   }
-  const aWins = decisive.filter((result) => result.mappedJudgment?.winnerPosition === "A" && !result.mirrorAudit).length
-    + decisive.filter((result) => result.mirrorAudit && result.mirrorAudit.winnerCandidateId === result.comparison.blind.A).length;
-  const bWins = decisive.length - aWins;
+  const judgmentPasses = results.flatMap((result) => [
+    result.judgment ? { pass: "original", winner: result.judgment.winner } : null,
+    result.mirror?.judgment ? { pass: "mirror", winner: result.mirror.judgment.winner } : null
+  ]).filter((pass) => pass && ["A_stronger", "B_stronger"].includes(pass.winner));
+  const passCounts = (passes) => ({
+    A: passes.filter((pass) => pass.winner === "A_stronger").length,
+    B: passes.filter((pass) => pass.winner === "B_stronger").length
+  });
+  const allPassCounts = passCounts(judgmentPasses);
+  const originalPassCounts = passCounts(judgmentPasses.filter((pass) => pass.pass === "original"));
+  const mirrorPassCounts = passCounts(judgmentPasses.filter((pass) => pass.pass === "mirror"));
+  const mirroredCount = results.filter((result) => result.mirror).length;
+  const unstableCount = results.filter((result) => result.mirrorAudit?.unstable).length;
   const substantialTreatmentLosses = direct.filter((result) => {
     const winnerEnvironment = result.mirrorAudit?.winnerCandidateId
       ? [result.comparison.mappedCandidates.A, result.comparison.mappedCandidates.B].find((candidate) => candidate.candidateId === result.mirrorAudit.winnerCandidateId).environment
@@ -302,16 +312,19 @@ export function aggregateTournament(cohorts, results) {
       confidence: counts(results.filter((result) => result.judgment).map((result) => result.judgment.confidence)),
       lowConfidenceComparisons: results.filter((result) => result.judgment?.confidence === "low").map((result) => result.comparison.comparisonId),
       unclearComparisons: results.filter((result) => result.judgment?.winner === "unclear").map((result) => result.comparison.comparisonId),
+      evaluatorErrors: results.filter((result) => result.error || result.mirrorError).map((result) => result.comparison.comparisonId),
       unstableComparisons: results.filter((result) => result.mirrorAudit?.unstable).map((result) => result.comparison.comparisonId),
-      mirroredComparisons: results.filter((result) => result.mirror).length,
+      mirroredComparisons: mirroredCount,
       substantialTreatmentLosses,
       treatmentBottomTopics,
       repeatedTreatmentRegressions,
       positionBias: {
-        aWins,
-        bWins,
-        difference: Math.abs(aWins - bWins),
-        suspicious: decisive.length >= 10 && Math.abs(aWins - bWins) / decisive.length >= 0.3
+        allPasses: { ...allPassCounts, total: judgmentPasses.length },
+        originalPasses: { ...originalPassCounts, total: originalPassCounts.A + originalPassCounts.B },
+        mirroredPasses: { ...mirrorPassCounts, total: mirrorPassCounts.A + mirrorPassCounts.B },
+        unstableMirroredComparisons: unstableCount,
+        unstableMirrorRate: mirroredCount ? unstableCount / mirroredCount : null,
+        suspicious: mirroredCount >= 4 && unstableCount / mirroredCount >= 0.25
       }
     }
   };
@@ -319,13 +332,14 @@ export function aggregateTournament(cohorts, results) {
 
 export function tournamentHumanReviewShortlist(tournament, results, maximum = 10) {
   const priority = (result) =>
-    (result.mirrorAudit?.unstable ? 100 : 0)
+    (result.error || result.mirrorError ? 120 : 0)
+    + (result.mirrorAudit?.unstable ? 100 : 0)
     + (result.judgment?.winner === "unclear" ? 80 : 0)
     + (result.mappedJudgment?.loserEnvironment === "treatment" && result.judgment?.margin === "substantial" ? 60 : 0)
     + (result.judgment?.confidence === "low" ? 30 : 0)
     + (result.judgment?.margin === "slight" ? 10 : 0);
   return [...results].filter((result) => priority(result) > 0).sort((left, right) => priority(right) - priority(left)).slice(0, maximum)
-    .map((result) => ({ comparisonId: result.comparison.comparisonId, cohortId: result.comparison.cohortId, priority: priority(result), reason: result.mirrorAudit?.unstable
-      ? "position instability" : result.judgment?.winner === "unclear" ? "exceptional unclear result" : result.mappedJudgment?.loserEnvironment === "treatment" && result.judgment?.margin === "substantial"
+    .map((result) => ({ comparisonId: result.comparison.comparisonId, cohortId: result.comparison.cohortId, priority: priority(result), reason: result.error || result.mirrorError
+      ? "evaluator error" : result.mirrorAudit?.unstable ? "position instability" : result.judgment?.winner === "unclear" ? "exceptional unclear result" : result.mappedJudgment?.loserEnvironment === "treatment" && result.judgment?.margin === "substantial"
         ? "substantial treatment loss" : result.judgment?.confidence === "low" ? "low confidence" : "slight margin" }));
 }

@@ -26,7 +26,7 @@ on:
         description: Number of complete topic cohorts to include in tournament calibration
         required: true
         type: number
-        default: 3
+        default: 2
 
 permissions:
   actions: read
@@ -42,8 +42,8 @@ jobs:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
       TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
-      TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '3' }}
-      CALIBRATION_REVISION: tournament-v2-evidence-context
+      TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '2' }}
+      CALIBRATION_REVISION: tournament-v3-position-audit
 
     steps:
       - name: Check out repository

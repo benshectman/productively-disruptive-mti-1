@@ -284,7 +284,7 @@ export function buildTournamentBody(request, model) {
   return {
     model,
     store: false,
-    max_output_tokens: 900,
+    max_output_tokens: 1800,
     instructions: [
       "You are making a blinded editorial publishing decision between two versions of professional portfolio prose created for the same brief, selected topics, and evidence context.",
       "Both may be competent or high quality. If only one could be published, choose the stronger complete portfolio experience.",

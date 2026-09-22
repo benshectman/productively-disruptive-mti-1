@@ -343,6 +343,7 @@ describe("relative-quality tournament", () => {
     expect(aggregate.summary.directControlTreatmentComparisons).toBe(9);
     expect(aggregate.summary.directWins.control + aggregate.summary.directWins.treatment).toBe(9);
     expect(aggregate.summary.placement.control.top3 + aggregate.summary.placement.treatment.top3).toBe(3);
+    expect(aggregate.summary.positionBias.allPasses.total).toBe(15);
   });
 
   it("handles a non-transitive A over B, B over C, C over A cycle", () => {

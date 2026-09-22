@@ -307,7 +307,8 @@ export function buildMarkdownReport(bundle) {
       "",
       `Direct treatment win rate: ${percent(summary.directTreatmentWinRate)} across ${summary.directControlTreatmentComparisons} control-vs-treatment comparisons.`,
       `Margins: ${counts(summary.margins)}. Confidence: ${counts(summary.confidence)}.`,
-      `A-vs-B wins: A ${summary.positionBias?.aWins || 0}, B ${summary.positionBias?.bWins || 0}. Suspicious imbalance flagged: ${summary.positionBias?.suspicious ? "yes" : "no"}.`,
+      `A-vs-B pass wins: A ${summary.positionBias?.allPasses?.A || 0}, B ${summary.positionBias?.allPasses?.B || 0}, across ${summary.positionBias?.allPasses?.total || 0} original and mirrored judgments. Unstable mirror rate: ${percent(summary.positionBias?.unstableMirrorRate)}. Suspicious position sensitivity flagged: ${summary.positionBias?.suspicious ? "yes" : "no"}.`,
+      `Evaluator-error comparisons: ${summary.evaluatorErrors?.length || 0}.`,
       `Substantial treatment losses: ${summary.substantialTreatmentLosses?.length || 0}. Treatment-bottom cohorts: ${summary.treatmentBottomTopics?.join(", ") || "none"}. Repeated-regression cohorts: ${summary.repeatedTreatmentRegressions?.join(", ") || "none"}.`,
       ""
     );
