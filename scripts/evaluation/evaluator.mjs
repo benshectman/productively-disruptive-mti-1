@@ -11,6 +11,13 @@ import {
   reconcileMirroredArbitrations,
   unblindJudgment
 } from "./core.mjs";
+import {
+  mapTournamentJudgment,
+  TOURNAMENT_CONFIDENCE,
+  TOURNAMENT_MARGINS,
+  TOURNAMENT_WINNERS,
+  tournamentRequest
+} from "./tournament.mjs";
 
 const assessmentCriterionSchema = {
   type: "object",
@@ -108,6 +115,18 @@ const arbitrationSchema = {
       }
     },
     confidence: { type: "string", enum: ["high", "medium", "low"] }
+  }
+};
+
+const tournamentSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["winner", "margin", "confidence", "rationale"],
+  properties: {
+    winner: { type: "string", enum: TOURNAMENT_WINNERS },
+    margin: { type: "string", enum: TOURNAMENT_MARGINS },
+    confidence: { type: "string", enum: TOURNAMENT_CONFIDENCE },
+    rationale: { type: "string", minLength: 1, maxLength: 700 }
   }
 };
 
@@ -261,6 +280,29 @@ export function buildArbitrationBody(request, model) {
   };
 }
 
+export function buildTournamentBody(request, model) {
+  return {
+    model,
+    store: false,
+    max_output_tokens: 900,
+    instructions: [
+      "You are making a blinded editorial publishing decision between two versions of professional portfolio prose created for the same brief, selected topics, and evidence context.",
+      "Both may be competent or high quality. If only one could be published, choose the stronger complete portfolio experience.",
+      "A and B are arbitrary presentation labels. Never infer or speculate which model, system, branch, environment, or generation process produced either response.",
+      "Evaluate each response as a whole. Section-level observations may support the rationale, but do not rank sections separately.",
+      "Prefer stronger editorial judgment, synthesis, framing, evidence use, clarity, coherence, concision and economy, articulation of Ben's contribution, and memorability without sacrificing grounding or attribution discipline.",
+      "Do not reward verbosity, fact count, metric count, length, or complexity by itself.",
+      "For a normal valid comparison, choose A_stronger or B_stronger even when the difference is slight. There is no ordinary equivalent option.",
+      "Use unclear only when a defensible comparison is impossible because of insufficient information or another concrete problem. Do not use unclear merely because both responses are strong or similar.",
+      "Report margin as slight, clear, or substantial and confidence as low, medium, or high. Margin describes the size of the editorial advantage. Confidence describes certainty in the comparison.",
+      "Give a concise rationale naming the editorial distinction that drove the choice, such as synthesis, framing, evidence selection, repetition, detail, throughline, role articulation, structure, or proportionality between claim and proof.",
+      "Do not infer anything about the model or environment that produced either response."
+    ].join(" "),
+    input: JSON.stringify(request),
+    text: { format: { type: "json_schema", name: "portfolio_generation_tournament_preference", strict: true, schema: tournamentSchema } }
+  };
+}
+
 // Compatibility alias for callers that used the former direct-comparison builder.
 export function buildEvaluatorBody(request, model) {
   return buildArbitrationBody(request, model);
@@ -284,6 +326,14 @@ function assertArbitration(value) {
   if (!value || !value.criteria || !value.overall || !Array.isArray(value.concerns)) throw new Error("Arbitration response is missing required fields");
   for (const criterion of CRITERIA) {
     if (!value.criteria[criterion]?.judgment || !value.criteria[criterion]?.rationale) throw new Error(`Arbitration response is missing ${criterion}`);
+  }
+  return value;
+}
+
+function assertTournamentJudgment(value) {
+  if (!value || !TOURNAMENT_WINNERS.includes(value.winner) || !TOURNAMENT_MARGINS.includes(value.margin)
+    || !TOURNAMENT_CONFIDENCE.includes(value.confidence) || !value.rationale) {
+    throw new Error("Tournament evaluator response is missing or invalid required fields");
   }
   return value;
 }
@@ -385,6 +435,34 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, fetch
     unblinded: unblindJudgment(result.judgment, pair),
     evaluatorRequest: request,
     rawEvaluatorResponse: result.rawResponse
+  };
+}
+
+export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
+  const request = tournamentRequest(comparison, runsById);
+  const body = buildTournamentBody(request, model);
+  const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertTournamentJudgment });
+  const base = {
+    comparison,
+    placement: {
+      ...comparison.placement,
+      candidateMapping: {
+        A: { ...comparison.mappedCandidates.A },
+        B: { ...comparison.mappedCandidates.B }
+      }
+    },
+    startedAt: result.startedAt,
+    durationMs: result.durationMs,
+    evaluatorModel: model
+  };
+  if (result.error) return { ...base, error: result.error, rawEvaluatorText: result.rawEvaluatorText };
+  return {
+    ...base,
+    judgment: result.judgment,
+    mappedJudgment: mapTournamentJudgment(comparison, result.judgment),
+    evaluatorRequest: request,
+    rawEvaluatorResponse: result.rawResponse,
+    usage: result.rawResponse?.usage || null
   };
 }
 

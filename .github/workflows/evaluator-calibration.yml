@@ -16,17 +16,17 @@ on:
         type: string
         default: "10599295492"
 
-      pair_count:
-        description: Number of saved eligible pairs to evaluate
-        required: true
-        type: number
-        default: 8
-
       evaluator_model:
         description: OpenAI model used for independent qualitative assessment
         required: true
         type: string
-        default: gpt-4.1-mini
+        default: gpt-5.6-luna
+
+      tournament_cohorts:
+        description: Number of complete topic cohorts to include in tournament calibration
+        required: true
+        type: number
+        default: 3
 
 permissions:
   actions: read
@@ -40,9 +40,10 @@ jobs:
 
     env:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10599295492' }}
-      PAIR_COUNT: ${{ inputs.pair_count || '32' }}
-      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-4.1-mini' }}
-      CALIBRATION_REVISION: v9
+      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
+      TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-luna' }}
+      TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '3' }}
+      CALIBRATION_REVISION: tournament-v1
 
     steps:
       - name: Check out repository
@@ -75,7 +76,7 @@ jobs:
           mkdir -p saved-capture
           unzip -q saved-capture.zip -d saved-capture
 
-      - name: Select calibration pairs
+      - name: Select calibration corpus
         shell: bash
         run: |
           capture_path="$(find saved-capture -type f -name 'portfolio-generation-capture-*.json' -print -quit)"
@@ -84,30 +85,19 @@ jobs:
             exit 1
           fi
 
-          node --input-type=module - "$capture_path" calibration-input.json "$PAIR_COUNT" <<'NODE'
+          node --input-type=module - "$capture_path" calibration-input.json <<'NODE'
           import { readFileSync, writeFileSync } from "node:fs";
 
-          const [inputPath, outputPath, countText] = process.argv.slice(2);
+          const [inputPath, outputPath] = process.argv.slice(2);
           const source = JSON.parse(readFileSync(inputPath, "utf8"));
-          const count = Number.parseInt(countText, 10);
-          if (!Number.isInteger(count) || count < 1) throw new Error("PAIR_COUNT must be a positive integer");
-
-          const pairs = source.pairs.filter((pair) => pair.eligibility?.qualitativeEligible !== false).slice(0, count);
-          if (pairs.length !== count) throw new Error(`Only ${pairs.length} eligible pairs were available`);
-          const runIds = new Set(pairs.flatMap((pair) => [pair.controlRunId, pair.treatmentRunId]));
 
           const sample = {
             ...source,
-            pairs,
-            runs: source.runs.filter((run) => runIds.has(run.runId)),
-            evaluations: [],
-            qualitative: null,
-            shortlist: [],
-            sanity: null
+            tournament: null
           };
 
           writeFileSync(outputPath, `${JSON.stringify(sample, null, 2)}\n`, "utf8");
-          console.log(`Selected ${pairs.length} pairs and ${sample.runs.length} runs from ${inputPath}`);
+          console.log(`Prepared ${sample.runs.length} saved runs from ${inputPath}`);
           NODE
 
       - name: Run evaluator calibration
@@ -121,7 +111,7 @@ jobs:
             exit 1
           fi
 
-          npm run eval:evaluate -- calibration-input.json --output calibration-results
+          npm run eval:evaluate -- calibration-input.json --output calibration-results --tournament-only --tournament-cohorts "$TOURNAMENT_COHORTS"
 
       - name: Upload calibration results
         if: always()

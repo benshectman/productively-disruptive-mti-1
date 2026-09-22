@@ -103,7 +103,7 @@ function arbitrationPlacement(pair) {
 }
 
 export function buildMarkdownReport(bundle) {
-  const { metadata, reliability, qualitative, shortlist = [], runs, sanity } = bundle;
+  const { metadata, reliability, qualitative, tournament, shortlist = [], runs, sanity } = bundle;
   const lines = [
     "# Portfolio generation evaluation",
     "",
@@ -281,6 +281,60 @@ export function buildMarkdownReport(bundle) {
     );
   }
 
+  lines.push("## Relative-quality tournament", "");
+  if (!tournament?.summary) {
+    lines.push("The relative tournament was not run. No tournament ranking is available.", "");
+  } else {
+    const summary = tournament.summary;
+    const controlPlacement = summary.placement?.control || {};
+    const treatmentPlacement = summary.placement?.treatment || {};
+    lines.push(
+      `Regression interpretation: **Treatment ${summary.interpretation}.** This is decision support, not a final editorial verdict.`,
+      "",
+      `${tournament.method}. ${tournament.caveat}`,
+      "",
+      `Evaluator: \`${tournament.evaluatorModel || "not recorded"}\`. Calls: ${tournament.usage?.calls || 0}. Pairwise comparisons: ${summary.comparisonCount}; decisive: ${summary.decisiveComparisonCount}; mirrored: ${summary.mirroredComparisons}; unstable: ${summary.unstableComparisons?.length || 0}.`,
+      "",
+      "| Indicator | Control | Treatment |",
+      "| --- | ---: | ---: |",
+      `| Cohort winners | ${controlPlacement.first || 0} | ${treatmentPlacement.first || 0} |`,
+      `| Direct head-to-head wins | ${summary.directWins?.control || 0} | ${summary.directWins?.treatment || 0} |`,
+      `| Mean rank | ${summary.rankStatistics?.control?.mean?.toFixed?.(2) ?? "n/a"} | ${summary.rankStatistics?.treatment?.mean?.toFixed?.(2) ?? "n/a"} |`,
+      `| Median rank | ${summary.rankStatistics?.control?.median ?? "n/a"} | ${summary.rankStatistics?.treatment?.median ?? "n/a"} |`,
+      `| Top-2 placements | ${controlPlacement.top2 || 0} | ${treatmentPlacement.top2 || 0} |`,
+      `| Top-3 placements | ${controlPlacement.top3 || 0} | ${treatmentPlacement.top3 || 0} |`,
+      `| Bottom placements | ${controlPlacement.bottom || 0} | ${treatmentPlacement.bottom || 0} |`,
+      "",
+      `Direct treatment win rate: ${percent(summary.directTreatmentWinRate)} across ${summary.directControlTreatmentComparisons} control-vs-treatment comparisons.`,
+      `Margins: ${counts(summary.margins)}. Confidence: ${counts(summary.confidence)}.`,
+      `A-vs-B wins: A ${summary.positionBias?.aWins || 0}, B ${summary.positionBias?.bWins || 0}. Suspicious imbalance flagged: ${summary.positionBias?.suspicious ? "yes" : "no"}.`,
+      `Substantial treatment losses: ${summary.substantialTreatmentLosses?.length || 0}. Treatment-bottom cohorts: ${summary.treatmentBottomTopics?.join(", ") || "none"}. Repeated-regression cohorts: ${summary.repeatedTreatmentRegressions?.join(", ") || "none"}.`,
+      ""
+    );
+    for (const cohort of tournament.cohorts || []) {
+      lines.push(
+        `### ${cohort.topicConfiguration.label}`,
+        "",
+        "| Rank | Candidate | Environment | W | L | Unresolved | Relative strength |",
+        "| ---: | --- | --- | ---: | ---: | ---: | ---: |"
+      );
+      for (const candidate of cohort.ranking || []) {
+        lines.push(`| ${candidate.rank} | ${candidate.environment === "control" ? "Control" : "Treatment"} rep ${candidate.repetition} | ${candidate.environment} | ${candidate.wins} | ${candidate.losses} | ${candidate.unresolved} | ${candidate.relativeStrength.toFixed(3)} |`);
+      }
+      lines.push("");
+    }
+    if (tournament.humanReviewShortlist?.length) {
+      lines.push(
+        "### Tournament comparisons for manual review",
+        "",
+        "| Cohort | Comparison | Reason |",
+        "| --- | --- | --- |",
+        ...tournament.humanReviewShortlist.map((item) => `| ${escapeCell(item.cohortId)} | \`${item.comparisonId}\` | ${escapeCell(item.reason)} |`),
+        ""
+      );
+    }
+  }
+
   lines.push("## Cases Ben should review", "");
   if (!shortlist.length) lines.push("No qualitative shortlist is available yet.", "");
   const runMap = new Map(runs.map((run) => [run.runId, run]));
@@ -343,7 +397,7 @@ export function buildMarkdownReport(bundle) {
     "## Raw results",
     "",
     qualitative
-      ? "The companion JSON artifact contains every request mapping, independent control and treatment assessment, deterministic comparison, arbitration request and response when required, placement metadata, diagnostic field, evaluator response, and final classification. No source prose was discarded."
+      ? "The companion JSON artifact contains every request mapping, independent control and treatment assessment, deterministic comparison, arbitration request and response when required, tournament pairwise judgment and placement mapping, diagnostic field, evaluator response, and final classification. No source prose was discarded."
       : "The companion JSON artifact contains every request mapping, response payload, diagnostic field, and source prose. Qualitative evaluator records will be added when that pass runs. No source prose was discarded.",
     ""
   );

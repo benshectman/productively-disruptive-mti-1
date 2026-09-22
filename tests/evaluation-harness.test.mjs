@@ -22,13 +22,24 @@ import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
 import {
   buildArbitrationBody,
   buildIndependentAssessmentBody,
+  buildTournamentBody,
+  evaluateTournamentComparison,
   evaluatePair,
   INDEPENDENT_CRITERION_RUBRICS,
   INDEPENDENT_OVERALL_RUBRIC,
   preflightEvaluator
 } from "../scripts/evaluation/evaluator.mjs";
 import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
-import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
+import { args, evaluateBundle, evaluateTournamentBundle, needsQualitativeEvaluation, needsTournamentEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
+import {
+  aggregateTournament,
+  createTournamentCohorts,
+  mapTournamentJudgment,
+  mirrorTournamentComparison,
+  rankTournamentCohort,
+  reconcileTournamentMirror,
+  tournamentRequest
+} from "../scripts/evaluation/tournament.mjs";
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
 import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata.ts";
 import { assembleApprovedBenFactsNarrative } from "../src/shared/approved-benfacts.ts";
@@ -190,6 +201,196 @@ describe("evaluator evidence context", () => {
     expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"]).toEqual(
       buildEligibleSectionEvidencePools(["T-003"]).find((pool) => pool.sectionId === "operating-model").facts
     );
+  });
+});
+
+describe("relative-quality tournament", () => {
+  function sixRuns(configuration = "one") {
+    return [1, 2, 3].flatMap((repetition) => [run("control", configuration, repetition), run("treatment", configuration, repetition)]);
+  }
+
+  function result(comparison, winner = "A_stronger", margin = "clear", confidence = "high") {
+    const judgment = { winner, margin, confidence, rationale: "Sharper synthesis and a clearer throughline." };
+    return { comparison, judgment, mappedJudgment: mapTournamentJudgment(comparison, judgment), durationMs: 100, usage: { input_tokens: 10, output_tokens: 5, total_tokens: 15 } };
+  }
+
+  it("creates all 15 unique round-robin comparisons with no self-comparisons", () => {
+    const [cohort] = createTournamentCohorts(sixRuns(), "seed");
+    expect(cohort.candidates).toHaveLength(6);
+    expect(cohort.comparisons).toHaveLength(15);
+    expect(new Set(cohort.comparisons.map((item) => item.candidateIds.join(":"))).size).toBe(15);
+    expect(cohort.comparisons.every((item) => item.candidateIds[0] !== item.candidateIds[1])).toBe(true);
+    const appearances = Object.fromEntries(cohort.candidates.map((candidate) => [candidate.candidateId, 0]));
+    for (const comparison of cohort.comparisons) for (const id of comparison.candidateIds) appearances[id] += 1;
+    expect(Object.values(appearances)).toEqual([5, 5, 5, 5, 5, 5]);
+  });
+
+  it("counterbalances A/B placement for every candidate", () => {
+    const first = createTournamentCohorts(sixRuns(), "seed")[0];
+    const second = createTournamentCohorts(sixRuns(), "seed")[0];
+    expect(first).toEqual(second);
+    const byCandidate = Object.fromEntries(first.candidates.map((candidate) => [candidate.candidateId, { A: 0, B: 0 }]));
+    for (const comparison of first.comparisons) {
+      byCandidate[comparison.blind.A].A += 1;
+      byCandidate[comparison.blind.B].B += 1;
+    }
+    for (const placement of Object.values(byCandidate)) expect(Math.abs(placement.A - placement.B)).toBeLessThanOrEqual(1);
+  });
+
+  it("keeps environment and model identity out of blinded evaluator input", () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    const request = tournamentRequest(comparison, new Map(runs.map((item) => [item.runId, item])));
+    const serialized = JSON.stringify(request);
+    expect(Object.keys(request)).toEqual(["topicConfiguration", "responseA", "responseB"]);
+    expect(serialized).not.toContain("environment");
+    expect(serialized).not.toContain("develop");
+    expect(serialized).not.toContain("feature/example");
+    expect(serialized).not.toContain("model");
+  });
+
+  it.each([["A_stronger", "A"], ["B_stronger", "B"]])("maps %s back to the correct candidate", (winner, position) => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mapped = mapTournamentJudgment(comparison, { winner, margin: "slight", confidence: "medium", rationale: "Editorial distinction" });
+    expect(mapped.winnerCandidateId).toBe(comparison.blind[position]);
+    expect(mapped.winnerEnvironment).toBe(comparison.mappedCandidates[position].environment);
+    expect(mapped.margin).toBe("slight");
+    expect(mapped.confidence).toBe("medium");
+  });
+
+  it("does not create an arbitrary winner for exceptional unclear results", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    expect(mapTournamentJudgment(comparison, { winner: "unclear", margin: "slight", confidence: "low", rationale: "Insufficient information" })).toMatchObject({ winnerCandidateId: null, winnerEnvironment: null });
+  });
+
+  it("uses the forced-preference schema and editorial prompt", () => {
+    const body = buildTournamentBody({}, "test-model");
+    expect(body.text.format.schema.properties.winner.enum).toEqual(["A_stronger", "B_stronger", "unclear"]);
+    expect(body.text.format.schema.properties.margin.enum).toEqual(["slight", "clear", "substantial"]);
+    expect(body.text.format.schema.properties.confidence.enum).toEqual(["low", "medium", "high"]);
+    expect(body.instructions).toContain("If only one could be published");
+    expect(body.instructions).toContain("There is no ordinary equivalent option");
+  });
+
+  it("parses a tournament response and preserves audit mapping and usage", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async (_url, init) => {
+        const body = JSON.parse(init.body);
+        expect(body.input).not.toContain("environment");
+        return new Response(JSON.stringify({ output_text: JSON.stringify({ winner: "B_stronger", margin: "substantial", confidence: "high", rationale: "Better synthesis." }), usage: { input_tokens: 100, output_tokens: 20, total_tokens: 120 } }), { status: 200 });
+      }
+    });
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.B);
+    expect(evaluated.judgment).toMatchObject({ margin: "substantial", confidence: "high" });
+    expect(evaluated.placement.candidateMapping.B.candidateId).toBe(comparison.blind.B);
+    expect(evaluated.usage.total_tokens).toBe(120);
+  });
+
+  it("maps a selective mirror and flags an order-sensitive reversal as unstable", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mirroredComparison = mirrorTournamentComparison(comparison);
+    expect(mirroredComparison.blind).toEqual({ A: comparison.blind.B, B: comparison.blind.A });
+    const original = result(comparison, "A_stronger");
+    const stableMirror = result(mirroredComparison, "B_stronger");
+    expect(reconcileTournamentMirror(original, stableMirror)).toMatchObject({ unstable: false, winnerCandidateId: comparison.blind.A });
+    const reversedMirror = result(mirroredComparison, "A_stronger");
+    expect(reconcileTournamentMirror(original, reversedMirror)).toMatchObject({ unstable: true, winnerCandidateId: null });
+  });
+
+  it("aggregates wins, losses, direct environment outcomes, and deterministic ranking", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = cohort.comparisons.map((comparison) => result(comparison, "A_stronger"));
+    const first = rankTournamentCohort(cohort, results);
+    const second = rankTournamentCohort(cohort, results);
+    expect(first).toEqual(second);
+    expect(first.reduce((sum, candidate) => sum + candidate.wins, 0)).toBe(15);
+    expect(first.reduce((sum, candidate) => sum + candidate.losses, 0)).toBe(15);
+    const aggregate = aggregateTournament([cohort], results);
+    expect(aggregate.summary.directControlTreatmentComparisons).toBe(9);
+    expect(aggregate.summary.directWins.control + aggregate.summary.directWins.treatment).toBe(9);
+    expect(aggregate.summary.placement.control.top3 + aggregate.summary.placement.treatment.top3).toBe(3);
+  });
+
+  it("handles a non-transitive A over B, B over C, C over A cycle", () => {
+    const runs = [run("control", "cycle", 1), run("control", "cycle", 2), run("treatment", "cycle", 1)];
+    const cohort = createTournamentCohorts(runs, "cycle-seed")[0];
+    const [a, b, c] = cohort.candidates;
+    const desiredWinner = new Map([[`${a.candidateId}:${b.candidateId}`, a.candidateId], [`${b.candidateId}:${c.candidateId}`, b.candidateId], [`${a.candidateId}:${c.candidateId}`, c.candidateId]]);
+    const results = cohort.comparisons.map((comparison) => {
+      const winnerId = desiredWinner.get(comparison.candidateIds.join(":"));
+      return result(comparison, comparison.blind.A === winnerId ? "A_stronger" : "B_stronger");
+    });
+    const ranking = rankTournamentCohort(cohort, results);
+    expect(ranking).toHaveLength(3);
+    expect(ranking.every((candidate) => Number.isFinite(candidate.relativeStrength))).toBe(true);
+    expect(ranking.map((candidate) => candidate.wins).sort()).toEqual([1, 1, 1]);
+  });
+
+  it("retains unstable matchups as unresolved in ranking and review data", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const comparison = cohort.comparisons[0];
+    const original = result(comparison, "A_stronger", "slight", "low");
+    original.mirror = result(mirrorTournamentComparison(comparison), "A_stronger");
+    original.mirrorAudit = reconcileTournamentMirror(original, original.mirror);
+    const ranking = rankTournamentCohort(cohort, [original]);
+    expect(original.mirrorAudit.unstable).toBe(true);
+    expect(ranking.reduce((sum, candidate) => sum + candidate.unresolved, 0)).toBe(2);
+    expect(aggregateTournament([cohort], [original]).summary.unstableComparisons).toEqual([comparison.comparisonId]);
+  });
+
+  it("excludes failed and fallback candidates under existing reliability rules", () => {
+    const runs = sixRuns();
+    runs[0] = { ...runs[0], ok: false };
+    runs[1] = { ...runs[1], totalFallbackFields: 1 };
+    const cohort = createTournamentCohorts(runs, "seed")[0];
+    expect(cohort.candidates).toHaveLength(4);
+    expect(cohort.comparisons).toHaveLength(6);
+    expect(cohort.excludedCandidates.map((candidate) => candidate.reason).sort()).toEqual(["fallback-containing-response", "generation-failed"]);
+  });
+
+  it("resumes tournament progress without repeating completed comparisons", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const completed = result(cohorts[0].comparisons[0]);
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [completed] } };
+    const evaluated = [];
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(true);
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorLowConfidence: false, mirrorSlight: false, mirrorTopImpact: false }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: "test-model",
+      evaluator: async ({ comparison }) => {
+        evaluated.push(comparison.comparisonId);
+        return result(comparison);
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toHaveLength(14);
+    expect(evaluated).not.toContain(completed.comparison.comparisonId);
+    expect(bundle.tournament.comparisons).toHaveLength(15);
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(false);
+  });
+
+  it("renders a separated tournament summary and cohort ranking", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = cohort.comparisons.map((comparison) => result(comparison));
+    const aggregate = aggregateTournament([cohort], results);
+    const tournament = { ...aggregate, evaluatorModel: "gpt-5.6-luna", usage: { calls: 15 }, humanReviewShortlist: [] };
+    const report = buildMarkdownReport({
+      metadata: { generatedAt: "2026-09-22T00:00:00Z", environments: { control: { id: "develop" }, treatment: { id: "experiment" } }, topicConfigurationCount: 1, repetitions: 3 },
+      reliability: aggregateReliability(sixRuns()), qualitative: null, tournament, shortlist: [], runs: sixRuns(), sanity: null
+    });
+    expect(report).toContain("## Relative-quality tournament");
+    expect(report).toContain("Regression interpretation:");
+    expect(report).toContain("| Rank | Candidate | Environment | W | L | Unresolved | Relative strength |");
+    expect(report).toContain("Calls: 15");
   });
 });
 
