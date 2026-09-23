@@ -41,6 +41,7 @@ import {
   referenceComparison,
   selectValidationMirrors
 } from "../scripts/evaluation/cross-provider-validation.mjs";
+import { OPENROUTER_FULL_TOURNAMENT_MODEL } from "../scripts/evaluation/full-tournament-validation.mjs";
 import { args, evaluateBundle, evaluateTournamentBundle, needsQualitativeEvaluation, needsTournamentEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import {
   aggregateTournament,
@@ -220,6 +221,7 @@ describe("evaluator evidence context", () => {
 describe("evaluator provider adapter", () => {
   it("pins the sparse OpenRouter validation to the exact paid Qwen model", () => {
     expect(OPENROUTER_VALIDATION_MODEL).toBe("qwen/qwen3-235b-a22b-2507");
+    expect(OPENROUTER_FULL_TOURNAMENT_MODEL).toBe("qwen/qwen3-235b-a22b-2507");
   });
 
   it("pins the workflow provider and model instead of relying on OpenRouter routing preferences", async () => {
@@ -227,6 +229,8 @@ describe("evaluator provider adapter", () => {
     expect(workflow).toContain("EVAL_PROVIDER: openrouter");
     expect(workflow).toContain("EVAL_MODEL: qwen/qwen3-235b-a22b-2507");
     expect(workflow).toContain("OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}");
+    expect(workflow).toContain("eval:full-qwen-tournament");
+    expect(workflow).toContain("qwen-full-tournament-validation-${{ github.run_id }}");
   });
 
   it("defaults to OpenAI and selects OpenRouter explicitly", () => {
@@ -504,7 +508,9 @@ describe("relative-quality tournament", () => {
     const ranking = rankTournamentCohort(cohort, [original]);
     expect(original.mirrorAudit.unstable).toBe(true);
     expect(ranking.reduce((sum, candidate) => sum + candidate.unresolved, 0)).toBe(2);
-    expect(aggregateTournament([cohort], [original]).summary.unstableComparisons).toEqual([comparison.comparisonId]);
+    const aggregate = aggregateTournament([cohort], [original]);
+    expect(aggregate.summary.unstableComparisons).toEqual([comparison.comparisonId]);
+    expect(aggregate.summary.directWins.control + aggregate.summary.directWins.treatment).toBe(0);
   });
 
   it("excludes failed and fallback candidates under existing reliability rules", () => {
@@ -570,6 +576,56 @@ describe("relative-quality tournament", () => {
     expect(evaluated).not.toContain(completed.comparison.comparisonId);
     expect(bundle.tournament.comparisons).toHaveLength(15);
     expect(needsTournamentEvaluation(bundle, cohorts)).toBe(false);
+  });
+
+  it("mirrors every eligible base comparison and preserves a stable underlying winner", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [] } };
+    const evaluated = [];
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorEvery: true, maxAttempts: 6, retryDelayMs: 5000 }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: OPENROUTER_FULL_TOURNAMENT_MODEL,
+      provider: "openrouter",
+      evaluator: async ({ comparison, maxAttempts, retryDelayMs }) => {
+        evaluated.push(comparison);
+        expect(maxAttempts).toBe(6);
+        expect(retryDelayMs).toBe(5000);
+        const winnerCandidateId = [...comparison.candidateIds].sort()[0];
+        return result(comparison, comparison.blind.A === winnerCandidateId ? "A_stronger" : "B_stronger");
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toHaveLength(30);
+    expect(bundle.tournament.comparisons).toHaveLength(15);
+    expect(bundle.tournament.comparisons.every((item) => item.mirror && item.mirrorAudit?.unstable === false)).toBe(true);
+    expect(bundle.tournament.comparisons.every((item) => item.mirror.comparison.blind.A === item.comparison.blind.B
+      && item.mirror.comparison.blind.B === item.comparison.blind.A)).toBe(true);
+    expect(bundle.tournament.summary).toMatchObject({ stableComparisons: 15, mirroredComparisons: 15 });
+  });
+
+  it("neutralizes orientation-dependent winners across all pair types", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [] } };
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorEvery: true }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: "test-model",
+      evaluator: async ({ comparison }) => result(comparison, "A_stronger"),
+      persist: async () => {}
+    });
+    expect(bundle.tournament.comparisons.every((item) => item.mirrorAudit?.unstable)).toBe(true);
+    expect(bundle.tournament.summary.directWins).toEqual({ control: 0, treatment: 0 });
+    expect(bundle.tournament.summary.stabilityByType).toMatchObject({
+      controlTreatment: { total: 9, stable: 0, unstable: 9 },
+      controlControl: { total: 3, stable: 0, unstable: 3 },
+      treatmentTreatment: { total: 3, stable: 0, unstable: 3 }
+    });
+    expect(bundle.tournament.cohorts[0].graph).toMatchObject({ stableEdges: 0, connectedComponents: 6, orderingStrength: "underdetermined" });
   });
 
   it("recognizes a failed selective mirror as resumable work", () => {
