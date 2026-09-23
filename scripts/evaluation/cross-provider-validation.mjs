@@ -12,7 +12,7 @@ import {
   selectStratifiedDirectComparisons
 } from "./tournament.mjs";
 
-export const OPENROUTER_VALIDATION_MODEL = "qwen/qwen3.8-27b:free";
+export const OPENROUTER_VALIDATION_MODEL = "qwen/qwen3-235b-a22b-2507";
 const MAX_CLEAR_HIGH_MIRRORS = 4;
 const PREFLIGHT_MAX_ATTEMPTS = 8;
 const PREFLIGHT_RETRY_DELAY_MS = 15_000;
@@ -108,16 +108,17 @@ export function selectValidationMirrors(results, { clearHighSampleSize = MAX_CLE
   return [...required, ...clearHigh];
 }
 
-export function summarizeValidation({ comparisons, references = {}, startedAt, completedAt, preflight, sample }) {
+export function summarizeValidation({ comparisons, references = {}, startedAt, completedAt, preflight, sample, reliabilityExclusions = [] }) {
   const baseDirections = comparisons.map(resultDirection);
   const successful = comparisons.filter((result) => !result.error && !result.excluded);
   const margins = successful.map((result) => result.judgment.margin);
   const confidences = successful.map((result) => result.judgment.confidence);
-  const cohorts = [...new Set(comparisons.map((result) => result.comparison.cohortId))].map((cohortId) => {
+  const cohorts = [...new Set([...sample.map((comparison) => comparison.cohortId), ...reliabilityExclusions.map((exclusion) => exclusion.cohortId)])].map((cohortId) => {
     const results = comparisons.filter((result) => result.comparison.cohortId === cohortId);
     const directions = results.map(resultDirection);
-    const cohortCounts = counts(directions, ["control", "treatment", "unclear", "failure", "excluded"]);
-    return { cohortId, ...cohortCounts, direction: cohortCounts.treatment > cohortCounts.control ? "treatment" : cohortCounts.control > cohortCounts.treatment ? "control" : "mixed" };
+    const cohortCounts = counts(directions, ["control", "treatment", "unclear", "failure"]);
+    const excluded = reliabilityExclusions.filter((exclusion) => exclusion.cohortId === cohortId).length;
+    return { cohortId, ...cohortCounts, excluded, direction: cohortCounts.treatment > cohortCounts.control ? "treatment" : cohortCounts.control > cohortCounts.treatment ? "control" : "mixed" };
   });
   const referenceAgreement = Object.fromEntries(Object.entries(references).map(([name, reference]) => [name, referenceComparison(comparisons, reference)]));
   const lunaSolRates = [referenceAgreement.luna?.agreementRate, referenceAgreement.sol?.agreementRate].filter((value) => value != null);
@@ -147,14 +148,14 @@ export function summarizeValidation({ comparisons, references = {}, startedAt, c
     },
     sample: {
       baseComparisons: sample.length,
-      validProseComparisons: sample.filter((comparison) => comparison.qualitativeEligible !== false).length,
-      excludedReliabilityCases: sample.filter((comparison) => comparison.qualitativeEligible === false).length,
+      validProseComparisons: sample.length,
+      excludedReliabilityCases: reliabilityExclusions.length,
       cohorts: cohorts.length,
       treatmentAsA,
       controlAsA: sample.length - treatmentAsA,
       repetitions
     },
-    outcomes: counts(baseDirections, ["control", "treatment", "unclear", "failure", "excluded"]),
+    outcomes: counts(baseDirections, ["control", "treatment", "unclear", "failure"]),
     margins: counts(margins, ["slight", "clear", "substantial"]),
     confidence: counts(confidences, ["low", "medium", "high"]),
     mirrorAudit: {
@@ -165,6 +166,7 @@ export function summarizeValidation({ comparisons, references = {}, startedAt, c
       failures: mirrors.filter((result) => result.mirrorError).length
     },
     cohorts,
+    reliabilityExclusions,
     api,
     preflight,
     referenceAgreement,
@@ -183,11 +185,11 @@ function markdown(summary) {
     "",
     `Model: \`${summary.metadata.evaluatorModel}\` via OpenRouter`,
     "",
-    "This is a 33-slot stratified direct control-vs-treatment validation. Reliability exclusions remain separate from prose-quality judgments. It does not fit or report a six-way Bradley-Terry ranking.",
+    "This is a sparse stratified direct control-vs-treatment validation with up to three eligible pairs per cohort. Reliability exclusions remain separate from prose-quality judgments. It does not fit or report a six-way Bradley-Terry ranking.",
     "",
     "## Overall",
     "",
-    `- Base comparison slots: ${summary.sample.baseComparisons}`,
+    `- Base comparisons attempted: ${summary.sample.baseComparisons}`,
     `- Valid prose-quality comparisons: ${summary.sample.validProseComparisons}`,
     `- Excluded reliability/fallback cases: ${summary.sample.excludedReliabilityCases}`,
     `- Treatment wins: ${summary.outcomes.treatment}`,
@@ -253,7 +255,14 @@ async function main() {
   const cohorts = createTournamentCohorts(source.runs, source.config?.tournament?.pairingSeed || "portfolio-generation-tournament-v1");
   if (cohorts.length !== 11) throw new Error(`Expected 11 topic cohorts; found ${cohorts.length}`);
   const sample = selectStratifiedDirectComparisons(cohorts);
-  if (sample.length !== 33) throw new Error(`Expected 33 sampled comparisons; found ${sample.length}`);
+  if (!sample.length || sample.length > 33) throw new Error(`Expected between 1 and 33 eligible sampled comparisons; found ${sample.length}`);
+  const reliabilityExclusions = cohorts.flatMap((cohort) => cohort.excludedCandidates.map((candidate) => ({
+    cohortId: cohort.cohortId,
+    candidateId: candidate.candidateId,
+    environment: candidate.environment,
+    repetition: candidate.repetition,
+    reason: candidate.reason
+  })));
   const references = Object.fromEntries(await Promise.all(options.references.map(async ({ name, filename }) => [name, JSON.parse(await readFile(filename, "utf8"))])));
   const runsById = new Map(source.runs.map((run) => [run.runId, run]));
   await mkdir(options.output, { recursive: true });
@@ -272,7 +281,7 @@ async function main() {
     }
   }
   let comparisons = [];
-  const persist = async () => writeFile(checkpointPath, `${JSON.stringify({ startedAt, preflight, sample, comparisons }, null, 2)}\n`, "utf8");
+  const persist = async () => writeFile(checkpointPath, `${JSON.stringify({ startedAt, preflight, sample, reliabilityExclusions, comparisons }, null, 2)}\n`, "utf8");
   try {
     const checkpoint = JSON.parse(await readFile(checkpointPath, "utf8"));
     if (Array.isArray(checkpoint.comparisons)) comparisons = checkpoint.comparisons;
@@ -335,7 +344,7 @@ async function main() {
     await delay(1_000);
   }
   const completedAt = new Date().toISOString();
-  const summary = summarizeValidation({ comparisons, references, startedAt, completedAt, preflight, sample });
+  const summary = summarizeValidation({ comparisons, references, startedAt, completedAt, preflight, sample, reliabilityExclusions });
   await writeFile(checkpointPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
   await writeFile(path.join(options.output, "qwen-validation.md"), markdown(summary), "utf8");
   console.log(markdown(summary));

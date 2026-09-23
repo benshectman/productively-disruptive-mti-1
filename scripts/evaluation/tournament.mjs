@@ -127,39 +127,40 @@ export function canonicalPairIdentity(comparison) {
   return `${cohortId}|${candidateIds.join("|")}`;
 }
 
-function sparseComparison(cohort, left, right, seed) {
-  const comparison = directComparison(cohort, left, right, seed);
-  const excludedCandidates = [left, right].filter((candidate) => candidate.reason);
-  if (!excludedCandidates.length) return { ...comparison, qualitativeEligible: true };
-  return {
-    ...comparison,
-    qualitativeEligible: false,
-    exclusion: {
-      category: "reliability",
-      reason: excludedCandidates.map((candidate) => candidate.reason).join(","),
-      excludedCandidates: excludedCandidates.map((candidate) => ({ ...candidate }))
-    }
-  };
+function combinations(values, size) {
+  if (size === 0) return [[]];
+  if (values.length < size) return [];
+  return values.flatMap((value, index) => combinations(values.slice(index + 1), size - 1)
+    .map((tail) => [value, ...tail]));
 }
 
 export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cross-provider-validation-v1") {
   const optionsByCohort = cohorts.map((cohort) => {
-    const capturedCandidates = [...cohort.candidates, ...cohort.excludedCandidates];
-    const control = capturedCandidates.filter((candidate) => candidate.environment === "control")
+    const control = cohort.candidates.filter((candidate) => candidate.environment === "control")
       .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
-    const treatment = capturedCandidates.filter((candidate) => candidate.environment === "treatment")
+    const treatment = cohort.candidates.filter((candidate) => candidate.environment === "treatment")
       .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
-    if (control.length !== 3 || treatment.length !== 3) {
-      throw new Error(`Cohort ${cohort.cohortId} must contain exactly three captured control and treatment repetitions`);
-    }
-    return permutations(treatment).map((orderedTreatment) => {
-      const comparisons = control.map((candidate, index) => sparseComparison(cohort, candidate, orderedTreatment[index], seed));
+    const comparisonCount = Math.min(3, control.length, treatment.length);
+    if (!comparisonCount) return [{ comparisons: [], treatmentAsA: 0, signature: `${cohort.cohortId}:empty`, repetitionPenalty: 0 }];
+    const options = combinations(control, comparisonCount).flatMap((selectedControl) =>
+      combinations(treatment, comparisonCount).flatMap((selectedTreatment) => permutations(selectedTreatment).map((orderedTreatment) => {
+      const comparisons = selectedControl.map((candidate, index) => ({
+        ...directComparison(cohort, candidate, orderedTreatment[index], seed),
+        qualitativeEligible: true
+      }));
+      const repetitionPenalty = [1, 2, 3].reduce((total, repetition) => total
+        + Math.abs(selectedControl.filter((candidate) => candidate.repetition === repetition).length
+          - orderedTreatment.filter((candidate) => candidate.repetition === repetition).length), 0);
       return {
         comparisons,
         treatmentAsA: comparisons.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length,
-        signature: comparisons.map((comparison) => comparison.comparisonId).join(":")
+        signature: comparisons.map((comparison) => comparison.comparisonId).join(":"),
+        repetitionPenalty
       };
-    }).sort((left, right) => stableHash(`${seed}:${cohort.cohortId}:${left.signature}`)
+    })));
+    const minimumRepetitionPenalty = Math.min(...options.map((option) => option.repetitionPenalty));
+    return options.filter((option) => option.repetitionPenalty === minimumRepetitionPenalty)
+      .sort((left, right) => stableHash(`${seed}:${cohort.cohortId}:${left.signature}`)
       .localeCompare(stableHash(`${seed}:${cohort.cohortId}:${right.signature}`)));
   });
 
@@ -179,7 +180,7 @@ export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cro
     }
     states = next;
   }
-  const total = cohorts.length * 3;
+  const total = optionsByCohort.reduce((sum, options) => sum + options[0].comparisons.length, 0);
   const selected = [...states.values()].sort((left, right) =>
     Math.abs(left.treatmentAsA - total / 2) - Math.abs(right.treatmentAsA - total / 2)
     || stableHash(`${seed}:${left.signature}`).localeCompare(stableHash(`${seed}:${right.signature}`)))[0];
