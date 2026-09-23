@@ -928,6 +928,23 @@ describe("evaluation harness", () => {
     expect(result.evaluatorModel).toBe("test-model");
   });
 
+  it("preflights OpenRouter with validated strict JSON and enough output room for reasoning models", async () => {
+    let requestBody;
+    const result = await preflightEvaluator({
+      apiKey: "test-key",
+      model: "qwen/qwen3.8-27b:free",
+      provider: "openrouter",
+      fetcher: async (_url, init) => {
+        requestBody = JSON.parse(init.body);
+        return new Response(JSON.stringify({ choices: [{ message: { content: '```json\n{"status":"EVALUATOR_PREFLIGHT_OK"}\n```' } }] }), { status: 200 });
+      }
+    });
+    expect(requestBody).toMatchObject({ model: "qwen/qwen3.8-27b:free", max_tokens: 256 });
+    expect(requestBody.messages[0].content).toContain("strict JSON");
+    expect(JSON.stringify(requestBody)).not.toContain("Approved evidence");
+    expect(result).toMatchObject({ evaluatorModel: "qwen/qwen3.8-27b:free", evaluatorProvider: "openrouter" });
+  });
+
   it("supports explicit staged evaluation and atomically persists checkpoints", async () => {
     expect(args(["--evaluate-existing", "capture.json", "--output", "reports"])).toMatchObject({ input: "capture.json", output: "reports" });
     const directory = await mkdtemp(path.join(os.tmpdir(), "portfolio-eval-checkpoint-"));
