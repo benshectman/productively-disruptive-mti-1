@@ -1,6 +1,6 @@
-name: Evaluator Calibration
+name: OpenRouter Evaluator Validation
 
-run-name: Calibrate evaluator on saved response pairs
+run-name: Validate saved control-vs-treatment pairs with Nemotron
 
 on:
   push:
@@ -8,42 +8,30 @@ on:
       - experiment/gpt-5-6-luna-comparison-2026-09-20
     paths:
       - .github/workflows/evaluator-calibration.yml
+      - scripts/evaluation/cross-provider-validation.mjs
+      - scripts/evaluation/evaluator-provider.mjs
+      - scripts/evaluation/evaluator.mjs
+      - scripts/evaluation/tournament.mjs
+      - tests/evaluation-harness.test.mjs
+      - package.json
   workflow_dispatch:
-    inputs:
-      artifact_id:
-        description: Existing GitHub Actions artifact containing a capture JSON
-        required: true
-        type: string
-        default: "10718309826"
-
-      evaluator_model:
-        description: OpenAI model used for independent qualitative assessment
-        required: true
-        type: string
-        default: gpt-5.6-sol
-
-      tournament_cohorts:
-        description: Number of complete topic cohorts to include in tournament calibration
-        required: true
-        type: number
-        default: 11
 
 permissions:
   actions: read
   contents: read
 
 jobs:
-  calibrate:
-    name: Evaluate saved response pairs
+  validate:
+    name: Evaluate stratified saved pairs
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     env:
-      ARTIFACT_ID: ${{ inputs.artifact_id || '10718309826' }}
-      EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
-      TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
-      TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '11' }}
-      CALIBRATION_REVISION: tournament-full-corpus-gpt-5-6-sol-v3-fresh
+      EVAL_PROVIDER: openrouter
+      EVAL_MODEL: nvidia/nemotron-3-ultra-550b-a55b:free
+      LUNA_ARTIFACT_ID: "10716816853"
+      MINI_ARTIFACT_ID: "10718309826"
+      SOL_ARTIFACT_ID: "10729140009"
 
     steps:
       - name: Check out repository
@@ -58,71 +46,77 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download saved capture artifact
+      - name: Run focused tests
+        run: npm test -- --run tests/evaluation-harness.test.mjs
+
+      - name: Download saved corpus and reference evaluator results
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
+          set -euo pipefail
           if [ -z "$GH_TOKEN" ]; then
             echo "The GitHub Actions token is unavailable."
             exit 1
           fi
 
-          curl --fail --silent --show-error --location \
-            --header "Authorization: Bearer $GH_TOKEN" \
-            --header "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
-            --output saved-capture.zip
-          mkdir -p saved-capture
-          unzip -q saved-capture.zip -d saved-capture
+          download_artifact() {
+            local artifact_id="$1"
+            local destination="$2"
+            mkdir -p "$destination"
+            curl --fail --silent --show-error --location \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" \
+              --output "$destination.zip"
+            unzip -q "$destination.zip" -d "$destination"
+          }
 
-      - name: Select calibration corpus
-        shell: bash
-        run: |
-          capture_path="$(find saved-capture -type f \( -name 'portfolio-generation-evaluation-*.json' -o -name 'portfolio-generation-capture-*.json' \) -print -quit)"
-          if [ -z "$capture_path" ]; then
-            echo "No portfolio generation capture JSON was found in the artifact."
-            exit 1
-          fi
+          download_artifact "$LUNA_ARTIFACT_ID" references/luna
+          download_artifact "$MINI_ARTIFACT_ID" references/mini
+          download_artifact "$SOL_ARTIFACT_ID" references/sol
 
-          node --input-type=module - "$capture_path" calibration-input.json <<'NODE'
-          import { readFileSync, writeFileSync } from "node:fs";
+          for name in luna mini sol; do
+            result_path="$(find "references/$name" -type f -name 'portfolio-generation-evaluation-*.json' -print -quit)"
+            if [ -z "$result_path" ]; then
+              echo "No evaluation JSON found for $name."
+              exit 1
+            fi
+            cp "$result_path" "reference-$name.json"
+          done
 
-          const [inputPath, outputPath] = process.argv.slice(2);
-          const source = JSON.parse(readFileSync(inputPath, "utf8"));
-
-          const sample = {
-            ...source,
-            config: {
-              ...source.config,
-              requestDelayMs: 1000,
-              tournament: { ...source.config.tournament, concurrency: 1 }
-            },
-            tournament: null
-          };
-
-          writeFileSync(outputPath, `${JSON.stringify(sample, null, 2)}\n`, "utf8");
-          console.log(`Prepared ${sample.runs.length} saved runs from ${inputPath}`);
+          node --input-type=module - <<'NODE'
+          import { readFileSync } from "node:fs";
+          for (const name of ["luna", "mini", "sol"]) {
+            const bundle = JSON.parse(readFileSync(`reference-${name}.json`, "utf8"));
+            if (bundle.runs?.length !== 66) throw new Error(`${name} reference does not contain the 66-response corpus`);
+            console.log(`${name}: ${bundle.tournament?.evaluatorModel}; ${bundle.tournament?.comparisons?.length || 0} comparisons`);
+          }
           NODE
 
-      - name: Run evaluator calibration
+      - name: Run Nemotron cross-provider validation
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         shell: bash
         run: |
-          echo "Calibration revision: $CALIBRATION_REVISION"
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "The OPENAI_API_KEY repository secret is not configured."
+          set -euo pipefail
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "The OPENROUTER_API_KEY repository secret is not configured."
             exit 1
           fi
 
-          npm run eval:evaluate -- calibration-input.json --output calibration-results --tournament-only --tournament-cohorts "$TOURNAMENT_COHORTS"
+          npm run eval:cross-provider -- \
+            --input reference-mini.json \
+            --reference luna=reference-luna.json \
+            --reference sol=reference-sol.json \
+            --reference mini=reference-mini.json \
+            --output nemotron-validation-results
 
-      - name: Upload calibration results
+      - name: Upload validation results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: evaluator-calibration-${{ github.run_id }}
-          path: calibration-results
+          name: nemotron-cross-provider-validation-${{ github.run_id }}
+          path: nemotron-validation-results
           if-no-files-found: warn
           retention-days: 30
