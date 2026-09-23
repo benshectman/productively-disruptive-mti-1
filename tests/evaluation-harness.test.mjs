@@ -29,6 +29,12 @@ import {
   INDEPENDENT_OVERALL_RUBRIC,
   preflightEvaluator
 } from "../scripts/evaluation/evaluator.mjs";
+import {
+  buildProviderRequest,
+  parseEvaluatorJson,
+  resolveEvaluatorProvider,
+  resolveEvaluatorRuntime
+} from "../scripts/evaluation/evaluator-provider.mjs";
 import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
 import { args, evaluateBundle, evaluateTournamentBundle, needsQualitativeEvaluation, needsTournamentEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import {
@@ -38,6 +44,7 @@ import {
   mirrorTournamentComparison,
   rankTournamentCohort,
   reconcileTournamentMirror,
+  selectStratifiedDirectComparisons,
   tournamentRequest
 } from "../scripts/evaluation/tournament.mjs";
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
@@ -204,6 +211,30 @@ describe("evaluator evidence context", () => {
   });
 });
 
+describe("evaluator provider adapter", () => {
+  it("defaults to OpenAI and selects OpenRouter explicitly", () => {
+    expect(resolveEvaluatorProvider()).toMatchObject({ id: "openai", apiKeyEnv: "OPENAI_API_KEY" });
+    expect(resolveEvaluatorProvider("OPENROUTER")).toMatchObject({ id: "openrouter", apiKeyEnv: "OPENROUTER_API_KEY" });
+    expect(() => resolveEvaluatorProvider("unknown")).toThrow("Unsupported evaluator provider");
+  });
+
+  it("resolves only the selected provider secret and never falls back to the other key", () => {
+    const config = { defaultProvider: "openai", defaultModel: "openai-model" };
+    expect(resolveEvaluatorRuntime({ config, environment: { OPENAI_API_KEY: "openai-key" } })).toMatchObject({ provider: "openai", apiKeyEnv: "OPENAI_API_KEY", apiKey: "openai-key", model: "openai-model" });
+    expect(resolveEvaluatorRuntime({ config, environment: { EVAL_PROVIDER: "openrouter", OPENROUTER_API_KEY: "router-key", EVAL_MODEL: "router-model" } })).toMatchObject({ provider: "openrouter", apiKeyEnv: "OPENROUTER_API_KEY", apiKey: "router-key", model: "router-model" });
+    expect(() => resolveEvaluatorRuntime({ config, environment: { EVAL_PROVIDER: "openrouter", OPENAI_API_KEY: "wrong-key" } })).toThrow("Set OPENROUTER_API_KEY");
+  });
+
+  it("preserves the existing OpenAI request body and parses strict or surrounded JSON", () => {
+    const body = { model: "test-model", store: false, input: "payload", text: { format: { type: "json_schema" } } };
+    const request = buildProviderRequest({ provider: "openai", apiKey: "test-key", body, signal: null });
+    expect(request.url).toBe("https://api.openai.com/v1/responses");
+    expect(JSON.parse(request.init.body)).toEqual(body);
+    expect(parseEvaluatorJson('{"winner":"A_stronger"}')).toEqual({ winner: "A_stronger" });
+    expect(parseEvaluatorJson('comment {"winner":"B_stronger"}')).toEqual({ winner: "B_stronger" });
+  });
+});
+
 describe("relative-quality tournament", () => {
   function sixRuns(configuration = "one") {
     return [1, 2, 3].flatMap((repetition) => [run("control", configuration, repetition), run("treatment", configuration, repetition)]);
@@ -235,6 +266,23 @@ describe("relative-quality tournament", () => {
       byCandidate[comparison.blind.B].B += 1;
     }
     for (const placement of Object.values(byCandidate)) expect(Math.abs(placement.A - placement.B)).toBeLessThanOrEqual(1);
+  });
+
+  it("selects exactly three direct comparisons per cohort with balanced repetitions and placement", () => {
+    const runs = Array.from({ length: 11 }, (_, index) => sixRuns(`cohort-${index}`)).flat();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const selected = selectStratifiedDirectComparisons(cohorts, "sample-seed");
+    expect(selected).toHaveLength(33);
+    expect(selectStratifiedDirectComparisons(cohorts, "sample-seed")).toEqual(selected);
+    expect(Math.abs(selected.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length - 16.5)).toBe(0.5);
+    for (const cohort of cohorts) {
+      const comparisons = selected.filter((comparison) => comparison.cohortId === cohort.cohortId);
+      expect(comparisons).toHaveLength(3);
+      expect(comparisons.every((comparison) => comparison.mappedCandidates.A.environment !== comparison.mappedCandidates.B.environment)).toBe(true);
+      for (const environment of ["control", "treatment"]) {
+        expect(comparisons.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === environment).repetition).sort()).toEqual([1, 2, 3]);
+      }
+    }
   });
 
   it("keeps environment and model identity out of blinded evaluator input", () => {
@@ -284,7 +332,8 @@ describe("relative-quality tournament", () => {
       runsById: new Map(runs.map((item) => [item.runId, item])),
       apiKey: "test-key",
       model: "test-model",
-      fetcher: async (_url, init) => {
+      fetcher: async (url, init) => {
+        expect(url).toBe("https://api.openai.com/v1/responses");
         const body = JSON.parse(init.body);
         expect(body.input).not.toContain('"environment":');
         expect(body.input).not.toContain('"environmentId":');
@@ -318,6 +367,36 @@ describe("relative-quality tournament", () => {
     expect(evaluated.attemptCount).toBe(2);
     expect(evaluated.attempts[0].error).toContain("SyntaxError");
     expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
+  });
+
+  it("builds OpenRouter chat requests without API-enforced response_format and retries invalid JSON", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      provider: "openrouter",
+      apiKey: "openrouter-test-key",
+      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+      fetcher: async (url, init) => {
+        calls += 1;
+        expect(url).toBe("https://openrouter.ai/api/v1/chat/completions");
+        expect(init.headers.Authorization).toBe("Bearer openrouter-test-key");
+        const body = JSON.parse(init.body);
+        expect(body.model).toBe("nvidia/nemotron-3-ultra-550b-a55b:free");
+        expect(body).not.toHaveProperty("response_format");
+        expect(body).not.toHaveProperty("text");
+        expect(body.messages[0].content).toContain("Return only one strict JSON object");
+        expect(body.messages[0].content).toContain('"winner"');
+        const content = calls === 1 ? '{"winner":"A_stronger"}' : JSON.stringify({ winner: "B_stronger", margin: "clear", confidence: "medium", rationale: "More coherent." });
+        return new Response(JSON.stringify({ choices: [{ message: { content } }], usage: { prompt_tokens: 90, completion_tokens: 10, total_tokens: 100 } }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(2);
+    expect(evaluated.evaluatorProvider).toBe("openrouter");
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.B);
+    expect(evaluated.usage).toMatchObject({ input_tokens: 90, output_tokens: 10, total_tokens: 100 });
   });
 
   it("maps a selective mirror and flags an order-sensitive reversal as unstable", () => {
