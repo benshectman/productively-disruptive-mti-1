@@ -218,14 +218,14 @@ describe("evaluator evidence context", () => {
 });
 
 describe("evaluator provider adapter", () => {
-  it("pins the sparse OpenRouter validation to the exact Qwen free model", () => {
-    expect(OPENROUTER_VALIDATION_MODEL).toBe("qwen/qwen3.8-27b:free");
+  it("pins the sparse OpenRouter validation to the exact paid Qwen model", () => {
+    expect(OPENROUTER_VALIDATION_MODEL).toBe("qwen/qwen3-235b-a22b-2507");
   });
 
   it("pins the workflow provider and model instead of relying on OpenRouter routing preferences", async () => {
     const workflow = await readFile(new URL("../.github/workflows/evaluator-calibration.yml", import.meta.url), "utf8");
     expect(workflow).toContain("EVAL_PROVIDER: openrouter");
-    expect(workflow).toContain("EVAL_MODEL: qwen/qwen3.8-27b:free");
+    expect(workflow).toContain("EVAL_MODEL: qwen/qwen3-235b-a22b-2507");
     expect(workflow).toContain("OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}");
   });
 
@@ -433,13 +433,13 @@ describe("relative-quality tournament", () => {
       runsById: new Map(runs.map((item) => [item.runId, item])),
       provider: "openrouter",
       apiKey: "openrouter-test-key",
-      model: "qwen/qwen3.8-27b:free",
+      model: "qwen/qwen3-235b-a22b-2507",
       fetcher: async (url, init) => {
         calls += 1;
         expect(url).toBe("https://openrouter.ai/api/v1/chat/completions");
         expect(init.headers.Authorization).toBe("Bearer openrouter-test-key");
         const body = JSON.parse(init.body);
-        expect(body.model).toBe("qwen/qwen3.8-27b:free");
+        expect(body.model).toBe("qwen/qwen3-235b-a22b-2507");
         expect(body).not.toHaveProperty("response_format");
         expect(body).not.toHaveProperty("text");
         expect(body.messages[0].content).toContain("Return only one strict JSON object");
@@ -517,19 +517,19 @@ describe("relative-quality tournament", () => {
     expect(cohort.excludedCandidates.map((candidate) => candidate.reason).sort()).toEqual(["fallback-containing-response", "generation-failed"]);
   });
 
-  it("keeps a fallback repetition as an explicit reliability exclusion in the sparse design", () => {
+  it("preserves a fallback repetition as a reliability event and reduces the sparse sample", () => {
     const runs = sixRuns();
     const fallbackRunId = runs[0].runId;
     runs[0] = { ...runs[0], totalFallbackFields: 1 };
     const [cohort] = createTournamentCohorts(runs, "seed");
     const selected = selectStratifiedDirectComparisons([cohort], "sample-seed");
-    expect(selected).toHaveLength(3);
-    expect(selected.filter((comparison) => comparison.qualitativeEligible !== false)).toHaveLength(2);
-    expect(selected.filter((comparison) => comparison.qualitativeEligible === false)).toHaveLength(1);
-    expect(selected.find((comparison) => comparison.qualitativeEligible === false)).toMatchObject({
-      exclusion: { category: "reliability", reason: "fallback-containing-response" }
-    });
-    expect(selected.find((comparison) => comparison.qualitativeEligible === false).candidateIds).toContain(fallbackRunId);
+    expect(selected).toHaveLength(2);
+    expect(selected.every((comparison) => comparison.qualitativeEligible === true)).toBe(true);
+    expect(selected.every((comparison) => !comparison.candidateIds.includes(fallbackRunId))).toBe(true);
+    expect(cohort.excludedCandidates).toContainEqual(expect.objectContaining({ candidateId: fallbackRunId, reason: "fallback-containing-response" }));
+    const controlRepetitions = selected.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === "control").repetition).sort();
+    const treatmentRepetitions = selected.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === "treatment").repetition).sort();
+    expect(treatmentRepetitions).toEqual(controlRepetitions);
   });
 
   it("mirrors every slight or low-confidence result plus a deterministic clear/high audit sample", () => {
@@ -932,17 +932,17 @@ describe("evaluation harness", () => {
     let requestBody;
     const result = await preflightEvaluator({
       apiKey: "test-key",
-      model: "qwen/qwen3.8-27b:free",
+      model: "qwen/qwen3-235b-a22b-2507",
       provider: "openrouter",
       fetcher: async (_url, init) => {
         requestBody = JSON.parse(init.body);
         return new Response(JSON.stringify({ choices: [{ message: { content: '```json\n{"status":"EVALUATOR_PREFLIGHT_OK"}\n```' } }] }), { status: 200 });
       }
     });
-    expect(requestBody).toMatchObject({ model: "qwen/qwen3.8-27b:free", max_tokens: 256 });
+    expect(requestBody).toMatchObject({ model: "qwen/qwen3-235b-a22b-2507", max_tokens: 256 });
     expect(requestBody.messages[0].content).toContain("strict JSON");
     expect(JSON.stringify(requestBody)).not.toContain("Approved evidence");
-    expect(result).toMatchObject({ evaluatorModel: "qwen/qwen3.8-27b:free", evaluatorProvider: "openrouter" });
+    expect(result).toMatchObject({ evaluatorModel: "qwen/qwen3-235b-a22b-2507", evaluatorProvider: "openrouter" });
   });
 
   it("supports explicit staged evaluation and atomically persists checkpoints", async () => {
