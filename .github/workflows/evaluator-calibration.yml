@@ -28,7 +28,7 @@ jobs:
 
     env:
       EVAL_PROVIDER: openrouter
-      EVAL_MODEL: qwen/qwen3.8-27b:free
+      EVAL_MODEL: qwen/qwen3-235b-a22b-2507
       LUNA_ARTIFACT_ID: "10716816853"
       MINI_ARTIFACT_ID: "10718309826"
       SOL_ARTIFACT_ID: "10729140009"
