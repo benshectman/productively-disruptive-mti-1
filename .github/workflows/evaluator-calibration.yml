@@ -1,6 +1,6 @@
 name: OpenRouter Evaluator Validation
 
-run-name: Validate saved control-vs-treatment pairs with Nemotron
+run-name: Validate saved control-vs-treatment pairs with Qwen
 
 on:
   push:
@@ -24,11 +24,11 @@ jobs:
   validate:
     name: Evaluate stratified saved pairs
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
 
     env:
       EVAL_PROVIDER: openrouter
-      EVAL_MODEL: nvidia/nemotron-3-ultra-550b-a55b:free
+      EVAL_MODEL: qwen/qwen3.8-27b:free
       LUNA_ARTIFACT_ID: "10716816853"
       MINI_ARTIFACT_ID: "10718309826"
       SOL_ARTIFACT_ID: "10729140009"
@@ -94,7 +94,7 @@ jobs:
           }
           NODE
 
-      - name: Run Nemotron cross-provider validation
+      - name: Run Qwen cross-provider validation
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         shell: bash
@@ -110,13 +110,13 @@ jobs:
             --reference luna=reference-luna.json \
             --reference sol=reference-sol.json \
             --reference mini=reference-mini.json \
-            --output nemotron-validation-results
+            --output qwen-validation-results
 
       - name: Upload validation results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: nemotron-cross-provider-validation-${{ github.run_id }}
-          path: nemotron-validation-results
+          name: qwen-cross-provider-validation-${{ github.run_id }}
+          path: qwen-validation-results
           if-no-files-found: warn
           retention-days: 30
