@@ -93,6 +93,61 @@ export function createTournamentCohorts(runs, seed = "portfolio-tournament-v1") 
   });
 }
 
+function permutations(values) {
+  if (values.length <= 1) return [values];
+  return values.flatMap((value, index) => permutations(values.filter((_, itemIndex) => itemIndex !== index))
+    .map((rest) => [value, ...rest]));
+}
+
+function directComparison(cohort, left, right) {
+  return cohort.comparisons.find((comparison) => comparison.candidateIds.includes(left.candidateId)
+    && comparison.candidateIds.includes(right.candidateId));
+}
+
+export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cross-provider-validation-v1") {
+  const optionsByCohort = cohorts.map((cohort) => {
+    const control = cohort.candidates.filter((candidate) => candidate.environment === "control")
+      .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
+    const treatment = cohort.candidates.filter((candidate) => candidate.environment === "treatment")
+      .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
+    if (control.length !== 3 || treatment.length !== 3) {
+      throw new Error(`Cohort ${cohort.cohortId} must contain exactly three generated control and treatment repetitions`);
+    }
+    return permutations(treatment).map((orderedTreatment) => {
+      const comparisons = control.map((candidate, index) => directComparison(cohort, candidate, orderedTreatment[index]));
+      if (comparisons.some((comparison) => !comparison)) throw new Error(`Cohort ${cohort.cohortId} is missing a direct comparison`);
+      return {
+        comparisons,
+        treatmentAsA: comparisons.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length,
+        signature: comparisons.map((comparison) => comparison.comparisonId).join(":")
+      };
+    }).sort((left, right) => stableHash(`${seed}:${cohort.cohortId}:${left.signature}`)
+      .localeCompare(stableHash(`${seed}:${cohort.cohortId}:${right.signature}`)));
+  });
+
+  let states = new Map([[0, { treatmentAsA: 0, selections: [], signature: "" }]]);
+  for (let index = 0; index < cohorts.length; index += 1) {
+    const next = new Map();
+    for (const state of states.values()) {
+      for (const option of optionsByCohort[index]) {
+        const treatmentAsA = state.treatmentAsA + option.treatmentAsA;
+        const signature = `${state.signature}:${option.signature}`;
+        const candidate = { treatmentAsA, selections: [...state.selections, option], signature };
+        const existing = next.get(treatmentAsA);
+        if (!existing || stableHash(`${seed}:${candidate.signature}`).localeCompare(stableHash(`${seed}:${existing.signature}`)) < 0) {
+          next.set(treatmentAsA, candidate);
+        }
+      }
+    }
+    states = next;
+  }
+  const total = cohorts.length * 3;
+  const selected = [...states.values()].sort((left, right) =>
+    Math.abs(left.treatmentAsA - total / 2) - Math.abs(right.treatmentAsA - total / 2)
+    || stableHash(`${seed}:${left.signature}`).localeCompare(stableHash(`${seed}:${right.signature}`)))[0];
+  return selected.selections.flatMap((selection) => selection.comparisons);
+}
+
 export function tournamentRequest(comparison, runsById) {
   const a = runsById.get(comparison.blind.A);
   const b = runsById.get(comparison.blind.B);

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +17,7 @@ import {
   validateConfig
 } from "./core.mjs";
 import { evaluateArbitration, evaluatePair, evaluateTournamentComparison, preflightEvaluator } from "./evaluator.mjs";
+import { resolveEvaluatorRuntime } from "./evaluator-provider.mjs";
 import { buildMarkdownReport } from "./report.mjs";
 import {
   aggregateTournament,
@@ -188,14 +188,14 @@ function finalCriteria(unblinded) {
   }]));
 }
 
-export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode, evaluator = evaluatePair, arbitrator = evaluateArbitration, persist = async () => {} }) {
+export async function evaluateBundle({ bundle, config, apiKey, model, provider = "openai", sanityMode, evaluator = evaluatePair, arbitrator = evaluateArbitration, persist = async () => {} }) {
   const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
   for (let index = 0; index < bundle.pairs.length; index += 1) {
     const pair = bundle.pairs[index];
     const existing = evaluationForPair(bundle, pair.pairId);
     if (evaluationComplete(existing, pair, false)) continue;
     console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} independent assessment`);
-    const evaluation = await evaluator({ pair, runsById, apiKey, model });
+    const evaluation = await evaluator({ pair, runsById, apiKey, model, provider });
     if (!pair.eligibility && evaluation.pair?.eligibility) pair.eligibility = evaluation.pair.eligibility;
     upsertEvaluation(bundle, pair.pairId, evaluation);
     await persist(bundle);
@@ -207,7 +207,7 @@ export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode
       const existing = evaluationForPair(bundle, pair.pairId);
       if (!existing || existing.error || !existing.arbitrationRequired || !existing.arbitration || existing.mirrorAudit || existing.mirrorError) continue;
       console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} mirrored arbitration`);
-      const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model });
+      const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model, provider });
       if (mirrored.error) {
         upsertEvaluation(bundle, pair.pairId, { ...existing, mirrorError: mirrored.error, failedMirrorPass: mirrored });
       } else {
@@ -276,6 +276,7 @@ export async function evaluateTournamentBundle({
   config,
   apiKey,
   model,
+  provider = "openai",
   cohortLimit = null,
   explicitMirrorIds = [],
   evaluator = evaluateTournamentComparison,
@@ -303,7 +304,7 @@ export async function evaluateTournamentBundle({
   });
   await mapWithConcurrency(pending, concurrency, async (comparison, index) => {
     console.log(`[tournament ${index + 1}/${pending.length}] ${comparison.cohortId} ${comparison.comparisonId}`);
-    const result = await evaluator({ comparison, runsById, apiKey, model });
+    const result = await evaluator({ comparison, runsById, apiKey, model, provider });
     const existingIndex = bundle.tournament.comparisons.findIndex((item) => item.comparison?.comparisonId === comparison.comparisonId);
     if (existingIndex === -1) bundle.tournament.comparisons.push(result);
     else bundle.tournament.comparisons[existingIndex] = result;
@@ -327,7 +328,7 @@ export async function evaluateTournamentBundle({
   for (const result of bundle.tournament.comparisons) {
     if (result.error || (result.mirror && !result.mirrorError) || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
     console.log(`[tournament mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
-    const mirror = await evaluator({ comparison: mirrorTournamentComparison(result.comparison), runsById, apiKey, model });
+    const mirror = await evaluator({ comparison: mirrorTournamentComparison(result.comparison), runsById, apiKey, model, provider });
     result.mirror = mirror;
     if (!mirror.error) {
       result.mirrorAudit = reconcileTournamentMirror(result, mirror);
@@ -364,11 +365,9 @@ async function main() {
     if (options.reportOnly) throw new Error("--report-only requires --input");
     let evaluatorPreflight = null;
     if (!options.captureOnly) {
-      const apiKey = process.env[config.evaluator.apiKeyEnv];
-      if (!apiKey) throw new Error(`Set ${config.evaluator.apiKeyEnv}, or rerun with --capture-only`);
-      const model = process.env[config.evaluator.modelEnv] || config.evaluator.defaultModel;
-      console.log(`[preflight] ${model}`);
-      evaluatorPreflight = await preflightEvaluator({ apiKey, model });
+      const runtime = resolveEvaluatorRuntime({ config: config.evaluator });
+      console.log(`[preflight] ${runtime.provider} ${runtime.model}`);
+      evaluatorPreflight = await preflightEvaluator(runtime);
     }
     const control = resolveEnvironment(config, "control");
     const treatment = resolveEnvironment(config, "treatment");
@@ -415,13 +414,12 @@ async function main() {
 
   const sanityMode = bundle.metadata.mode === "sanity" || options.sanity;
   if (!options.reportOnly && !options.captureOnly) {
-    const apiKey = process.env[config.evaluator.apiKeyEnv];
-    if (!apiKey) throw new Error(`Set ${config.evaluator.apiKeyEnv}, or rerun with --capture-only`);
-    const model = process.env[config.evaluator.modelEnv] || config.evaluator.defaultModel;
+    const runtime = resolveEvaluatorRuntime({ config: config.evaluator });
+    const { apiKey, model, provider } = runtime;
     if (!options.tournamentOnly && needsQualitativeEvaluation(bundle, sanityMode)) {
       if (options.input) {
         console.log(`[preflight] ${model}`);
-        bundle.metadata.evaluatorPreflight = await preflightEvaluator({ apiKey, model });
+        bundle.metadata.evaluatorPreflight = await preflightEvaluator(runtime);
         await writeJsonAtomic(checkpointPath, bundle);
       }
       await evaluateBundle({
@@ -429,6 +427,7 @@ async function main() {
         config,
         apiKey,
         model,
+        provider,
         sanityMode,
         persist: (current) => writeJsonAtomic(checkpointPath, current)
       });
@@ -443,6 +442,7 @@ async function main() {
           config,
           apiKey,
           model: tournamentModel,
+          provider,
           cohortLimit: options.tournamentCohorts,
           explicitMirrorIds: options.mirrorComparisonIds,
           persist: (current) => writeJsonAtomic(checkpointPath, current)

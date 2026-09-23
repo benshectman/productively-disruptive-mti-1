@@ -18,6 +18,12 @@ import {
   TOURNAMENT_WINNERS,
   tournamentRequest
 } from "./tournament.mjs";
+import {
+  buildProviderRequest,
+  normalizeProviderUsage,
+  parseEvaluatorJson,
+  providerResponseText
+} from "./evaluator-provider.mjs";
 
 const assessmentCriterionSchema = {
   type: "object",
@@ -309,10 +315,6 @@ export function buildEvaluatorBody(request, model) {
   return buildArbitrationBody(request, model);
 }
 
-function responseText(result) {
-  return result.output_text || result.output?.flatMap((item) => item.content || []).map((item) => item.text || "").join("").trim() || "";
-}
-
 function assertIndependentAssessment(value) {
   if (!value || !value.criteria || !value.overall || !Array.isArray(value.concerns)) throw new Error("Independent evaluator response is missing required fields");
   for (const criterion of CRITERIA) {
@@ -332,14 +334,16 @@ function assertArbitration(value) {
 }
 
 function assertTournamentJudgment(value) {
+  const keys = value && typeof value === "object" ? Object.keys(value).sort() : [];
   if (!value || !TOURNAMENT_WINNERS.includes(value.winner) || !TOURNAMENT_MARGINS.includes(value.margin)
-    || !TOURNAMENT_CONFIDENCE.includes(value.confidence) || !value.rationale) {
+    || !TOURNAMENT_CONFIDENCE.includes(value.confidence) || typeof value.rationale !== "string" || !value.rationale.trim()
+    || JSON.stringify(keys) !== JSON.stringify(["confidence", "margin", "rationale", "winner"])) {
     throw new Error("Tournament evaluator response is missing or invalid required fields");
   }
   return value;
 }
 
-async function postEvaluator({ body, apiKey, fetcher, timeoutMs, parse }) {
+async function postEvaluator({ body, apiKey, provider = "openai", fetcher, timeoutMs, parse }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = new Date().toISOString();
@@ -347,16 +351,12 @@ async function postEvaluator({ body, apiKey, fetcher, timeoutMs, parse }) {
   let response;
   let rawText = "";
   try {
-    response = await fetcher("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
+    const request = buildProviderRequest({ provider, apiKey, body, signal: controller.signal });
+    response = await fetcher(request.url, request.init);
     rawText = await response.text();
     if (!response.ok) throw new Error(`Evaluator HTTP ${response.status}`);
     const rawResponse = JSON.parse(rawText);
-    const judgment = parse(JSON.parse(responseText(rawResponse)));
+    const judgment = parse(parseEvaluatorJson(providerResponseText(rawResponse, provider)));
     return { startedAt, durationMs: Math.round(performance.now() - start), rawResponse, judgment };
   } catch (error) {
     const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
@@ -366,44 +366,46 @@ async function postEvaluator({ body, apiKey, fetcher, timeoutMs, parse }) {
   }
 }
 
-export async function preflightEvaluator({ apiKey, model, fetcher = fetch, timeoutMs = 30_000 }) {
+export async function preflightEvaluator({ apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 30_000 }) {
   const marker = "EVALUATOR_PREFLIGHT_OK";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = new Date().toISOString();
   const start = performance.now();
   try {
-    const response = await fetcher("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const request = buildProviderRequest({
+      provider,
+      apiKey,
+      signal: controller.signal,
+      body: {
         model,
         store: false,
         max_output_tokens: 32,
         instructions: `This is a connectivity preflight. Reply with exactly ${marker}.`,
         input: "Confirm evaluator connectivity using the required marker. No portfolio or evidence data is included."
-      }),
-      signal: controller.signal
+      }
     });
+    const response = await fetcher(request.url, request.init);
     const rawText = await response.text();
     if (!response.ok) throw new Error(`Evaluator preflight HTTP ${response.status}`);
     const result = JSON.parse(rawText);
-    if (!responseText(result).includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
-    return { startedAt, completedAt: new Date().toISOString(), durationMs: Math.round(performance.now() - start), evaluatorModel: model };
+    if (!providerResponseText(result, provider).includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
+    return { startedAt, completedAt: new Date().toISOString(), durationMs: Math.round(performance.now() - start), evaluatorModel: model, evaluatorProvider: provider };
   } finally {
     clearTimeout(timer);
   }
 }
 
-export async function evaluateIndependentResponse({ run, pair, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
+export async function evaluateIndependentResponse({ run, pair, apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 60_000 }) {
   const request = independentAssessmentRequest(run, pair);
   const body = buildIndependentAssessmentBody(request, model);
-  const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertIndependentAssessment });
+  const result = await postEvaluator({ body, apiKey, provider, fetcher, timeoutMs, parse: assertIndependentAssessment });
   return {
     runId: run.runId,
     startedAt: result.startedAt,
     durationMs: result.durationMs,
     evaluatorModel: model,
+    evaluatorProvider: provider,
     assessment: result.judgment,
     evaluatorRequest: request,
     rawEvaluatorResponse: result.rawResponse,
@@ -411,10 +413,10 @@ export async function evaluateIndependentResponse({ run, pair, apiKey, model, fe
   };
 }
 
-export async function evaluateArbitration({ pair, runsById, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
+export async function evaluateArbitration({ pair, runsById, apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 60_000 }) {
   const request = arbitrationRequest(pair, runsById);
   const body = buildArbitrationBody(request, model);
-  const result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertArbitration });
+  const result = await postEvaluator({ body, apiKey, provider, fetcher, timeoutMs, parse: assertArbitration });
   if (result.error) {
     return {
       pair,
@@ -422,6 +424,7 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, fetch
       startedAt: result.startedAt,
       durationMs: result.durationMs,
       evaluatorModel: model,
+      evaluatorProvider: provider,
       error: result.error,
       rawEvaluatorText: result.rawEvaluatorText
     };
@@ -432,6 +435,7 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, fetch
     startedAt: result.startedAt,
     durationMs: result.durationMs,
     evaluatorModel: model,
+    evaluatorProvider: provider,
     judgment: result.judgment,
     unblinded: unblindJudgment(result.judgment, pair),
     evaluatorRequest: request,
@@ -439,13 +443,13 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, fetch
   };
 }
 
-export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, fetcher = fetch, timeoutMs = 60_000 }) {
+export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 60_000 }) {
   const request = tournamentRequest(comparison, runsById);
   const body = buildTournamentBody(request, model);
   const attempts = [];
   let result;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
-    result = await postEvaluator({ body, apiKey, fetcher, timeoutMs, parse: assertTournamentJudgment });
+    result = await postEvaluator({ body, apiKey, provider, fetcher, timeoutMs, parse: assertTournamentJudgment });
     attempts.push({ attempt, startedAt: result.startedAt, durationMs: result.durationMs, error: result.error || null });
     if (!result.error) break;
   }
@@ -462,7 +466,8 @@ export async function evaluateTournamentComparison({ comparison, runsById, apiKe
     durationMs: attempts.reduce((sum, attempt) => sum + attempt.durationMs, 0),
     attemptCount: attempts.length,
     attempts,
-    evaluatorModel: model
+    evaluatorModel: model,
+    evaluatorProvider: provider
   };
   if (result.error) return { ...base, error: result.error, rawEvaluatorText: result.rawEvaluatorText };
   return {
@@ -471,7 +476,7 @@ export async function evaluateTournamentComparison({ comparison, runsById, apiKe
     mappedJudgment: mapTournamentJudgment(comparison, result.judgment),
     evaluatorRequest: request,
     rawEvaluatorResponse: result.rawResponse,
-    usage: result.rawResponse?.usage || null
+    usage: normalizeProviderUsage(result.rawResponse?.usage, provider)
   };
 }
 
@@ -501,6 +506,7 @@ export async function evaluatePair({
   runsById,
   apiKey,
   model,
+  provider = "openai",
   fetcher = fetch,
   timeoutMs = 60_000,
   assessor = evaluateIndependentResponse,
@@ -524,8 +530,8 @@ export async function evaluatePair({
     };
   }
   const [controlAssessment, treatmentAssessment] = await Promise.all([
-    assessor({ run: controlRun, pair, apiKey, model, fetcher, timeoutMs }),
-    assessor({ run: treatmentRun, pair, apiKey, model, fetcher, timeoutMs })
+    assessor({ run: controlRun, pair, apiKey, model, provider, fetcher, timeoutMs }),
+    assessor({ run: treatmentRun, pair, apiKey, model, provider, fetcher, timeoutMs })
   ]);
   if (controlAssessment.error || treatmentAssessment.error) {
     return {
@@ -556,7 +562,7 @@ export async function evaluatePair({
     unblinded: deterministicUnblinded
   };
   if (!base.arbitrationRequired) return base;
-  const arbitration = await arbitrator({ pair, runsById, apiKey, model, fetcher, timeoutMs });
+  const arbitration = await arbitrator({ pair, runsById, apiKey, model, provider, fetcher, timeoutMs });
   if (arbitration.error) {
     return {
       ...base,
@@ -579,7 +585,7 @@ export async function evaluatePair({
   };
   if (!mirrorArbitration) return { ...base, arbitration, final: arbitrationResult, unblinded };
 
-  const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model, fetcher, timeoutMs });
+  const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model, provider, fetcher, timeoutMs });
   if (mirrored.error) {
     return {
       ...base,
