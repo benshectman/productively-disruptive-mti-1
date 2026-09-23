@@ -36,14 +36,14 @@ jobs:
   calibrate:
     name: Evaluate saved response pairs
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     env:
       ARTIFACT_ID: ${{ inputs.artifact_id || '10718309826' }}
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
       TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
       TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '11' }}
-      CALIBRATION_REVISION: tournament-full-corpus-gpt-5-6-sol-v2-fresh
+      CALIBRATION_REVISION: tournament-full-corpus-gpt-5-6-sol-v3-fresh
 
     steps:
       - name: Check out repository
