@@ -43,7 +43,7 @@ jobs:
       EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
       TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model || 'gpt-5.6-sol' }}
       TOURNAMENT_COHORTS: ${{ inputs.tournament_cohorts || '11' }}
-      CALIBRATION_REVISION: tournament-full-corpus-gpt-5-6-sol-v1
+      CALIBRATION_REVISION: tournament-full-corpus-gpt-5-6-sol-v2-fresh
 
     steps:
       - name: Check out repository
@@ -98,7 +98,7 @@ jobs:
               requestDelayMs: 1000,
               tournament: { ...source.config.tournament, concurrency: 1 }
             },
-            tournament: source.tournament || null
+            tournament: null
           };
 
           writeFileSync(outputPath, `${JSON.stringify(sample, null, 2)}\n`, "utf8");
