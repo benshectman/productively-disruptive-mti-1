@@ -368,6 +368,7 @@ async function postEvaluator({ body, apiKey, provider = "openai", fetcher, timeo
 
 export async function preflightEvaluator({ apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 30_000 }) {
   const marker = "EVALUATOR_PREFLIGHT_OK";
+  const openRouter = provider === "openrouter";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = new Date().toISOString();
@@ -380,16 +381,24 @@ export async function preflightEvaluator({ apiKey, model, provider = "openai", f
       body: {
         model,
         store: false,
-        max_output_tokens: 32,
-        instructions: `This is a connectivity preflight. Reply with exactly ${marker}.`,
-        input: "Confirm evaluator connectivity using the required marker. No portfolio or evidence data is included."
+        max_output_tokens: openRouter ? 256 : 32,
+        instructions: openRouter
+          ? `This is a connectivity preflight. Return only strict JSON exactly matching {"status":"${marker}"}. Do not use Markdown fences or add commentary.`
+          : `This is a connectivity preflight. Reply with exactly ${marker}.`,
+        input: openRouter
+          ? "Confirm evaluator connectivity using the required strict JSON object. No portfolio or evidence data is included."
+          : "Confirm evaluator connectivity using the required marker. No portfolio or evidence data is included."
       }
     });
     const response = await fetcher(request.url, request.init);
     const rawText = await response.text();
     if (!response.ok) throw new Error(`Evaluator preflight HTTP ${response.status}`);
     const result = JSON.parse(rawText);
-    if (!providerResponseText(result, provider).includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
+    const responseText = providerResponseText(result, provider);
+    if (openRouter) {
+      const parsed = parseEvaluatorJson(responseText);
+      if (!parsed || Object.keys(parsed).length !== 1 || parsed.status !== marker) throw new Error("Evaluator preflight response did not contain the expected strict JSON marker");
+    } else if (!responseText.includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
     return { startedAt, completedAt: new Date().toISOString(), durationMs: Math.round(performance.now() - start), evaluatorModel: model, evaluatorProvider: provider };
   } finally {
     clearTimeout(timer);
