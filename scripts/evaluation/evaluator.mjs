@@ -443,15 +443,16 @@ export async function evaluateArbitration({ pair, runsById, apiKey, model, provi
   };
 }
 
-export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 60_000 }) {
+export async function evaluateTournamentComparison({ comparison, runsById, apiKey, model, provider = "openai", fetcher = fetch, timeoutMs = 60_000, maxAttempts = 2, retryDelayMs = 0 }) {
   const request = tournamentRequest(comparison, runsById);
   const body = buildTournamentBody(request, model);
   const attempts = [];
   let result;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     result = await postEvaluator({ body, apiKey, provider, fetcher, timeoutMs, parse: assertTournamentJudgment });
     attempts.push({ attempt, startedAt: result.startedAt, durationMs: result.durationMs, error: result.error || null });
     if (!result.error) break;
+    if (attempt < maxAttempts && retryDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, retryDelayMs * attempt));
   }
   const base = {
     comparison,

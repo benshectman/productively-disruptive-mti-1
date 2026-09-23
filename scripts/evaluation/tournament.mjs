@@ -118,6 +118,30 @@ function directComparison(cohort, left, right, seed) {
   };
 }
 
+export function canonicalPairIdentity(comparison) {
+  const cohortId = comparison?.cohortId || comparison?.topicConfiguration?.id;
+  const candidateIds = [...(comparison?.candidateIds || Object.values(comparison?.blind || {}))].sort();
+  if (!cohortId || candidateIds.length !== 2 || candidateIds.some((candidateId) => !candidateId)) {
+    throw new Error("Canonical pair identity requires a cohort and exactly two candidate IDs");
+  }
+  return `${cohortId}|${candidateIds.join("|")}`;
+}
+
+function sparseComparison(cohort, left, right, seed) {
+  const comparison = directComparison(cohort, left, right, seed);
+  const excludedCandidates = [left, right].filter((candidate) => candidate.reason);
+  if (!excludedCandidates.length) return { ...comparison, qualitativeEligible: true };
+  return {
+    ...comparison,
+    qualitativeEligible: false,
+    exclusion: {
+      category: "reliability",
+      reason: excludedCandidates.map((candidate) => candidate.reason).join(","),
+      excludedCandidates: excludedCandidates.map((candidate) => ({ ...candidate }))
+    }
+  };
+}
+
 export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cross-provider-validation-v1") {
   const optionsByCohort = cohorts.map((cohort) => {
     const capturedCandidates = [...cohort.candidates, ...cohort.excludedCandidates];
@@ -129,7 +153,7 @@ export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cro
       throw new Error(`Cohort ${cohort.cohortId} must contain exactly three captured control and treatment repetitions`);
     }
     return permutations(treatment).map((orderedTreatment) => {
-      const comparisons = control.map((candidate, index) => directComparison(cohort, candidate, orderedTreatment[index], seed));
+      const comparisons = control.map((candidate, index) => sparseComparison(cohort, candidate, orderedTreatment[index], seed));
       return {
         comparisons,
         treatmentAsA: comparisons.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length,

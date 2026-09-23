@@ -1,19 +1,23 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { evaluateTournamentComparison, preflightEvaluator } from "./evaluator.mjs";
 import { resolveEvaluatorRuntime } from "./evaluator-provider.mjs";
 import {
+  canonicalPairIdentity,
   createTournamentCohorts,
   mirrorTournamentComparison,
   reconcileTournamentMirror,
   selectStratifiedDirectComparisons
 } from "./tournament.mjs";
 
-export const OPENROUTER_VALIDATION_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free";
-const REQUEST_BUDGET = 50;
-const MAX_MIRRORS = 8;
+export const OPENROUTER_VALIDATION_MODEL = "qwen/qwen3.8-27b:free";
+const MAX_CLEAR_HIGH_MIRRORS = 4;
+const COMPARISON_MAX_ATTEMPTS = 4;
+const COMPARISON_RETRY_DELAY_MS = 2_000;
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const stableHash = (value) => createHash("sha256").update(value).digest("hex");
 
 function parseArgs(argv) {
   const result = { input: null, output: "validation-results", references: [] };
@@ -31,13 +35,19 @@ function parseArgs(argv) {
 
 function resultDirection(result) {
   if (!result || result.error) return "failure";
+  if (result.excluded) return "excluded";
+  if (result.mirrorAudit?.unstable || result.mirrorAudit?.unresolved) return "unclear";
+  if (result.mirrorAudit?.winnerCandidateId) {
+    return Object.values(result.comparison.mappedCandidates).find((candidate) => candidate.candidateId === result.mirrorAudit.winnerCandidateId)?.environment || "unclear";
+  }
   return result.mappedJudgment?.winnerEnvironment || "unclear";
 }
 
 function usage(results, preflightAttempts = 1, preflightSuccesses = 1, preflightFailures = 0) {
-  const records = results.flatMap((result) => [result, result.mirror].filter(Boolean));
+  const records = results.flatMap((result) => [result, result.mirror].filter((record) => record && !record.excluded));
   return records.reduce((total, result) => {
     total.attempts += Number(result.attemptCount || 1);
+    total.retries += Math.max(0, Number(result.attemptCount || 1) - 1);
     total.successes += result.judgment ? 1 : 0;
     total.failedAttempts += (result.attempts || []).filter((attempt) => attempt.error).length;
     total.terminalFailures += result.error ? 1 : 0;
@@ -46,30 +56,36 @@ function usage(results, preflightAttempts = 1, preflightSuccesses = 1, preflight
     total.totalTokens += Number(result.usage?.total_tokens || 0);
     total.durationMs += Number(result.durationMs || 0);
     return total;
-  }, { attempts: preflightAttempts, successes: preflightSuccesses, failedAttempts: preflightFailures, terminalFailures: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, durationMs: 0 });
+  }, { attempts: preflightAttempts, retries: Math.max(0, preflightAttempts - 1), successes: preflightSuccesses, failedAttempts: preflightFailures, terminalFailures: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, durationMs: 0 });
 }
 
 function counts(values, allowed) {
   return Object.fromEntries(allowed.map((value) => [value, values.filter((item) => item === value).length]));
 }
 
-function referenceComparison(sampled, reference) {
-  const byId = new Map((reference.tournament?.comparisons || []).map((result) => [result.comparison?.comparisonId, result]));
-  const outcomes = sampled.map((result) => {
-    const prior = byId.get(result.comparison.comparisonId);
+export function referenceComparison(sampled, reference) {
+  const byIdentity = new Map((reference.tournament?.comparisons || []).map((result) => {
+    const comparison = result.comparison || result.pair;
+    return [canonicalPairIdentity(comparison), result];
+  }));
+  const outcomes = sampled.filter((result) => !result.excluded).map((result) => {
+    const pairIdentity = canonicalPairIdentity(result.comparison);
+    const prior = byIdentity.get(pairIdentity);
     return {
+      pairIdentity,
       comparisonId: result.comparison.comparisonId,
       cohortId: result.comparison.cohortId,
-      nemotron: resultDirection(result),
-      reference: resultDirection(prior)
+      qwen: resultDirection(result),
+      reference: resultDirection(prior),
+      referencePairFound: Boolean(prior)
     };
   });
-  const comparable = outcomes.filter((outcome) => !["failure", "unclear"].includes(outcome.nemotron)
+  const comparable = outcomes.filter((outcome) => !["failure", "unclear"].includes(outcome.qwen)
     && !["failure", "unclear"].includes(outcome.reference));
-  const same = comparable.filter((outcome) => outcome.nemotron === outcome.reference).length;
+  const same = comparable.filter((outcome) => outcome.qwen === outcome.reference).length;
   return {
     evaluatorModel: reference.tournament?.evaluatorModel || reference.metadata?.evaluatorModel || "unknown",
-    sampledPairsFound: outcomes.filter((outcome) => outcome.reference !== "failure").length,
+    sampledPairsFound: outcomes.filter((outcome) => outcome.referencePairFound).length,
     comparablePairs: comparable.length,
     sameDirection: same,
     oppositeDirection: comparable.length - same,
@@ -78,15 +94,27 @@ function referenceComparison(sampled, reference) {
   };
 }
 
+export function selectValidationMirrors(results, { clearHighSampleSize = MAX_CLEAR_HIGH_MIRRORS, seed = "portfolio-cross-provider-mirror-audit-v1" } = {}) {
+  const eligible = results.filter((result) => !result.excluded && !result.error && (!result.mirror || result.mirror.error));
+  const required = eligible.filter((result) => result.judgment.margin === "slight" || result.judgment.confidence === "low");
+  const requiredIds = new Set(required.map((result) => canonicalPairIdentity(result.comparison)));
+  const clearHigh = eligible.filter((result) => !requiredIds.has(canonicalPairIdentity(result.comparison))
+    && result.judgment.margin === "clear" && result.judgment.confidence === "high")
+    .sort((left, right) => stableHash(`${seed}:${canonicalPairIdentity(left.comparison)}`)
+      .localeCompare(stableHash(`${seed}:${canonicalPairIdentity(right.comparison)}`)))
+    .slice(0, clearHighSampleSize);
+  return [...required, ...clearHigh];
+}
+
 export function summarizeValidation({ comparisons, references = {}, startedAt, completedAt, preflight, sample }) {
   const baseDirections = comparisons.map(resultDirection);
-  const successful = comparisons.filter((result) => !result.error);
+  const successful = comparisons.filter((result) => !result.error && !result.excluded);
   const margins = successful.map((result) => result.judgment.margin);
   const confidences = successful.map((result) => result.judgment.confidence);
   const cohorts = [...new Set(comparisons.map((result) => result.comparison.cohortId))].map((cohortId) => {
     const results = comparisons.filter((result) => result.comparison.cohortId === cohortId);
     const directions = results.map(resultDirection);
-    const cohortCounts = counts(directions, ["control", "treatment", "unclear", "failure"]);
+    const cohortCounts = counts(directions, ["control", "treatment", "unclear", "failure", "excluded"]);
     return { cohortId, ...cohortCounts, direction: cohortCounts.treatment > cohortCounts.control ? "treatment" : cohortCounts.control > cohortCounts.treatment ? "control" : "mixed" };
   });
   const referenceAgreement = Object.fromEntries(Object.entries(references).map(([name, reference]) => [name, referenceComparison(comparisons, reference)]));
@@ -115,8 +143,16 @@ export function summarizeValidation({ comparisons, references = {}, startedAt, c
       evaluatorModel: OPENROUTER_VALIDATION_MODEL,
       purpose: "sparse cross-provider validation; no Bradley-Terry ranking"
     },
-    sample: { baseComparisons: sample.length, cohorts: cohorts.length, treatmentAsA, controlAsA: sample.length - treatmentAsA, repetitions },
-    outcomes: counts(baseDirections, ["control", "treatment", "unclear", "failure"]),
+    sample: {
+      baseComparisons: sample.length,
+      validProseComparisons: sample.filter((comparison) => comparison.qualitativeEligible !== false).length,
+      excludedReliabilityCases: sample.filter((comparison) => comparison.qualitativeEligible === false).length,
+      cohorts: cohorts.length,
+      treatmentAsA,
+      controlAsA: sample.length - treatmentAsA,
+      repetitions
+    },
+    outcomes: counts(baseDirections, ["control", "treatment", "unclear", "failure", "excluded"]),
     margins: counts(margins, ["slight", "clear", "substantial"]),
     confidence: counts(confidences, ["low", "medium", "high"]),
     mirrorAudit: {
@@ -141,14 +177,17 @@ function percent(value) {
 
 function markdown(summary) {
   const lines = [
-    "# Nemotron sparse cross-provider validation",
+    "# Qwen sparse cross-provider validation",
     "",
     `Model: \`${summary.metadata.evaluatorModel}\` via OpenRouter`,
     "",
-    "This is a 33-pair stratified direct control-vs-treatment validation. It does not fit or report a six-way Bradley-Terry ranking.",
+    "This is a 33-slot stratified direct control-vs-treatment validation. Reliability exclusions remain separate from prose-quality judgments. It does not fit or report a six-way Bradley-Terry ranking.",
     "",
     "## Overall",
     "",
+    `- Base comparison slots: ${summary.sample.baseComparisons}`,
+    `- Valid prose-quality comparisons: ${summary.sample.validProseComparisons}`,
+    `- Excluded reliability/fallback cases: ${summary.sample.excludedReliabilityCases}`,
     `- Treatment wins: ${summary.outcomes.treatment}`,
     `- Control wins: ${summary.outcomes.control}`,
     `- Unclear: ${summary.outcomes.unclear}`,
@@ -168,6 +207,7 @@ function markdown(summary) {
     "## API execution",
     "",
     `- Attempts (including preflight): ${summary.api.attempts}`,
+    `- Retries: ${summary.api.retries}`,
     `- Successful calls (including preflight): ${summary.api.successes}`,
     `- Failed attempts: ${summary.api.failedAttempts}`,
     `- Terminal comparison failures: ${summary.api.terminalFailures}`,
@@ -176,9 +216,9 @@ function markdown(summary) {
     "",
     "## Cohort direction",
     "",
-    "| Cohort | Treatment | Control | Unclear | Failure | Direction |",
-    "| --- | ---: | ---: | ---: | ---: | --- |",
-    ...summary.cohorts.map((cohort) => `| ${cohort.cohortId} | ${cohort.treatment} | ${cohort.control} | ${cohort.unclear} | ${cohort.failure} | ${cohort.direction} |`),
+    "| Cohort | Treatment | Control | Unclear | Failure | Excluded | Direction |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
+    ...summary.cohorts.map((cohort) => `| ${cohort.cohortId} | ${cohort.treatment} | ${cohort.control} | ${cohort.unclear} | ${cohort.failure} | ${cohort.excluded} | ${cohort.direction} |`),
     "",
     "## Exact sampled-pair agreement with prior evaluators",
     "",
@@ -189,10 +229,10 @@ function markdown(summary) {
     "## Conclusion",
     "",
     summary.conclusion.agreement === "luna-sol"
-      ? "On the exact sampled pairs, Nemotron broadly agrees more with Luna/Sol than with Mini."
+      ? "On the exact canonical sampled pairs, Qwen broadly agrees more with Luna/Sol than with Mini."
       : summary.conclusion.agreement === "mini"
-        ? "On the exact sampled pairs, Nemotron broadly agrees more with Mini than with Luna/Sol."
-        : "On the exact sampled pairs, Nemotron does not show a sufficiently distinct broad agreement with Luna/Sol or Mini.",
+        ? "On the exact canonical sampled pairs, Qwen broadly agrees more with Mini than with Luna/Sol."
+        : "On the exact canonical sampled pairs, Qwen does not show a sufficiently distinct broad agreement with Luna/Sol or Mini.",
     "",
     "Ben remains the final editorial judge. Full per-pair mappings, rationales, attempts, usage, mirror audits, and exact reference outcomes are preserved in the JSON artifact."
   ];
@@ -207,7 +247,7 @@ async function main() {
   const runtime = resolveEvaluatorRuntime({
     config: { defaultProvider: "openrouter", apiKeyEnvByProvider: { openrouter: "OPENROUTER_API_KEY" }, defaultModel: OPENROUTER_VALIDATION_MODEL }
   });
-  if (runtime.provider !== "openrouter" || runtime.model !== OPENROUTER_VALIDATION_MODEL) throw new Error("Nemotron validation provider/model must remain pinned");
+  if (runtime.provider !== "openrouter" || runtime.model !== OPENROUTER_VALIDATION_MODEL) throw new Error("Qwen validation provider/model must remain pinned");
   const cohorts = createTournamentCohorts(source.runs, source.config?.tournament?.pairingSeed || "portfolio-generation-tournament-v1");
   if (cohorts.length !== 11) throw new Error(`Expected 11 topic cohorts; found ${cohorts.length}`);
   const sample = selectStratifiedDirectComparisons(cohorts);
@@ -215,18 +255,18 @@ async function main() {
   const references = Object.fromEntries(await Promise.all(options.references.map(async ({ name, filename }) => [name, JSON.parse(await readFile(filename, "utf8"))])));
   const runsById = new Map(source.runs.map((run) => [run.runId, run]));
   await mkdir(options.output, { recursive: true });
-  const checkpointPath = path.join(options.output, "nemotron-validation.json");
+  const checkpointPath = path.join(options.output, "qwen-validation.json");
   let preflight;
   let preflightFailures = 0;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
       preflight = await preflightEvaluator({ ...runtime, timeoutMs: 120_000 });
       preflight = { ...preflight, attemptCount: attempt, failedAttempts: preflightFailures, success: true };
       break;
     } catch (error) {
       preflightFailures += 1;
-      if (attempt === 2) throw error;
-      await delay(1_000);
+      if (attempt === 3) throw error;
+      await delay(2_000 * attempt);
     }
   }
   let comparisons = [];
@@ -239,9 +279,32 @@ async function main() {
   }
   for (let index = 0; index < sample.length; index += 1) {
     const existingIndex = comparisons.findIndex((result) => result.comparison?.comparisonId === sample[index].comparisonId);
-    if (existingIndex >= 0 && !comparisons[existingIndex].error) continue;
-    console.log(`[nemotron ${index + 1}/${sample.length}] ${sample[index].cohortId} ${sample[index].comparisonId}`);
-    const evaluated = await evaluateTournamentComparison({ comparison: sample[index], runsById, ...runtime, timeoutMs: 120_000 });
+    if (existingIndex >= 0 && (!comparisons[existingIndex].error || comparisons[existingIndex].excluded)) continue;
+    let evaluated;
+    if (sample[index].qualitativeEligible === false) {
+      console.log(`[qwen ${index + 1}/${sample.length}] ${sample[index].cohortId} ${sample[index].comparisonId} excluded: ${sample[index].exclusion.reason}`);
+      evaluated = {
+        comparison: sample[index],
+        excluded: true,
+        qualitativeEligible: false,
+        exclusion: sample[index].exclusion,
+        attemptCount: 0,
+        attempts: [],
+        durationMs: 0,
+        evaluatorModel: runtime.model,
+        evaluatorProvider: runtime.provider
+      };
+    } else {
+      console.log(`[qwen ${index + 1}/${sample.length}] ${sample[index].cohortId} ${sample[index].comparisonId}`);
+      evaluated = await evaluateTournamentComparison({
+        comparison: sample[index],
+        runsById,
+        ...runtime,
+        timeoutMs: 120_000,
+        maxAttempts: COMPARISON_MAX_ATTEMPTS,
+        retryDelayMs: COMPARISON_RETRY_DELAY_MS
+      });
+    }
     if (existingIndex >= 0) comparisons[existingIndex] = evaluated;
     else comparisons.push(evaluated);
     await persist();
@@ -249,22 +312,30 @@ async function main() {
   }
   comparisons.sort((left, right) => sample.findIndex((comparison) => comparison.comparisonId === left.comparison?.comparisonId)
     - sample.findIndex((comparison) => comparison.comparisonId === right.comparison?.comparisonId));
-  const uncertain = comparisons.filter((result) => !result.error && !result.mirror && (result.judgment.margin === "slight" || result.judgment.confidence === "low"));
-  const baseUsage = usage(comparisons, preflight.attemptCount, 1, preflight.failedAttempts);
-  const mirrorLimit = Math.min(MAX_MIRRORS, Math.floor(Math.max(0, REQUEST_BUDGET - baseUsage.attempts) / 2), uncertain.length);
-  for (const result of uncertain.slice(0, mirrorLimit)) {
-    console.log(`[nemotron mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
-    const mirror = await evaluateTournamentComparison({ comparison: mirrorTournamentComparison(result.comparison), runsById, ...runtime, timeoutMs: 120_000 });
+  const mirrorTargets = selectValidationMirrors(comparisons);
+  for (const result of mirrorTargets) {
+    console.log(`[qwen mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
+    const mirror = await evaluateTournamentComparison({
+      comparison: mirrorTournamentComparison(result.comparison),
+      runsById,
+      ...runtime,
+      timeoutMs: 120_000,
+      maxAttempts: COMPARISON_MAX_ATTEMPTS,
+      retryDelayMs: COMPARISON_RETRY_DELAY_MS
+    });
     result.mirror = mirror;
     if (mirror.error) result.mirrorError = mirror.error;
-    else result.mirrorAudit = reconcileTournamentMirror(result, mirror);
+    else {
+      delete result.mirrorError;
+      result.mirrorAudit = reconcileTournamentMirror(result, mirror);
+    }
     await persist();
     await delay(1_000);
   }
   const completedAt = new Date().toISOString();
   const summary = summarizeValidation({ comparisons, references, startedAt, completedAt, preflight, sample });
   await writeFile(checkpointPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
-  await writeFile(path.join(options.output, "nemotron-validation.md"), markdown(summary), "utf8");
+  await writeFile(path.join(options.output, "qwen-validation.md"), markdown(summary), "utf8");
   console.log(markdown(summary));
 }
 
