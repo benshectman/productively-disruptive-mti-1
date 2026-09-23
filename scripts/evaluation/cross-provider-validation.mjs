@@ -14,8 +14,10 @@ import {
 
 export const OPENROUTER_VALIDATION_MODEL = "qwen/qwen3.8-27b:free";
 const MAX_CLEAR_HIGH_MIRRORS = 4;
-const COMPARISON_MAX_ATTEMPTS = 4;
-const COMPARISON_RETRY_DELAY_MS = 2_000;
+const PREFLIGHT_MAX_ATTEMPTS = 8;
+const PREFLIGHT_RETRY_DELAY_MS = 15_000;
+const COMPARISON_MAX_ATTEMPTS = 6;
+const COMPARISON_RETRY_DELAY_MS = 5_000;
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const stableHash = (value) => createHash("sha256").update(value).digest("hex");
 
@@ -258,15 +260,15 @@ async function main() {
   const checkpointPath = path.join(options.output, "qwen-validation.json");
   let preflight;
   let preflightFailures = 0;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  for (let attempt = 1; attempt <= PREFLIGHT_MAX_ATTEMPTS; attempt += 1) {
     try {
       preflight = await preflightEvaluator({ ...runtime, timeoutMs: 120_000 });
       preflight = { ...preflight, attemptCount: attempt, failedAttempts: preflightFailures, success: true };
       break;
     } catch (error) {
       preflightFailures += 1;
-      if (attempt === 3) throw error;
-      await delay(2_000 * attempt);
+      if (attempt === PREFLIGHT_MAX_ATTEMPTS) throw error;
+      await delay(PREFLIGHT_RETRY_DELAY_MS * attempt);
     }
   }
   let comparisons = [];
