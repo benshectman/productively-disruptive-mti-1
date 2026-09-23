@@ -399,7 +399,14 @@ export async function preflightEvaluator({ apiKey, model, provider = "openai", f
       const parsed = parseEvaluatorJson(responseText);
       if (!parsed || Object.keys(parsed).length !== 1 || parsed.status !== marker) throw new Error("Evaluator preflight response did not contain the expected strict JSON marker");
     } else if (!responseText.includes(marker)) throw new Error("Evaluator preflight response did not contain the expected marker");
-    return { startedAt, completedAt: new Date().toISOString(), durationMs: Math.round(performance.now() - start), evaluatorModel: model, evaluatorProvider: provider };
+    return {
+      startedAt,
+      completedAt: new Date().toISOString(),
+      durationMs: Math.round(performance.now() - start),
+      evaluatorModel: model,
+      evaluatorProvider: provider,
+      usage: normalizeProviderUsage(result.usage, provider)
+    };
   } finally {
     clearTimeout(timer);
   }

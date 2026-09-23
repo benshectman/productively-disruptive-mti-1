@@ -249,6 +249,7 @@ export function reconcileTournamentMirror(original, mirrored) {
 }
 
 export function shouldMirrorTournamentResult(result, options = {}) {
+  if (options.mirrorEvery) return true;
   if (options.explicitComparisonIds?.includes(result.comparison.comparisonId)) return true;
   if (result.error || !result.mappedJudgment?.winnerCandidateId) return false;
   if (options.mirrorLowConfidence !== false && result.judgment.confidence === "low") return true;
@@ -267,6 +268,8 @@ function bradleyTerry(candidates, results, prior = 0.5) {
   const wins = Array(ids.length).fill(0);
   const games = Array.from({ length: ids.length }, () => Array(ids.length).fill(0));
   for (const result of results) {
+    const winner = decisiveResult(result);
+    if (!winner) continue;
     const [leftId, rightId] = result.comparison.candidateIds;
     const left = index.get(leftId);
     const right = index.get(rightId);
@@ -275,7 +278,6 @@ function bradleyTerry(candidates, results, prior = 0.5) {
     games[right][left] += 2 * prior;
     wins[left] += prior;
     wins[right] += prior;
-    const winner = decisiveResult(result);
     if (winner === leftId) { games[left][right] += 1; games[right][left] += 1; wins[left] += 1; }
     if (winner === rightId) { games[left][right] += 1; games[right][left] += 1; wins[right] += 1; }
   }
@@ -329,8 +331,66 @@ function counts(values) {
   return Object.fromEntries(values.reduce((map, value) => map.set(value, (map.get(value) || 0) + 1), new Map()));
 }
 
+function comparisonType(result) {
+  const environments = Object.values(result.comparison.mappedCandidates).map((candidate) => candidate.environment).sort();
+  if (environments[0] !== environments[1]) return "controlTreatment";
+  return environments[0] === "control" ? "controlControl" : "treatmentTreatment";
+}
+
+function stabilityCounts(results) {
+  const summary = {
+    controlTreatment: { total: 0, stable: 0, unstable: 0, unresolved: 0, failures: 0 },
+    controlControl: { total: 0, stable: 0, unstable: 0, unresolved: 0, failures: 0 },
+    treatmentTreatment: { total: 0, stable: 0, unstable: 0, unresolved: 0, failures: 0 }
+  };
+  for (const result of results) {
+    const entry = summary[comparisonType(result)];
+    entry.total += 1;
+    if (result.error || result.mirrorError) entry.failures += 1;
+    else if (result.mirrorAudit?.unstable) entry.unstable += 1;
+    else if (result.mirrorAudit?.unresolved || !decisiveResult(result)) entry.unresolved += 1;
+    else entry.stable += 1;
+  }
+  return summary;
+}
+
+function graphDiagnostics(cohort, results) {
+  const relevant = results.filter((result) => result.comparison.cohortId === cohort.cohortId);
+  const stable = relevant.filter((result) => decisiveResult(result));
+  const adjacency = new Map(cohort.candidates.map((candidate) => [candidate.candidateId, new Set()]));
+  for (const result of stable) {
+    const [left, right] = result.comparison.candidateIds;
+    adjacency.get(left)?.add(right);
+    adjacency.get(right)?.add(left);
+  }
+  let connectedComponents = 0;
+  const seen = new Set();
+  for (const candidate of cohort.candidates) {
+    if (seen.has(candidate.candidateId)) continue;
+    connectedComponents += 1;
+    const pending = [candidate.candidateId];
+    while (pending.length) {
+      const current = pending.pop();
+      if (seen.has(current)) continue;
+      seen.add(current);
+      for (const neighbor of adjacency.get(current) || []) if (!seen.has(neighbor)) pending.push(neighbor);
+    }
+  }
+  const stableCoverage = relevant.length ? stable.length / relevant.length : null;
+  return {
+    eligibleEdges: relevant.length,
+    stableEdges: stable.length,
+    unstableEdges: relevant.filter((result) => result.mirrorAudit?.unstable).length,
+    unresolvedEdges: relevant.filter((result) => result.mirrorAudit?.unresolved).length,
+    failedEdges: relevant.filter((result) => result.error || result.mirrorError).length,
+    stableCoverage,
+    connectedComponents,
+    orderingStrength: connectedComponents > 1 ? "underdetermined" : stableCoverage != null && stableCoverage < 0.75 ? "weak" : "supported"
+  };
+}
+
 export function aggregateTournament(cohorts, results) {
-  const rankedCohorts = cohorts.map((cohort) => ({ ...cohort, ranking: rankTournamentCohort(cohort, results) }));
+  const rankedCohorts = cohorts.map((cohort) => ({ ...cohort, ranking: rankTournamentCohort(cohort, results), graph: graphDiagnostics(cohort, results) }));
   const decisive = results.filter((result) => decisiveResult(result));
   const direct = decisive.filter((result) => {
     const environments = result.comparison.candidateIds.map((id) => result.comparison.mappedCandidates.A.candidateId === id
@@ -353,18 +413,22 @@ export function aggregateTournament(cohorts, results) {
     }
   }
   const judgmentPasses = results.flatMap((result) => [
-    result.judgment ? { pass: "original", winner: result.judgment.winner } : null,
-    result.mirror?.judgment ? { pass: "mirror", winner: result.mirror.judgment.winner } : null
-  ]).filter((pass) => pass && ["A_stronger", "B_stronger"].includes(pass.winner));
+    result.judgment ? { pass: "original", ...result.judgment } : null,
+    result.mirror?.judgment ? { pass: "mirror", ...result.mirror.judgment } : null
+  ]).filter(Boolean);
   const passCounts = (passes) => ({
     A: passes.filter((pass) => pass.winner === "A_stronger").length,
-    B: passes.filter((pass) => pass.winner === "B_stronger").length
+    B: passes.filter((pass) => pass.winner === "B_stronger").length,
+    unclear: passes.filter((pass) => pass.winner === "unclear").length,
+    total: passes.length
   });
   const allPassCounts = passCounts(judgmentPasses);
   const originalPassCounts = passCounts(judgmentPasses.filter((pass) => pass.pass === "original"));
   const mirrorPassCounts = passCounts(judgmentPasses.filter((pass) => pass.pass === "mirror"));
   const mirroredCount = results.filter((result) => result.mirror).length;
   const unstableCount = results.filter((result) => result.mirrorAudit?.unstable).length;
+  const stableCount = results.filter((result) => decisiveResult(result)).length;
+  const stabilityByType = stabilityCounts(results);
   const substantialTreatmentLosses = direct.filter((result) => {
     const winnerEnvironment = result.mirrorAudit?.winnerCandidateId
       ? [result.comparison.mappedCandidates.A, result.comparison.mappedCandidates.B].find((candidate) => candidate.candidateId === result.mirrorAudit.winnerCandidateId).environment
@@ -395,8 +459,11 @@ export function aggregateTournament(cohorts, results) {
       comparisonCount: results.length,
       decisiveComparisonCount: decisive.length,
       directControlTreatmentComparisons: direct.length,
+      eligibleDirectControlTreatmentComparisons: stabilityByType.controlTreatment.total,
       directWins,
       directTreatmentWinRate: treatmentRate,
+      stableDirectTreatmentWinRate: treatmentRate,
+      directInstability: stabilityByType.controlTreatment,
       placement,
       rankStatistics: Object.fromEntries(Object.entries(allRanks).map(([environment, ranks]) => [environment, {
         mean: ranks.length ? ranks.reduce((sum, rank) => sum + rank, 0) / ranks.length : null,
@@ -404,18 +471,22 @@ export function aggregateTournament(cohorts, results) {
       }])),
       margins: counts(results.filter((result) => result.judgment).map((result) => result.judgment.margin)),
       confidence: counts(results.filter((result) => result.judgment).map((result) => result.judgment.confidence)),
+      allPassMargins: counts(judgmentPasses.map((pass) => pass.margin)),
+      allPassConfidence: counts(judgmentPasses.map((pass) => pass.confidence)),
       lowConfidenceComparisons: results.filter((result) => result.judgment?.confidence === "low").map((result) => result.comparison.comparisonId),
       unclearComparisons: results.filter((result) => result.judgment?.winner === "unclear").map((result) => result.comparison.comparisonId),
       evaluatorErrors: results.filter((result) => result.error || result.mirrorError).map((result) => result.comparison.comparisonId),
       unstableComparisons: results.filter((result) => result.mirrorAudit?.unstable).map((result) => result.comparison.comparisonId),
       mirroredComparisons: mirroredCount,
+      stableComparisons: stableCount,
+      stabilityByType,
       substantialTreatmentLosses,
       treatmentBottomTopics,
       repeatedTreatmentRegressions,
       positionBias: {
-        allPasses: { ...allPassCounts, total: judgmentPasses.length },
-        originalPasses: { ...originalPassCounts, total: originalPassCounts.A + originalPassCounts.B },
-        mirroredPasses: { ...mirrorPassCounts, total: mirrorPassCounts.A + mirrorPassCounts.B },
+        allPasses: allPassCounts,
+        originalPasses: originalPassCounts,
+        mirroredPasses: mirrorPassCounts,
         unstableMirroredComparisons: unstableCount,
         unstableMirrorRate: mirroredCount ? unstableCount / mirroredCount : null,
         suspicious: mirroredCount >= 4 && unstableCount / mirroredCount >= 0.25

@@ -304,7 +304,15 @@ export async function evaluateTournamentBundle({
   });
   await mapWithConcurrency(pending, concurrency, async (comparison, index) => {
     console.log(`[tournament ${index + 1}/${pending.length}] ${comparison.cohortId} ${comparison.comparisonId}`);
-    const result = await evaluator({ comparison, runsById, apiKey, model, provider });
+    const result = await evaluator({
+      comparison,
+      runsById,
+      apiKey,
+      model,
+      provider,
+      maxAttempts: config.tournament?.maxAttempts,
+      retryDelayMs: config.tournament?.retryDelayMs
+    });
     const existingIndex = bundle.tournament.comparisons.findIndex((item) => item.comparison?.comparisonId === comparison.comparisonId);
     if (existingIndex === -1) bundle.tournament.comparisons.push(result);
     else bundle.tournament.comparisons[existingIndex] = result;
@@ -320,15 +328,24 @@ export async function evaluateTournamentBundle({
     return cohort.comparisons.filter((comparison) => comparison.candidateIds.every((id) => topIds.has(id))).map((comparison) => comparison.comparisonId);
   });
   const mirrorOptions = {
+    mirrorEvery: config.tournament?.mirrorEvery === true,
     mirrorLowConfidence: config.tournament?.mirrorLowConfidence !== false,
     mirrorSlight: config.tournament?.mirrorSlight !== false,
     topImpactComparisonIds: config.tournament?.mirrorTopImpact === false ? [] : topImpactComparisonIds,
     explicitComparisonIds: explicitMirrorIds
   };
   for (const result of bundle.tournament.comparisons) {
-    if (result.error || (result.mirror && !result.mirrorError) || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
+    if ((result.error && !mirrorOptions.mirrorEvery) || (result.mirror && !result.mirrorError) || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
     console.log(`[tournament mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
-    const mirror = await evaluator({ comparison: mirrorTournamentComparison(result.comparison), runsById, apiKey, model, provider });
+    const mirror = await evaluator({
+      comparison: mirrorTournamentComparison(result.comparison),
+      runsById,
+      apiKey,
+      model,
+      provider,
+      maxAttempts: config.tournament?.maxAttempts,
+      retryDelayMs: config.tournament?.retryDelayMs
+    });
     result.mirror = mirror;
     if (!mirror.error) {
       result.mirrorAudit = reconcileTournamentMirror(result, mirror);
@@ -345,7 +362,9 @@ export async function evaluateTournamentBundle({
     completedAt: new Date().toISOString()
   };
   bundle.metadata ||= {};
-  bundle.metadata.tournamentFlow = "complete-round-robin -> selective-mirroring -> regularized-Bradley-Terry-ranking";
+  bundle.metadata.tournamentFlow = config.tournament?.mirrorEvery === true
+    ? "complete-round-robin -> full-bidirectional-mirroring -> stable-edge-only-regularized-Bradley-Terry-ranking"
+    : "complete-round-robin -> selective-mirroring -> regularized-Bradley-Terry-ranking";
   await checkpoint();
   return bundle;
 }
