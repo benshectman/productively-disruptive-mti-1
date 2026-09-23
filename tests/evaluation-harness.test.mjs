@@ -36,9 +36,15 @@ import {
   resolveEvaluatorRuntime
 } from "../scripts/evaluation/evaluator-provider.mjs";
 import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
+import {
+  OPENROUTER_VALIDATION_MODEL,
+  referenceComparison,
+  selectValidationMirrors
+} from "../scripts/evaluation/cross-provider-validation.mjs";
 import { args, evaluateBundle, evaluateTournamentBundle, needsQualitativeEvaluation, needsTournamentEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
 import {
   aggregateTournament,
+  canonicalPairIdentity,
   createTournamentCohorts,
   mapTournamentJudgment,
   mirrorTournamentComparison,
@@ -212,6 +218,17 @@ describe("evaluator evidence context", () => {
 });
 
 describe("evaluator provider adapter", () => {
+  it("pins the sparse OpenRouter validation to the exact Qwen free model", () => {
+    expect(OPENROUTER_VALIDATION_MODEL).toBe("qwen/qwen3.8-27b:free");
+  });
+
+  it("pins the workflow provider and model instead of relying on OpenRouter routing preferences", async () => {
+    const workflow = await readFile(new URL("../.github/workflows/evaluator-calibration.yml", import.meta.url), "utf8");
+    expect(workflow).toContain("EVAL_PROVIDER: openrouter");
+    expect(workflow).toContain("EVAL_MODEL: qwen/qwen3.8-27b:free");
+    expect(workflow).toContain("OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}");
+  });
+
   it("defaults to OpenAI and selects OpenRouter explicitly", () => {
     expect(resolveEvaluatorProvider()).toMatchObject({ id: "openai", apiKeyEnv: "OPENAI_API_KEY" });
     expect(resolveEvaluatorProvider("OPENROUTER")).toMatchObject({ id: "openrouter", apiKeyEnv: "OPENROUTER_API_KEY" });
@@ -283,6 +300,22 @@ describe("relative-quality tournament", () => {
         expect(comparisons.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === environment).repetition).sort()).toEqual([1, 2, 3]);
       }
     }
+  });
+
+  it("uses an A/B-order-independent canonical identity for the underlying pair", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mirrored = mirrorTournamentComparison(comparison);
+    expect(canonicalPairIdentity(mirrored)).toBe(canonicalPairIdentity(comparison));
+    expect(canonicalPairIdentity({ ...comparison, comparisonId: "different-local-id" })).toBe(canonicalPairIdentity(comparison));
+  });
+
+  it("matches reference outcomes by canonical candidate pair instead of local comparison ID", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const sampled = result({ ...comparison, comparisonId: "qwen-local-id" }, "A_stronger");
+    const mirroredReference = result({ ...mirrorTournamentComparison(comparison), comparisonId: "reference-local-id" }, "B_stronger");
+    const agreement = referenceComparison([sampled], { tournament: { evaluatorModel: "reference-model", comparisons: [mirroredReference] } });
+    expect(agreement).toMatchObject({ sampledPairsFound: 1, comparablePairs: 1, sameDirection: 1, oppositeDirection: 0, agreementRate: 1 });
+    expect(agreement.outcomes[0].pairIdentity).toBe(canonicalPairIdentity(comparison));
   });
 
   it("keeps environment and model identity out of blinded evaluator input", () => {
@@ -369,6 +402,28 @@ describe("relative-quality tournament", () => {
     expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
   });
 
+  it("allows the sparse validation to request additional retries without changing the default OpenAI path", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      maxAttempts: 4,
+      retryDelayMs: 0,
+      fetcher: async () => {
+        calls += 1;
+        const outputText = calls < 4 ? "{" : JSON.stringify({ winner: "A_stronger", margin: "clear", confidence: "high", rationale: "Better synthesis." });
+        return new Response(JSON.stringify({ output_text: outputText }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(4);
+    expect(evaluated.attemptCount).toBe(4);
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
+  });
+
   it("builds OpenRouter chat requests without API-enforced response_format and retries invalid JSON", async () => {
     const runs = sixRuns();
     const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
@@ -378,13 +433,13 @@ describe("relative-quality tournament", () => {
       runsById: new Map(runs.map((item) => [item.runId, item])),
       provider: "openrouter",
       apiKey: "openrouter-test-key",
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+      model: "qwen/qwen3.8-27b:free",
       fetcher: async (url, init) => {
         calls += 1;
         expect(url).toBe("https://openrouter.ai/api/v1/chat/completions");
         expect(init.headers.Authorization).toBe("Bearer openrouter-test-key");
         const body = JSON.parse(init.body);
-        expect(body.model).toBe("nvidia/nemotron-3-ultra-550b-a55b:free");
+        expect(body.model).toBe("qwen/qwen3.8-27b:free");
         expect(body).not.toHaveProperty("response_format");
         expect(body).not.toHaveProperty("text");
         expect(body.messages[0].content).toContain("Return only one strict JSON object");
@@ -460,6 +515,37 @@ describe("relative-quality tournament", () => {
     expect(cohort.candidates).toHaveLength(4);
     expect(cohort.comparisons).toHaveLength(6);
     expect(cohort.excludedCandidates.map((candidate) => candidate.reason).sort()).toEqual(["fallback-containing-response", "generation-failed"]);
+  });
+
+  it("keeps a fallback repetition as an explicit reliability exclusion in the sparse design", () => {
+    const runs = sixRuns();
+    const fallbackRunId = runs[0].runId;
+    runs[0] = { ...runs[0], totalFallbackFields: 1 };
+    const [cohort] = createTournamentCohorts(runs, "seed");
+    const selected = selectStratifiedDirectComparisons([cohort], "sample-seed");
+    expect(selected).toHaveLength(3);
+    expect(selected.filter((comparison) => comparison.qualitativeEligible !== false)).toHaveLength(2);
+    expect(selected.filter((comparison) => comparison.qualitativeEligible === false)).toHaveLength(1);
+    expect(selected.find((comparison) => comparison.qualitativeEligible === false)).toMatchObject({
+      exclusion: { category: "reliability", reason: "fallback-containing-response" }
+    });
+    expect(selected.find((comparison) => comparison.qualitativeEligible === false).candidateIds).toContain(fallbackRunId);
+  });
+
+  it("mirrors every slight or low-confidence result plus a deterministic clear/high audit sample", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = [
+      result(cohort.comparisons[0], "A_stronger", "slight", "high"),
+      result(cohort.comparisons[1], "A_stronger", "clear", "low"),
+      result(cohort.comparisons[2], "A_stronger", "clear", "high"),
+      result(cohort.comparisons[3], "A_stronger", "clear", "high"),
+      result(cohort.comparisons[4], "A_stronger", "substantial", "medium")
+    ];
+    const selected = selectValidationMirrors(results, { clearHighSampleSize: 1, seed: "mirror-seed" });
+    expect(selected).toHaveLength(3);
+    expect(selected).toEqual(expect.arrayContaining([results[0], results[1]]));
+    expect(selected.filter((item) => [results[2], results[3]].includes(item))).toHaveLength(1);
+    expect(selectValidationMirrors(results, { clearHighSampleSize: 1, seed: "mirror-seed" })).toEqual(selected);
   });
 
   it("resumes tournament progress without repeating completed comparisons", async () => {
