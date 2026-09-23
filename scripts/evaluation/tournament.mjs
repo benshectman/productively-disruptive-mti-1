@@ -99,23 +99,37 @@ function permutations(values) {
     .map((rest) => [value, ...rest]));
 }
 
-function directComparison(cohort, left, right) {
-  return cohort.comparisons.find((comparison) => comparison.candidateIds.includes(left.candidateId)
+function directComparison(cohort, left, right, seed) {
+  const existing = cohort.comparisons.find((comparison) => comparison.candidateIds.includes(left.candidateId)
     && comparison.candidateIds.includes(right.candidateId));
+  if (existing) return existing;
+  const candidateIds = [left.candidateId, right.candidateId].sort();
+  const pairKey = candidateIds.join(":");
+  const swap = Number.parseInt(stableHash(`${seed}:${cohort.cohortId}:${pairKey}:placement`).slice(0, 2), 16) % 2 === 1;
+  const [a, b] = swap ? [right, left] : [left, right];
+  return {
+    comparisonId: stableHash(`${seed}:${cohort.cohortId}:${pairKey}`).slice(0, 20),
+    cohortId: cohort.cohortId,
+    topicConfiguration: cohort.topicConfiguration,
+    candidateIds,
+    blind: { A: a.candidateId, B: b.candidateId },
+    placement: { strategy: "seeded-sparse-validation", A: a.candidateId, B: b.candidateId },
+    mappedCandidates: { A: a, B: b }
+  };
 }
 
 export function selectStratifiedDirectComparisons(cohorts, seed = "portfolio-cross-provider-validation-v1") {
   const optionsByCohort = cohorts.map((cohort) => {
-    const control = cohort.candidates.filter((candidate) => candidate.environment === "control")
+    const capturedCandidates = [...cohort.candidates, ...cohort.excludedCandidates];
+    const control = capturedCandidates.filter((candidate) => candidate.environment === "control")
       .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
-    const treatment = cohort.candidates.filter((candidate) => candidate.environment === "treatment")
+    const treatment = capturedCandidates.filter((candidate) => candidate.environment === "treatment")
       .sort((left, right) => left.repetition - right.repetition || left.candidateId.localeCompare(right.candidateId));
     if (control.length !== 3 || treatment.length !== 3) {
-      throw new Error(`Cohort ${cohort.cohortId} must contain exactly three generated control and treatment repetitions`);
+      throw new Error(`Cohort ${cohort.cohortId} must contain exactly three captured control and treatment repetitions`);
     }
     return permutations(treatment).map((orderedTreatment) => {
-      const comparisons = control.map((candidate, index) => directComparison(cohort, candidate, orderedTreatment[index]));
-      if (comparisons.some((comparison) => !comparison)) throw new Error(`Cohort ${cohort.cohortId} is missing a direct comparison`);
+      const comparisons = control.map((candidate, index) => directComparison(cohort, candidate, orderedTreatment[index], seed));
       return {
         comparisons,
         treatmentAsA: comparisons.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length,
