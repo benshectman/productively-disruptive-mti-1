@@ -85,6 +85,15 @@ export const NarrativeSchema = z.object({
 
 export const GenerationFieldProvenanceSchema = z.enum(["ai", "fallback"]);
 export const GenerationOutcomeSchema = z.enum(["ai", "mixed", "fallback"]);
+export const GenerationEvidenceDiagnosticsSchema = z.object({
+  eligibleFactCount: z.number().int().min(0).max(36),
+  eligibleFactIds: z.array(EvidenceFactIdSchema).max(36),
+  generatedSummaryCitedIds: z.array(z.string()).max(36),
+  generatedDetailCitedIds: z.array(z.string()).max(36),
+  finalDisplayedEvidenceIds: z.array(EvidenceFactIdSchema).max(36),
+  invalidSummaryCitedIds: z.array(z.string()).max(36),
+  invalidDetailCitedIds: z.array(z.string()).max(36)
+}).strict();
 export const GenerationSectionDiagnosticsSchema = z.object({
   id: z.string().min(1).max(80),
   status: GenerationOutcomeSchema,
@@ -92,7 +101,8 @@ export const GenerationSectionDiagnosticsSchema = z.object({
     headline: GenerationFieldProvenanceSchema,
     summary: GenerationFieldProvenanceSchema,
     detail: GenerationFieldProvenanceSchema
-  })
+  }),
+  evidence: GenerationEvidenceDiagnosticsSchema.optional()
 });
 export const GenerationRejectionSchema = z.object({
   sectionId: z.string().min(1).max(80).optional(),

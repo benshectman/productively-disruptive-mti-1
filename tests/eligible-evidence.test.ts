@@ -37,7 +37,17 @@ describe("uncapped approved evidence eligibility", () => {
       const body = JSON.parse(String(init?.body));
       requestBodies.push(body);
       if (body.text.format.name === "portfolio_narrative") {
-        return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map(({ id, headline, summary, detail }) => ({ id, headline, summary, detail })) }) }), { status: 200 });
+        const input = JSON.parse(body.input);
+        return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map(({ id, headline, summary, detail }) => {
+          const evidenceIds = input.sections.find((section: { id: string }) => section.id === id).evidence.map((fact: { id: string }) => fact.id);
+          return {
+            id, headline, summary, detail,
+            ...(["system-behind-design", "institutionalized-capability"].includes(id) ? {
+              summary_evidence_fact_ids: [evidenceIds[0]],
+              detail_evidence_fact_ids: [evidenceIds.at(-1)]
+            } : {})
+          };
+        }) }) }), { status: 200 });
       }
       const input = JSON.parse(body.input);
       const item = fallback.sections.find((section) => section.id === "proof-to-scale")!.proof_items!
@@ -53,6 +63,22 @@ describe("uncapped approved evidence eligibility", () => {
     const recentFallback = fallback.sections.find((section) => section.id === "operating-model")!;
     expect(recentInput.evidence.length).toBeGreaterThan(recentFallback.evidenceRefs.length);
     expect(recentInput.evidence.some((fact: { id: string }) => !recentFallback.evidenceRefs.includes(fact.id))).toBe(true);
+
+    const aboutInput = framingInput.sections.find((section: { id: string }) => section.id === "system-behind-design");
+    const throughlineInput = framingInput.sections.find((section: { id: string }) => section.id === "institutionalized-capability");
+    expect(aboutInput.evidence).toHaveLength(7);
+    expect(throughlineInput.evidence).toHaveLength(5);
+    expect(aboutInput.requiresFieldEvidenceProvenance).toBe(true);
+    expect(throughlineInput.requiresFieldEvidenceProvenance).toBe(true);
+    expect(framing.instructions).toContain("You may use some or all of the supplied facts");
+
+    const sectionSchemas = framing.text.format.schema.properties.sections.items.anyOf;
+    for (const inputSection of [aboutInput, throughlineInput]) {
+      const sectionSchema = sectionSchemas.find((schema: any) => schema.properties.id.enum[0] === inputSection.id);
+      const eligibleIds = inputSection.evidence.map((fact: { id: string }) => fact.id);
+      expect(sectionSchema.properties.summary_evidence_fact_ids.items.enum).toEqual(eligibleIds);
+      expect(sectionSchema.properties.detail_evidence_fact_ids.items.enum).toEqual(eligibleIds);
+    }
 
     const proofFallbacks = fallback.sections.find((section) => section.id === "proof-to-scale")!.proof_items!;
     const expandedProofRequest = requestBodies

@@ -6,7 +6,8 @@ import { GenerateRequestSchema, ProofItemSchema, type GenerationDiagnostics, typ
 import { deterministicGenerationDiagnostics, summarizeGenerationDiagnostics } from "../../src/shared/generation-diagnostics";
 import {
   approvedBenFactIds,
-  assembleApprovedBenFactsNarrative,
+  assembleApprovedBenFactsNarrativeWithFieldEvidence,
+  type NarrativeFieldEvidenceRefs,
   proofItemEvidenceIds,
   publicApprovedBenFacts,
   validateNarrativeProofProjects,
@@ -18,7 +19,7 @@ import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
 export type GenerationStatus = "ai" | "missing-api-key" | "upstream-error" | "empty-output" | "invalid-output" | "timeout" | "network-error";
-export type ValidationStatus = "schema" | "section-ids" | "headline-acronym" | "numeric-grounding" | "narrative-evidence";
+export type ValidationStatus = "schema" | "section-ids" | "headline-acronym" | "numeric-grounding" | "evidence-provenance" | "narrative-evidence";
 export function allowedOrigin(origin = "", requestHost = "") {
   const allowlist = (process.env.ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
   if (allowlist.includes(origin)) return origin;
@@ -30,24 +31,52 @@ export function allowedOrigin(origin = "", requestHost = "") {
   }
 }
 
-const generatedNarrativeJsonSchema = {
-  type: "object", additionalProperties: false, required: ["sections"],
-  properties: {
-    sections: {
-      type: "array", minItems: 4, maxItems: 4,
-      items: {
-        type: "object", additionalProperties: false,
-        required: ["id", "headline", "summary", "detail"],
-        properties: {
-          id: { type: "string", enum: ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"] },
-          headline: { type: "string", minLength: 8, maxLength: HEADLINE_MAX_CHARACTERS, pattern: "^[A-Za-z][A-Za-z &’',:–—-]*[A-Za-z]$" },
-          summary: { type: "string", minLength: 40, maxLength: 900 },
-          detail: { type: "string", minLength: 80, maxLength: 1600 }
-        }
+const experimentalProvenanceSectionIds = new Set(["system-behind-design", "institutionalized-capability"]);
+
+function generatedNarrativeJsonSchema(evidenceBySection: Map<string, PublicEvidence[]>) {
+  const sectionSchema = (id: string) => {
+    const provenanceRequired = experimentalProvenanceSectionIds.has(id);
+    const allowedEvidenceIds = (evidenceBySection.get(id) || []).map((fact) => fact.id);
+    return {
+      type: "object", additionalProperties: false,
+      required: provenanceRequired
+        ? ["id", "headline", "summary", "summary_evidence_fact_ids", "detail", "detail_evidence_fact_ids"]
+        : ["id", "headline", "summary", "detail"],
+      properties: {
+        id: { type: "string", enum: [id] },
+        headline: { type: "string", minLength: 8, maxLength: HEADLINE_MAX_CHARACTERS, pattern: "^[A-Za-z][A-Za-z &’',:–—-]*[A-Za-z]$" },
+        summary: { type: "string", minLength: 40, maxLength: 900 },
+        ...(provenanceRequired ? {
+          summary_evidence_fact_ids: {
+            type: "array", minItems: 1, maxItems: allowedEvidenceIds.length,
+            items: { type: "string", enum: allowedEvidenceIds }
+          }
+        } : {}),
+        detail: { type: "string", minLength: 80, maxLength: 1600 },
+        ...(provenanceRequired ? {
+          detail_evidence_fact_ids: {
+            type: "array", minItems: 1, maxItems: allowedEvidenceIds.length,
+            items: { type: "string", enum: allowedEvidenceIds }
+          }
+        } : {})
+      }
+    };
+  };
+  return {
+    type: "object", additionalProperties: false, required: ["sections"],
+    properties: {
+      sections: {
+        type: "array", minItems: 4, maxItems: 4,
+        items: { anyOf: [
+          sectionSchema("system-behind-design"),
+          sectionSchema("operating-model"),
+          sectionSchema("proof-to-scale"),
+          sectionSchema("institutionalized-capability")
+        ] }
       }
     }
-  }
-};
+  };
+}
 
 const danglingHeadlineWords = new Set(["a", "an", "and", "at", "by", "for", "from", "in", "of", "on", "the", "to", "with"]);
 const GeneratedHeadlineSchema = z.string().min(8).max(HEADLINE_MAX_CHARACTERS)
@@ -66,7 +95,9 @@ const WireFramingSectionSchema = z.object({
   id: z.enum(["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"]),
   headline: z.unknown().optional(),
   summary: z.unknown().optional(),
-  detail: z.unknown().optional()
+  summary_evidence_fact_ids: z.unknown().optional(),
+  detail: z.unknown().optional(),
+  detail_evidence_fact_ids: z.unknown().optional()
 }).strict();
 const WireFramingSchema = z.object({ sections: z.array(WireFramingSectionSchema).length(4) }).strict();
 const GeneratedSummarySchema = generatedProseSchema(40, 900)
@@ -273,6 +304,60 @@ function proofItemText(item: ProofItem): string {
   ].join(" ");
 }
 
+type FramingProvenanceContext = {
+  eligibleEvidenceBySection: Map<string, PublicEvidence[]>;
+  fallbackFieldEvidenceBySection: Map<string, NarrativeFieldEvidenceRefs>;
+  includeDiagnostics?: boolean;
+};
+
+type CitedEvidenceValidation = {
+  citedIds: string[];
+  validIds: string[];
+  invalidIds: string[];
+  valid: boolean;
+};
+
+function validateCitedEvidence(value: unknown, eligibleIds: Set<string>): CitedEvidenceValidation {
+  const citedIds = Array.isArray(value) ? value.map((id) => typeof id === "string" ? id : candidateText(id)) : [];
+  const invalidIds = citedIds.filter((id) => !eligibleIds.has(id));
+  const uniqueIds = [...new Set(citedIds)];
+  return {
+    citedIds,
+    validIds: uniqueIds.filter((id) => eligibleIds.has(id)),
+    invalidIds,
+    valid: Array.isArray(value)
+      && value.length > 0
+      && value.every((id) => typeof id === "string")
+      && uniqueIds.length === value.length
+      && invalidIds.length === 0
+  };
+}
+
+function evidenceProvenanceRejection(
+  sectionId: string,
+  field: "summary" | "detail",
+  validation: CitedEvidenceValidation,
+  eligibleFactIds: string[]
+): GenerationRejection {
+  return {
+    sectionId,
+    field,
+    category: "evidence-provenance",
+    reason: validation.citedIds.length === 0
+      ? `Generated ${field} did not cite any supplied evidence IDs.`
+      : validation.invalidIds.length
+        ? `Generated ${field} cited evidence IDs that were not supplied to this section.`
+        : `Generated ${field} evidence IDs were malformed or duplicated.`,
+    candidate: candidateText(validation.citedIds),
+    context: {
+      citedEvidenceIds: validation.citedIds,
+      invalidEvidenceIds: validation.invalidIds,
+      eligibleFactIds,
+      fallbackApplied: true
+    }
+  };
+}
+
 export function applyAiProofItem(value: unknown, fallback: ProofItem, evidenceText: string): ProofItem | null {
   const result = GeneratedProofItemSchema.safeParse(value);
   if (!result.success) return null;
@@ -292,6 +377,7 @@ export function applyAiFraming(
   onReject?: (status: ValidationStatus) => void,
   onProvenance?: (diagnostics: GenerationDiagnostics) => void,
   onRejectionDetail?: (rejection: GenerationRejection) => void,
+  provenanceContext?: FramingProvenanceContext,
 ): Narrative | null {
   const result = WireFramingSchema.safeParse(value);
   if (!result.success) {
@@ -317,8 +403,13 @@ export function applyAiFraming(
     });
     return null;
   }
-  const provenance: Array<{ id: string; fields: GenerationSectionDiagnostics["fields"] }> = [];
+  const provenance: Array<{
+    id: string;
+    fields: GenerationSectionDiagnostics["fields"];
+    evidence?: GenerationSectionDiagnostics["evidence"];
+  }> = [];
   let numericGroundingFailed = false;
+  let evidenceProvenanceFailed = false;
   const narrative: Narrative = {
     mode: "ai",
     grounding: fallback.grounding,
@@ -327,8 +418,30 @@ export function applyAiFraming(
       const summaryResult = GeneratedSummarySchema.safeParse(framing.summary);
       const detailResult = GeneratedDetailSchema.safeParse(framing.detail);
       const evidenceText = evidenceTextBySection?.get(section.id) || "";
-      const summaryIsGrounded = summaryResult.success && (!evidenceTextBySection || generatedTextIsGrounded(summaryResult.data, evidenceText));
-      const detailIsGrounded = detailResult.success && (!evidenceTextBySection || generatedTextIsGrounded(detailResult.data, evidenceText));
+      const eligibleEvidence = provenanceContext?.eligibleEvidenceBySection.get(section.id) || [];
+      const eligibleFactIds = eligibleEvidence.map((fact) => fact.id);
+      const eligibleIds = new Set(eligibleFactIds);
+      const experimentalSection = experimentalProvenanceSectionIds.has(section.id) && Boolean(provenanceContext);
+      const summaryCitations = experimentalSection
+        ? validateCitedEvidence(framing.summary_evidence_fact_ids, eligibleIds)
+        : { citedIds: [], validIds: [], invalidIds: [], valid: true };
+      const detailCitations = experimentalSection
+        ? validateCitedEvidence(framing.detail_evidence_fact_ids, eligibleIds)
+        : { citedIds: [], validIds: [], invalidIds: [], valid: true };
+      const summaryIsGrounded = summaryResult.success
+        && summaryCitations.valid
+        && (!evidenceTextBySection || generatedTextIsGrounded(summaryResult.data, evidenceText));
+      const detailIsGrounded = detailResult.success
+        && detailCitations.valid
+        && (!evidenceTextBySection || generatedTextIsGrounded(detailResult.data, evidenceText));
+      const summaryNumericGroundingFailed = summaryResult.success
+        && summaryCitations.valid
+        && Boolean(evidenceTextBySection)
+        && !generatedTextIsGrounded(summaryResult.data, evidenceText);
+      const detailNumericGroundingFailed = detailResult.success
+        && detailCitations.valid
+        && Boolean(evidenceTextBySection)
+        && !generatedTextIsGrounded(detailResult.data, evidenceText);
       const summary = summaryIsGrounded ? summaryResult.data : section.summary;
       const detail = detailIsGrounded ? detailResult.data : section.detail;
       const headlineResult = GeneratedHeadlineSchema.safeParse(framing.headline);
@@ -336,23 +449,46 @@ export function applyAiFraming(
       if (onRejectionDetail) {
         if (!summaryResult.success) proseRejections(section.id, "summary", framing.summary).forEach(onRejectionDetail);
         if (!detailResult.success) proseRejections(section.id, "detail", framing.detail).forEach(onRejectionDetail);
-        if (summaryResult.success && !summaryIsGrounded) onRejectionDetail(numericGroundingRejection(section.id, "summary", summaryResult.data, evidenceText));
-        if (detailResult.success && !detailIsGrounded) onRejectionDetail(numericGroundingRejection(section.id, "detail", detailResult.data, evidenceText));
+        if (summaryNumericGroundingFailed) onRejectionDetail(numericGroundingRejection(section.id, "summary", summaryResult.data, evidenceText));
+        if (detailNumericGroundingFailed) onRejectionDetail(numericGroundingRejection(section.id, "detail", detailResult.data, evidenceText));
+        if (summaryResult.success && experimentalSection && !summaryCitations.valid) {
+          onRejectionDetail(evidenceProvenanceRejection(section.id, "summary", summaryCitations, eligibleFactIds));
+        }
+        if (detailResult.success && experimentalSection && !detailCitations.valid) {
+          onRejectionDetail(evidenceProvenanceRejection(section.id, "detail", detailCitations, eligibleFactIds));
+        }
         if (!headlineIsAi) headlineRejections(section.id, framing.headline, summary).forEach(onRejectionDetail);
       }
-      if ((summaryResult.success && !summaryIsGrounded) || (detailResult.success && !detailIsGrounded)) numericGroundingFailed = true;
+      if (summaryNumericGroundingFailed || detailNumericGroundingFailed) numericGroundingFailed = true;
+      if (experimentalSection && (!summaryCitations.valid || !detailCitations.valid)) evidenceProvenanceFailed = true;
       const headline = headlineIsAi
         ? headlineResult.data
         : section.headline;
+      const fallbackFieldEvidence = provenanceContext?.fallbackFieldEvidenceBySection.get(section.id);
+      const finalEvidenceRefs = experimentalSection && fallbackFieldEvidence
+        ? [...new Set([
+          ...(summaryIsGrounded ? summaryCitations.validIds : fallbackFieldEvidence.summary),
+          ...(detailIsGrounded ? detailCitations.validIds : fallbackFieldEvidence.detail)
+        ])]
+        : section.evidenceRefs;
       provenance.push({ id: section.id, fields: {
         headline: headlineIsAi ? "ai" : "fallback",
         summary: summaryIsGrounded ? "ai" : "fallback",
         detail: detailIsGrounded ? "ai" : "fallback"
-      } });
-      return { ...section, headline, summary, detail };
+      }, ...(experimentalSection && provenanceContext?.includeDiagnostics ? { evidence: {
+        eligibleFactCount: eligibleFactIds.length,
+        eligibleFactIds,
+        generatedSummaryCitedIds: summaryCitations.citedIds,
+        generatedDetailCitedIds: detailCitations.citedIds,
+        finalDisplayedEvidenceIds: finalEvidenceRefs,
+        invalidSummaryCitedIds: summaryCitations.invalidIds,
+        invalidDetailCitedIds: detailCitations.invalidIds
+      } } : {}) });
+      return { ...section, headline, summary, detail, evidenceRefs: finalEvidenceRefs };
     })
   };
   if (numericGroundingFailed) onReject?.("numeric-grounding");
+  else if (evidenceProvenanceFailed) onReject?.("evidence-provenance");
   if (!validateNarrativeEvidence(narrative, allowedIds)) {
     onReject?.("narrative-evidence");
     onRejectionDetail?.({
@@ -389,7 +525,7 @@ function eligibleEvidenceBySection(topics: TopicId[]): Map<string, PublicEvidenc
 
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local", diagnosticsEnabled = false):
 Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
-  const fallback = assembleApprovedBenFactsNarrative(topics);
+  const { narrative: fallback, fieldEvidenceBySection } = assembleApprovedBenFactsNarrativeWithFieldEvidence(topics);
   const fallbackDiagnostics = deterministicGenerationDiagnostics(fallback);
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
   const runtimeDiagnostics = (diagnostics: GenerationDiagnostics): GenerationDiagnostics =>
@@ -415,6 +551,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, connect it to the longer career throughline, then introduce topic-relevant proof in practice.",
           "Make the sequence of headlines build from broad identity to recent leadership, career continuity, and proof. Do not repeat the same claim or construction.",
           "Use only the approved BenFacts assigned to each section.",
+          "For About Ben and Career throughline, consider all supplied approved evidence. Use the facts that best support the strongest, most coherent framing. You may use some or all of the supplied facts. Do not force inclusion of a fact if it does not materially improve the narrative. Return the IDs of the facts materially used in the lead and detail in summary_evidence_fact_ids and detail_evidence_fact_ids.",
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Do not add a number unless that exact number appears in the evidence assigned to that section. Preserve its unit and the measure it describes.",
@@ -438,6 +575,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
             audienceLabel: section.eyebrow,
             fallbackLead: section.summary,
             fallbackDetail: section.detail,
+            ...(experimentalProvenanceSectionIds.has(section.id) ? { requiresFieldEvidenceProvenance: true } : {}),
             allowedAcronyms: allowedHeadlineAcronyms(section.summary),
             narrativeRole: section.id === "system-behind-design" ? "career-wide orientation"
               : section.id === "operating-model" ? "recent leadership and organizational scale"
@@ -446,7 +584,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
             evidence: section.id === "proof-to-scale" ? [] : (evidenceBySection.get(section.id) || [])
           }))
         }),
-        text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema } }
+        text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema(evidenceBySection) } }
       })
     });
 
@@ -514,7 +652,8 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           framedNarrative = applyAiFraming(JSON.parse(text), fallback, allowedIds, evidenceTextBySection,
             (status) => { validationStatus = status; },
             (value) => { diagnostics = value; },
-            rejections ? (rejection) => { rejections.push(rejection); } : undefined);
+            rejections ? (rejection) => { rejections.push(rejection); } : undefined,
+            { eligibleEvidenceBySection: evidenceBySection, fallbackFieldEvidenceBySection: fieldEvidenceBySection, includeDiagnostics: diagnosticsEnabled });
         } catch {
           framedNarrative = null;
         }
