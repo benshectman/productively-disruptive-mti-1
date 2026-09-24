@@ -343,7 +343,7 @@ function assertTournamentJudgment(value) {
   return value;
 }
 
-async function postEvaluator({ body, apiKey, provider = "openai", fetcher, timeoutMs, parse }) {
+export async function postEvaluator({ body, apiKey, provider = "openai", fetcher, timeoutMs, parse }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = new Date().toISOString();
