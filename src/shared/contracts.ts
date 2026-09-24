@@ -70,7 +70,7 @@ export const NarrativeSectionSchema = z.object({
   eyebrow: z.string().min(1).max(60),
   headline: z.string().min(1).max(140),
   summary: z.string().min(1).max(900),
-  evidenceRefs: z.array(EvidenceFactIdSchema).min(1).max(20),
+  evidenceRefs: z.array(EvidenceFactIdSchema).min(1).max(120),
   disclosure: z.enum(["none", "inline", "deep-dive"]),
   detail: z.string().min(1).max(1600).optional(),
   proof_items: z.array(ProofItemSchema).min(1).max(3).optional()
@@ -86,13 +86,13 @@ export const NarrativeSchema = z.object({
 export const GenerationFieldProvenanceSchema = z.enum(["ai", "fallback"]);
 export const GenerationOutcomeSchema = z.enum(["ai", "mixed", "fallback"]);
 export const GenerationEvidenceDiagnosticsSchema = z.object({
-  eligibleFactCount: z.number().int().min(0).max(36),
-  eligibleFactIds: z.array(EvidenceFactIdSchema).max(36),
-  generatedSummaryCitedIds: z.array(z.string()).max(36),
-  generatedDetailCitedIds: z.array(z.string()).max(36),
-  finalDisplayedEvidenceIds: z.array(EvidenceFactIdSchema).max(36),
-  invalidSummaryCitedIds: z.array(z.string()).max(36),
-  invalidDetailCitedIds: z.array(z.string()).max(36)
+  eligibleFactCount: z.number().int().min(0).max(120),
+  eligibleFactIds: z.array(EvidenceFactIdSchema).max(120),
+  generatedSummaryCitedIds: z.array(z.string()).max(120),
+  generatedDetailCitedIds: z.array(z.string()).max(120),
+  finalDisplayedEvidenceIds: z.array(EvidenceFactIdSchema).max(120),
+  invalidSummaryCitedIds: z.array(z.string()).max(120),
+  invalidDetailCitedIds: z.array(z.string()).max(120)
 }).strict();
 export const GenerationSectionDiagnosticsSchema = z.object({
   id: z.string().min(1).max(80),
@@ -129,7 +129,7 @@ export const GenerationDiagnosticsSchema = z.object({
 export const GenerateRequestSchema = VisitorConfigurationSchema;
 export const GenerateResponseSchema = z.object({
   narrative: NarrativeSchema,
-  evidence: z.array(PublicEvidenceSchema).max(36).optional(),
+  evidence: z.array(PublicEvidenceSchema).max(120).optional(),
   generation: GenerationDiagnosticsSchema.optional(),
   requestId: z.string()
 });

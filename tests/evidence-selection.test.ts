@@ -1,14 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import { applyAiFraming } from "../netlify/functions/generate";
+import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
 import {
   approvedBenFactIds,
   assembleApprovedBenFactsNarrativeWithFieldEvidence
 } from "../src/shared/approved-benfacts";
+import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata";
 import { NarrativeSchema, type GenerationDiagnostics, type GenerationRejection, type PublicEvidence, type TopicId } from "../src/shared/contracts";
 import { buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence";
 
 const experimentalIds = ["system-behind-design", "operating-model", "institutionalized-capability"];
+const allowedAttributions = new Set(["personal", "leadership", "team", "organization", "shared_leadership"]);
+const approvedCorpus = approvedCorpusJson as unknown as {
+  facts: Array<{ id: string; visibility: string; attribution: string; project_id?: string }>;
+};
+
+function expectedSharedNonProjectIds() {
+  return approvedCorpus.facts
+    .filter((fact) => fact.visibility === "shareable" && allowedAttributions.has(fact.attribution) && !fact.project_id)
+    .map((fact) => fact.id);
+}
 
 function setup(topics: TopicId[] = ["T-003"]) {
   const { narrative: fallback, fieldEvidenceBySection } = assembleApprovedBenFactsNarrativeWithFieldEvidence(topics);
@@ -53,20 +65,38 @@ function apply(setupValue: ReturnType<typeof setup>) {
   return { narrative, diagnostics, rejections };
 }
 
-describe("small-pool framing evidence selection", () => {
-  it("makes all seven About Ben, all twenty Recent Leadership, and all five Career Throughline facts eligible", () => {
+describe("shared non-project framing evidence selection", () => {
+  it("gives all three framing sections the same complete eligible non-project pool", () => {
     const pools = buildEligibleSectionEvidencePools(["T-003"]);
     const about = pools.find((pool) => pool.sectionId === "system-behind-design")!;
     const recentLeadership = pools.find((pool) => pool.sectionId === "operating-model")!;
     const throughline = pools.find((pool) => pool.sectionId === "institutionalized-capability")!;
+    const expectedIds = expectedSharedNonProjectIds().sort();
 
-    expect(about.facts.map((fact) => fact.id).sort()).toEqual([
-      "BF-C-033", "BF-C-043", "BF-C-045", "BF-C-049", "BF-C-073", "BF-C-074", "BF-C-076"
-    ]);
-    expect(throughline.facts.map((fact) => fact.id).sort()).toEqual([
-      "BF-C-075", "BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079"
-    ]);
-    expect(recentLeadership.facts).toHaveLength(20);
+    expect(about.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
+    expect(recentLeadership.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
+    expect(throughline.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
+    expect(pools.every((pool) => pool.facts.every((fact) => !fact.project_id))).toBe(true);
+  });
+
+  it("keeps legacy narrative roles as hints without changing eligibility", () => {
+    const pools = buildEligibleSectionEvidencePools(["T-003"]);
+    const about = pools.find((pool) => pool.sectionId === "system-behind-design")!;
+    const roleMismatch = about.facts.find((fact) => {
+      const roles = approvedEditorialMetadata[fact.id]?.narrativeRoles || [];
+      return roles.length > 0 && !roles.includes("about");
+    })!;
+
+    expect(roleMismatch).toBeTruthy();
+    expect(roleMismatch.legacy_narrative_roles).toEqual(approvedEditorialMetadata[roleMismatch.id].narrativeRoles);
+    expect(pools.every((pool) => pool.facts.some((fact) => fact.id === roleMismatch.id))).toBe(true);
+
+    const value = setup();
+    const aboutFraming = value.framing.sections.find((section) => section.id === "system-behind-design")!;
+    aboutFraming.summary_evidence_fact_ids = [roleMismatch.id];
+    const { narrative, rejections } = apply(value);
+    expect(narrative?.sections.find((section) => section.id === "system-behind-design")?.summary).toBe(aboutFraming.summary);
+    expect(rejections.filter((rejection) => rejection.field === "summary")).toEqual([]);
   });
 
   it("accepts any supplied fact and replaces deterministic rail refs with generated citations", () => {
@@ -111,7 +141,7 @@ describe("small-pool framing evidence selection", () => {
     expect(result.evidenceRefs).toEqual([...new Set([...fallbackSummary, ...citedDetail])]);
   });
 
-  it.each(["BF-C-999", "BF-C-075"])("rejects invented or out-of-section ID %s locally", (invalidId) => {
+  it.each(["BF-C-999", "BF-C-051"])("rejects invented or project-specific ID %s locally", (invalidId) => {
     const value = setup();
     const about = value.framing.sections.find((section) => section.id === "system-behind-design")!;
     about.summary_evidence_fact_ids = [invalidId];
@@ -151,7 +181,7 @@ describe("small-pool framing evidence selection", () => {
     expect(narrative?.sections.find((section) => section.id === "proof-to-scale")?.proof_items)
       .toEqual(proofFallback.proof_items);
     expect(diagnostics?.sections.find((section) => section.id === "operating-model")?.evidence).toMatchObject({
-      eligibleFactCount: 20,
+      eligibleFactCount: expectedSharedNonProjectIds().length,
       generatedSummaryCitedIds: operatingFraming.summary_evidence_fact_ids,
       generatedDetailCitedIds: operatingFraming.detail_evidence_fact_ids,
       finalDisplayedEvidenceIds: operatingCitations
@@ -173,7 +203,7 @@ describe("small-pool framing evidence selection", () => {
     expect(result.evidenceRefs).toEqual([...new Set([...citedSummary, ...fallbackDetail])]);
   });
 
-  it("supports a Recent Leadership rail containing all twenty eligible facts", () => {
+  it("supports a Recent Leadership rail containing the complete shared pool", () => {
     const value = setup();
     const recent = value.framing.sections.find((section) => section.id === "operating-model")!;
     const allEligibleIds = value.eligibleEvidenceBySection.get("operating-model")!.map((fact) => fact.id);
@@ -186,6 +216,21 @@ describe("small-pool framing evidence selection", () => {
     expect(() => NarrativeSchema.parse(narrative)).not.toThrow();
   });
 
+  it("reports identical shared eligible pools and bounded citations for all three sections", () => {
+    const value = setup();
+    const { diagnostics } = apply(value);
+    const evidenceDiagnostics = experimentalIds.map((id) => diagnostics!.sections.find((section) => section.id === id)!.evidence!);
+    const expectedIds = value.eligibleEvidenceBySection.get("system-behind-design")!.map((fact) => fact.id);
+
+    for (const evidence of evidenceDiagnostics) {
+      expect(evidence.eligibleFactCount).toBe(expectedIds.length);
+      expect(evidence.eligibleFactIds).toEqual(expectedIds);
+      expect([...evidence.generatedSummaryCitedIds, ...evidence.generatedDetailCitedIds]
+        .every((id) => expectedIds.includes(id))).toBe(true);
+      expect(evidence.finalDisplayedEvidenceIds.every((id) => expectedIds.includes(id))).toBe(true);
+    }
+  });
+
   it("reports eligible, cited, rejected, and final displayed evidence IDs", () => {
     const value = setup();
     const throughline = value.framing.sections.find((section) => section.id === "institutionalized-capability")!;
@@ -194,8 +239,8 @@ describe("small-pool framing evidence selection", () => {
     const { diagnostics } = apply(value);
     const evidence = diagnostics?.sections.find((section) => section.id === "institutionalized-capability")?.evidence;
     expect(evidence).toMatchObject({
-      eligibleFactCount: 5,
-      eligibleFactIds: expect.arrayContaining(["BF-C-075", "BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079"]),
+      eligibleFactCount: expectedSharedNonProjectIds().length,
+      eligibleFactIds: expect.arrayContaining(expectedSharedNonProjectIds()),
       generatedSummaryCitedIds: throughline.summary_evidence_fact_ids,
       generatedDetailCitedIds: ["BF-C-999"],
       invalidDetailCitedIds: ["BF-C-999"]
