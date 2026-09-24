@@ -80,7 +80,7 @@ function assessmentMarkdown(label, record) {
   return [
     `#### Independent ${label} assessment`,
     "",
-    `Overall rating: **${assessment.overall.rating}**. Confidence: **${assessment.confidence}**.`,
+    `Overall rating: **${assessment.overall.rating}**. Exception: **${assessment.overall.exception ?? "none"}**. Confidence: **${assessment.overall.confidence || assessment.confidence}**.`,
     "",
     `Overall rationale: ${assessment.overall.rationale}`,
     "",
@@ -93,13 +93,17 @@ function rate(value) {
   return value || "n/a";
 }
 
+function exception(value) {
+  return value ?? "none";
+}
+
 function arbitrationPlacement(pair) {
   const placement = pair.arbitrationPlacement || {};
   return `strategy ${placement.strategy || "not recorded"}; A = ${pair.mapping?.A || "n/a"}, B = ${pair.mapping?.B || "n/a"}`;
 }
 
 export function buildMarkdownReport(bundle) {
-  const { metadata, reliability, qualitative, shortlist = [], runs, sanity } = bundle;
+  const { metadata, reliability, qualitative, tournament, shortlist = [], runs, sanity } = bundle;
   const lines = [
     "# Portfolio generation evaluation",
     "",
@@ -201,6 +205,38 @@ export function buildMarkdownReport(bundle) {
       `Arbitration required: ${qualitative.arbitrationRequiredCount || 0}. Arbitration instability: ${qualitative.arbitrationInstabilityCount || 0}.`,
       ""
     );
+    lines.push(
+      "### Independent rating distributions",
+      "",
+      "| Rating | Count |",
+      "| ---: | ---: |",
+      ...[1, 2, 3, 4, 5].map((rating) => `| ${rating} | ${qualitative.ratingDistribution?.[rating] || 0} |`),
+      "",
+      "Overall rating distribution:",
+      "",
+      "| Rating | Count |",
+      "| ---: | ---: |",
+      ...[1, 2, 3, 4, 5].map((rating) => `| ${rating} | ${qualitative.overallRatingDistribution?.[rating] || 0} |`),
+      "",
+      `Exception counts: concern ${qualitative.exceptionCounts?.concern || 0}; unclear ${qualitative.exceptionCounts?.unclear || 0}.`,
+      `Overall exception counts: concern ${qualitative.overallExceptionCounts?.concern || 0}; unclear ${qualitative.overallExceptionCounts?.unclear || 0}.`,
+      "",
+      "| Criterion | 1 | 2 | 3 | 4 | 5 | Concern | Unclear |",
+      "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    );
+    for (const criterion of CRITERIA) {
+      const scores = qualitative.criterionScoreDistributions?.[criterion] || {};
+      const exceptions = qualitative.criterionExceptionCounts?.[criterion] || {};
+      lines.push(`| ${labels[criterion]} | ${scores[1] || 0} | ${scores[2] || 0} | ${scores[3] || 0} | ${scores[4] || 0} | ${scores[5] || 0} | ${exceptions.concern || 0} | ${exceptions.unclear || 0} |`);
+    }
+    lines.push(
+      "",
+      "| Environment | 1 | 2 | 3 | 4 | 5 |",
+      "| --- | ---: | ---: | ---: | ---: | ---: |",
+      `| Control | ${qualitative.environmentScoreDistributions?.control?.[1] || 0} | ${qualitative.environmentScoreDistributions?.control?.[2] || 0} | ${qualitative.environmentScoreDistributions?.control?.[3] || 0} | ${qualitative.environmentScoreDistributions?.control?.[4] || 0} | ${qualitative.environmentScoreDistributions?.control?.[5] || 0} |`,
+      `| Treatment | ${qualitative.environmentScoreDistributions?.treatment?.[1] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[2] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[3] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[4] || 0} | ${qualitative.environmentScoreDistributions?.treatment?.[5] || 0} |`,
+      ""
+    );
     const audit = qualitative.positionBiasAudit;
     if (audit) {
       const position = audit.byPresentedPosition || {};
@@ -243,6 +279,61 @@ export function buildMarkdownReport(bundle) {
       ...(sanity.positionBiasPValue == null ? [] : [`Two-sided exact binomial p-value for the blind-position split: ${sanity.positionBiasPValue.toFixed(4)} (${sanity.decisiveComparisons} decisive arbitration comparisons).`]),
       ""
     );
+  }
+
+  lines.push("## Relative-quality tournament", "");
+  if (!tournament?.summary) {
+    lines.push("The relative tournament was not run. No tournament ranking is available.", "");
+  } else {
+    const summary = tournament.summary;
+    const controlPlacement = summary.placement?.control || {};
+    const treatmentPlacement = summary.placement?.treatment || {};
+    lines.push(
+      `Regression interpretation: **Treatment ${summary.interpretation}.** This is decision support, not a final editorial verdict.`,
+      "",
+      `${tournament.method}. ${tournament.caveat}`,
+      "",
+      `Evaluator: \`${tournament.evaluatorModel || "not recorded"}\`. API attempts: ${tournament.usage?.calls || 0}; successful judgments: ${tournament.usage?.successfulCalls ?? tournament.usage?.calls ?? 0}; failed attempts: ${tournament.usage?.failedAttempts || 0}. Pairwise comparisons: ${summary.comparisonCount}; decisive: ${summary.decisiveComparisonCount}; mirrored: ${summary.mirroredComparisons}; unstable: ${summary.unstableComparisons?.length || 0}.`,
+      "",
+      "| Indicator | Control | Treatment |",
+      "| --- | ---: | ---: |",
+      `| Cohort winners | ${controlPlacement.first || 0} | ${treatmentPlacement.first || 0} |`,
+      `| Direct head-to-head wins | ${summary.directWins?.control || 0} | ${summary.directWins?.treatment || 0} |`,
+      `| Mean rank | ${summary.rankStatistics?.control?.mean?.toFixed?.(2) ?? "n/a"} | ${summary.rankStatistics?.treatment?.mean?.toFixed?.(2) ?? "n/a"} |`,
+      `| Median rank | ${summary.rankStatistics?.control?.median ?? "n/a"} | ${summary.rankStatistics?.treatment?.median ?? "n/a"} |`,
+      `| Top-2 placements | ${controlPlacement.top2 || 0} | ${treatmentPlacement.top2 || 0} |`,
+      `| Top-3 placements | ${controlPlacement.top3 || 0} | ${treatmentPlacement.top3 || 0} |`,
+      `| Bottom placements | ${controlPlacement.bottom || 0} | ${treatmentPlacement.bottom || 0} |`,
+      "",
+      `Direct treatment win rate: ${percent(summary.directTreatmentWinRate)} across ${summary.directControlTreatmentComparisons} control-vs-treatment comparisons.`,
+      `Margins: ${counts(summary.margins)}. Confidence: ${counts(summary.confidence)}.`,
+      `A-vs-B pass wins: A ${summary.positionBias?.allPasses?.A || 0}, B ${summary.positionBias?.allPasses?.B || 0}, across ${summary.positionBias?.allPasses?.total || 0} original and mirrored judgments. Unstable mirror rate: ${percent(summary.positionBias?.unstableMirrorRate)}. Suspicious position sensitivity flagged: ${summary.positionBias?.suspicious ? "yes" : "no"}.`,
+      `Evaluator-error comparisons: ${summary.evaluatorErrors?.length || 0}.`,
+      `Substantial treatment losses: ${summary.substantialTreatmentLosses?.length || 0}. Treatment-bottom cohorts: ${summary.treatmentBottomTopics?.join(", ") || "none"}. Repeated-regression cohorts: ${summary.repeatedTreatmentRegressions?.join(", ") || "none"}.`,
+      ""
+    );
+    for (const cohort of tournament.cohorts || []) {
+      lines.push(
+        `### ${cohort.topicConfiguration.label}`,
+        "",
+        "| Rank | Candidate | Environment | W | L | Unresolved | Relative strength |",
+        "| ---: | --- | --- | ---: | ---: | ---: | ---: |"
+      );
+      for (const candidate of cohort.ranking || []) {
+        lines.push(`| ${candidate.rank} | ${candidate.environment === "control" ? "Control" : "Treatment"} rep ${candidate.repetition} | ${candidate.environment} | ${candidate.wins} | ${candidate.losses} | ${candidate.unresolved} | ${candidate.relativeStrength.toFixed(3)} |`);
+      }
+      lines.push("");
+    }
+    if (tournament.humanReviewShortlist?.length) {
+      lines.push(
+        "### Tournament comparisons for manual review",
+        "",
+        "| Cohort | Comparison | Reason |",
+        "| --- | --- | --- |",
+        ...tournament.humanReviewShortlist.map((item) => `| ${escapeCell(item.cohortId)} | \`${item.comparisonId}\` | ${escapeCell(item.reason)} |`),
+        ""
+      );
+    }
   }
 
   lines.push("## Cases Ben should review", "");
@@ -289,12 +380,12 @@ export function buildMarkdownReport(bundle) {
     lines.push(
       ...assessmentMarkdown("control", item.independentAssessments?.control),
       ...assessmentMarkdown("treatment", item.independentAssessments?.treatment),
-      "| Criterion | Control rating | Treatment rating | Deterministic comparison | Final result |",
-      "| --- | --- | --- | --- | --- |",
+      "| Criterion | Control rating | Control exception | Control confidence | Control rationale | Treatment rating | Treatment exception | Treatment confidence | Treatment rationale | Difference | Deterministic comparison | Final result |",
+      "| --- | ---: | --- | --- | --- | ---: | --- | --- | --- | ---: | --- | --- |",
       ...CRITERIA.map((criterion) => {
         const comparison = deterministic?.criteria?.[criterion] || {};
         const finalCriterion = final.criteria?.[criterion] || {};
-        return `| ${labels[criterion]} | ${rate(comparison.controlRating)} | ${rate(comparison.treatmentRating)} | ${classificationLabel(comparison.result)} | ${environmentResultLabel(finalCriterion.environmentResult)} |`;
+        return `| ${labels[criterion]} | ${rate(comparison.controlRating)} | ${exception(comparison.controlException)} | ${rate(comparison.controlConfidence)} | ${escapeCell(comparison.controlRationale || "n/a")} | ${rate(comparison.treatmentRating)} | ${exception(comparison.treatmentException)} | ${rate(comparison.treatmentConfidence)} | ${escapeCell(comparison.treatmentRationale || "n/a")} | ${comparison.ratingDifference ?? "n/a"} | ${classificationLabel(comparison.result)} | ${environmentResultLabel(finalCriterion.environmentResult)} |`;
       }),
       "",
       proseMarkdown("Control response", controlRun),
@@ -307,7 +398,7 @@ export function buildMarkdownReport(bundle) {
     "## Raw results",
     "",
     qualitative
-      ? "The companion JSON artifact contains every request mapping, independent control and treatment assessment, deterministic comparison, arbitration request and response when required, placement metadata, diagnostic field, evaluator response, and final classification. No source prose was discarded."
+      ? "The companion JSON artifact contains every request mapping, independent control and treatment assessment, deterministic comparison, arbitration request and response when required, tournament pairwise judgment and placement mapping, diagnostic field, evaluator response, and final classification. No source prose was discarded."
       : "The companion JSON artifact contains every request mapping, response payload, diagnostic field, and source prose. Qualitative evaluator records will be added when that pass runs. No source prose was discarded.",
     ""
   );

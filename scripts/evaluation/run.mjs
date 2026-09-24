@@ -1,26 +1,37 @@
-#!/usr/bin/env node
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  ASSESSMENT_EXCEPTIONS,
+  ASSESSMENT_RATINGS,
   aggregateQualitative,
   aggregateReliability,
   captureGeneration,
   chooseShortlist,
   createBlindPairs,
+  CRITERIA,
   mirrorPair,
   reconcileMirroredArbitrations,
   resolveEnvironment,
   sanityAssessment,
   validateConfig
 } from "./core.mjs";
-import { evaluateArbitration, evaluatePair, preflightEvaluator } from "./evaluator.mjs";
+import { evaluateArbitration, evaluatePair, evaluateTournamentComparison, preflightEvaluator } from "./evaluator.mjs";
+import { resolveEvaluatorRuntime } from "./evaluator-provider.mjs";
 import { buildMarkdownReport } from "./report.mjs";
+import {
+  aggregateTournament,
+  createTournamentCohorts,
+  mirrorTournamentComparison,
+  reconcileTournamentMirror,
+  shouldMirrorTournamentResult,
+  tournamentHumanReviewShortlist
+} from "./tournament.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export function args(argv) {
-  const result = { config: path.join(scriptDirectory, "default-config.json"), output: "evaluation-results", input: null, captureOnly: false, reportOnly: false, sanity: false };
+  const result = { config: path.join(scriptDirectory, "default-config.json"), output: "evaluation-results", input: null, captureOnly: false, reportOnly: false, sanity: false, tournament: true, tournamentOnly: false, tournamentCohorts: null, mirrorComparisonIds: [] };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--config") result.config = argv[++index];
@@ -30,6 +41,10 @@ export function args(argv) {
     else if (value === "--capture-only") result.captureOnly = true;
     else if (value === "--report-only") result.reportOnly = true;
     else if (value === "--sanity") result.sanity = true;
+    else if (value === "--no-tournament") result.tournament = false;
+    else if (value === "--tournament-only") { result.tournament = true; result.tournamentOnly = true; }
+    else if (value === "--tournament-cohorts") result.tournamentCohorts = Number.parseInt(argv[++index], 10);
+    else if (value === "--mirror-comparison") result.mirrorComparisonIds.push(argv[++index]);
     else if (value === "--help") result.help = true;
     else throw new Error(`Unknown argument: ${value}`);
   }
@@ -42,6 +57,7 @@ function help() {
 Usage:
   npm run eval:harness -- [--config FILE] [--output DIR] [--capture-only] [--sanity]
   npm run eval:harness -- --evaluate-existing CAPTURE.json [--output DIR]
+  npm run eval:harness -- --evaluate-existing CAPTURE.json --tournament-only [--tournament-cohorts 3]
   npm run eval:harness -- --input CAPTURE.json [--output DIR]  # backward-compatible alias
   npm run eval:report -- --input RESULTS.json [--output DIR]
 
@@ -53,11 +69,12 @@ Required for qualitative evaluation:
   OPENAI_API_KEY         Evaluator API key (never written to output)
 
 Optional:
-  EVAL_CONTROL_ID, EVAL_TREATMENT_ID, EVAL_MODEL
+  EVAL_CONTROL_ID, EVAL_TREATMENT_ID, EVAL_MODEL, TOURNAMENT_EVAL_MODEL
 
 The combined command runs an evaluator preflight before capture, writes an atomic capture checkpoint before qualitative evaluation, and saves evaluator progress after every pair.
 
-Use --sanity with equivalent endpoints to add the control-vs-control audit. Only unresolved pairs receive blinded arbitration, and sanity mode mirrors those arbitration placements.`;
+Use --sanity with equivalent endpoints to add the control-vs-control audit. Only unresolved pairs receive blinded arbitration, and sanity mode mirrors those arbitration placements.
+The tournament runs by default. Use --no-tournament to omit it, or --tournament-only to evaluate a saved corpus without rerunning independent assessment.`;
 }
 
 const delay = (milliseconds) => milliseconds > 0 ? new Promise((resolve) => setTimeout(resolve, milliseconds)) : Promise.resolve();
@@ -108,6 +125,26 @@ function evaluationForPair(bundle, pairId) {
   return (bundle.evaluations || []).find((evaluation) => evaluation.pair?.pairId === pairId);
 }
 
+function hasIndependentAssessments(evaluation) {
+  return ["control", "treatment"].every((environment) => {
+    const assessment = evaluation?.independentAssessments?.[environment]?.assessment;
+    return Boolean(
+      assessment
+      && ASSESSMENT_RATINGS.includes(assessment.overall?.rating)
+      && ASSESSMENT_EXCEPTIONS.includes(assessment.overall?.exception)
+      && ["high", "medium", "low"].includes(assessment.overall?.confidence)
+      && ["high", "medium", "low"].includes(assessment.confidence)
+      && CRITERIA.every((criterion) => {
+        const item = assessment.criteria?.[criterion];
+        return item
+          && ASSESSMENT_RATINGS.includes(item.rating)
+          && ASSESSMENT_EXCEPTIONS.includes(item.exception)
+          && ["high", "medium", "low"].includes(item.confidence);
+      })
+    );
+  });
+}
+
 function upsertEvaluation(bundle, pairId, evaluation) {
   bundle.evaluations ||= [];
   const index = bundle.evaluations.findIndex((item) => item.pair?.pairId === pairId);
@@ -120,6 +157,7 @@ export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?
     const evaluation = evaluationForPair(bundle, pair.pairId);
     if (!evaluation || evaluation.error || evaluation.mirrorError) return true;
     if (pair.eligibility && !pair.eligibility.qualitativeEligible) return false;
+    if (!hasIndependentAssessments(evaluation)) return true;
     if (evaluation.arbitrationRequired && !evaluation.arbitration) return true;
     return sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError;
   });
@@ -128,6 +166,7 @@ export function needsQualitativeEvaluation(bundle, sanityMode = bundle.metadata?
 function evaluationComplete(evaluation, pair, sanityMode) {
   if (!evaluation || evaluation.error) return false;
   if (pair.eligibility && !pair.eligibility.qualitativeEligible) return true;
+  if (!hasIndependentAssessments(evaluation)) return false;
   if (evaluation.arbitrationRequired && !evaluation.arbitration) return false;
   return !(sanityMode && evaluation.arbitrationRequired && !evaluation.mirrorAudit && !evaluation.mirrorError);
 }
@@ -143,18 +182,20 @@ function finalCriteria(unblinded) {
   return Object.fromEntries(Object.entries(unblinded.criteria || {}).map(([criterion, item]) => [criterion, {
     environmentResult: item.environmentResult,
     judgment: item.judgment,
+    controlException: item.controlException,
+    treatmentException: item.treatmentException,
     rationale: item.rationale
   }]));
 }
 
-export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode, evaluator = evaluatePair, arbitrator = evaluateArbitration, persist = async () => {} }) {
+export async function evaluateBundle({ bundle, config, apiKey, model, provider = "openai", sanityMode, evaluator = evaluatePair, arbitrator = evaluateArbitration, persist = async () => {} }) {
   const runsById = new Map(bundle.runs.map((run) => [run.runId, run]));
   for (let index = 0; index < bundle.pairs.length; index += 1) {
     const pair = bundle.pairs[index];
     const existing = evaluationForPair(bundle, pair.pairId);
     if (evaluationComplete(existing, pair, false)) continue;
     console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} independent assessment`);
-    const evaluation = await evaluator({ pair, runsById, apiKey, model });
+    const evaluation = await evaluator({ pair, runsById, apiKey, model, provider });
     if (!pair.eligibility && evaluation.pair?.eligibility) pair.eligibility = evaluation.pair.eligibility;
     upsertEvaluation(bundle, pair.pairId, evaluation);
     await persist(bundle);
@@ -166,7 +207,7 @@ export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode
       const existing = evaluationForPair(bundle, pair.pairId);
       if (!existing || existing.error || !existing.arbitrationRequired || !existing.arbitration || existing.mirrorAudit || existing.mirrorError) continue;
       console.log(`[evaluator ${index + 1}/${bundle.pairs.length}] ${pair.pairId} mirrored arbitration`);
-      const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model });
+      const mirrored = await arbitrator({ pair: mirrorPair(pair), runsById, apiKey, model, provider });
       if (mirrored.error) {
         upsertEvaluation(bundle, pair.pairId, { ...existing, mirrorError: mirrored.error, failedMirrorPass: mirrored });
       } else {
@@ -202,9 +243,136 @@ export async function evaluateBundle({ bundle, config, apiKey, model, sanityMode
   return bundle;
 }
 
+function tournamentResultFor(bundle, comparisonId) {
+  return (bundle.tournament?.comparisons || []).find((result) => result.comparison?.comparisonId === comparisonId);
+}
+
+export function needsTournamentEvaluation(bundle, cohorts) {
+  return cohorts.some((cohort) => cohort.comparisons.some((comparison) => {
+    const result = tournamentResultFor(bundle, comparison.comparisonId);
+    return !result || Boolean(result.error) || Boolean(result.mirrorError);
+  }));
+}
+
+function sumTournamentUsage(results) {
+  return results.reduce((total, result) => {
+    const records = [result, result.mirror].filter(Boolean);
+    for (const record of records) {
+      const usage = record.usage || record.rawEvaluatorResponse?.usage || {};
+      total.inputTokens += Number(usage.input_tokens || 0);
+      total.outputTokens += Number(usage.output_tokens || 0);
+      total.totalTokens += Number(usage.total_tokens || 0);
+      total.calls += Number(record.attemptCount || 1);
+      total.successfulCalls += record.judgment ? 1 : 0;
+      total.failedAttempts += (record.attempts || []).filter((attempt) => attempt.error).length;
+      total.durationMs += Number(record.durationMs || 0);
+    }
+    return total;
+  }, { calls: 0, successfulCalls: 0, failedAttempts: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, durationMs: 0 });
+}
+
+export async function evaluateTournamentBundle({
+  bundle,
+  config,
+  apiKey,
+  model,
+  provider = "openai",
+  cohortLimit = null,
+  explicitMirrorIds = [],
+  evaluator = evaluateTournamentComparison,
+  persist = async () => {}
+}) {
+  const allCohorts = createTournamentCohorts(bundle.runs || [], config.tournament?.pairingSeed || `${config.pairingSeed}:tournament`);
+  const cohorts = Number.isInteger(cohortLimit) && cohortLimit > 0 ? allCohorts.slice(0, cohortLimit) : allCohorts;
+  bundle.tournament ||= { schemaVersion: 1, cohorts, comparisons: [], summary: null, humanReviewShortlist: [] };
+  bundle.tournament.cohorts = cohorts;
+  bundle.tournament.evaluatorModel = model;
+  bundle.tournament.comparisons ||= [];
+  const runsById = new Map((bundle.runs || []).map((run) => [run.runId, run]));
+  const comparisons = cohorts.flatMap((cohort) => cohort.comparisons);
+  const comparisonOrder = new Map(comparisons.map((comparison, index) => [comparison.comparisonId, index]));
+  let persistChain = Promise.resolve();
+  const checkpoint = () => {
+    const snapshot = structuredClone(bundle);
+    persistChain = persistChain.then(() => persist(snapshot));
+    return persistChain;
+  };
+  const concurrency = Math.max(1, config.tournament?.concurrency || 3);
+  const pending = comparisons.filter((comparison) => {
+    const existing = tournamentResultFor(bundle, comparison.comparisonId);
+    return !existing || existing.error;
+  });
+  await mapWithConcurrency(pending, concurrency, async (comparison, index) => {
+    console.log(`[tournament ${index + 1}/${pending.length}] ${comparison.cohortId} ${comparison.comparisonId}`);
+    const result = await evaluator({
+      comparison,
+      runsById,
+      apiKey,
+      model,
+      provider,
+      maxAttempts: config.tournament?.maxAttempts,
+      retryDelayMs: config.tournament?.retryDelayMs
+    });
+    const existingIndex = bundle.tournament.comparisons.findIndex((item) => item.comparison?.comparisonId === comparison.comparisonId);
+    if (existingIndex === -1) bundle.tournament.comparisons.push(result);
+    else bundle.tournament.comparisons[existingIndex] = result;
+    await checkpoint();
+    await delay(config.requestDelayMs || 0);
+    return result;
+  });
+  bundle.tournament.comparisons.sort((left, right) => (comparisonOrder.get(left.comparison?.comparisonId) ?? Number.MAX_SAFE_INTEGER) - (comparisonOrder.get(right.comparison?.comparisonId) ?? Number.MAX_SAFE_INTEGER));
+
+  const preliminary = aggregateTournament(cohorts, bundle.tournament.comparisons);
+  const topImpactComparisonIds = preliminary.cohorts.flatMap((cohort) => {
+    const topIds = new Set(cohort.ranking.slice(0, 2).map((candidate) => candidate.candidateId));
+    return cohort.comparisons.filter((comparison) => comparison.candidateIds.every((id) => topIds.has(id))).map((comparison) => comparison.comparisonId);
+  });
+  const mirrorOptions = {
+    mirrorEvery: config.tournament?.mirrorEvery === true,
+    mirrorLowConfidence: config.tournament?.mirrorLowConfidence !== false,
+    mirrorSlight: config.tournament?.mirrorSlight !== false,
+    topImpactComparisonIds: config.tournament?.mirrorTopImpact === false ? [] : topImpactComparisonIds,
+    explicitComparisonIds: explicitMirrorIds
+  };
+  for (const result of bundle.tournament.comparisons) {
+    if ((result.error && !mirrorOptions.mirrorEvery) || (result.mirror && !result.mirrorError) || !shouldMirrorTournamentResult(result, mirrorOptions)) continue;
+    console.log(`[tournament mirror] ${result.comparison.cohortId} ${result.comparison.comparisonId}`);
+    const mirror = await evaluator({
+      comparison: mirrorTournamentComparison(result.comparison),
+      runsById,
+      apiKey,
+      model,
+      provider,
+      maxAttempts: config.tournament?.maxAttempts,
+      retryDelayMs: config.tournament?.retryDelayMs
+    });
+    result.mirror = mirror;
+    if (!mirror.error) {
+      result.mirrorAudit = reconcileTournamentMirror(result, mirror);
+      delete result.mirrorError;
+    } else result.mirrorError = mirror.error;
+    await checkpoint();
+    await delay(config.requestDelayMs || 0);
+  }
+  bundle.tournament = {
+    ...bundle.tournament,
+    ...aggregateTournament(cohorts, bundle.tournament.comparisons),
+    humanReviewShortlist: tournamentHumanReviewShortlist(bundle.tournament, bundle.tournament.comparisons, config.shortlist?.maximum || 10),
+    usage: sumTournamentUsage(bundle.tournament.comparisons),
+    completedAt: new Date().toISOString()
+  };
+  bundle.metadata ||= {};
+  bundle.metadata.tournamentFlow = config.tournament?.mirrorEvery === true
+    ? "complete-round-robin -> full-bidirectional-mirroring -> stable-edge-only-regularized-Bradley-Terry-ranking"
+    : "complete-round-robin -> selective-mirroring -> regularized-Bradley-Terry-ranking";
+  await checkpoint();
+  return bundle;
+}
+
 async function main() {
   const options = args(process.argv.slice(2));
   if (options.help) { console.log(help()); return; }
+  if (options.tournamentCohorts != null && (!Number.isInteger(options.tournamentCohorts) || options.tournamentCohorts < 1)) throw new Error("--tournament-cohorts must be a positive integer");
   let config = validateConfig(await loadJson(options.config));
   let bundle;
   let checkpointPath;
@@ -216,11 +384,9 @@ async function main() {
     if (options.reportOnly) throw new Error("--report-only requires --input");
     let evaluatorPreflight = null;
     if (!options.captureOnly) {
-      const apiKey = process.env[config.evaluator.apiKeyEnv];
-      if (!apiKey) throw new Error(`Set ${config.evaluator.apiKeyEnv}, or rerun with --capture-only`);
-      const model = process.env[config.evaluator.modelEnv] || config.evaluator.defaultModel;
-      console.log(`[preflight] ${model}`);
-      evaluatorPreflight = await preflightEvaluator({ apiKey, model });
+      const runtime = resolveEvaluatorRuntime({ config: config.evaluator });
+      console.log(`[preflight] ${runtime.provider} ${runtime.model}`);
+      evaluatorPreflight = await preflightEvaluator(runtime);
     }
     const control = resolveEnvironment(config, "control");
     const treatment = resolveEnvironment(config, "treatment");
@@ -267,13 +433,12 @@ async function main() {
 
   const sanityMode = bundle.metadata.mode === "sanity" || options.sanity;
   if (!options.reportOnly && !options.captureOnly) {
-    const apiKey = process.env[config.evaluator.apiKeyEnv];
-    if (!apiKey) throw new Error(`Set ${config.evaluator.apiKeyEnv}, or rerun with --capture-only`);
-    const model = process.env[config.evaluator.modelEnv] || config.evaluator.defaultModel;
-    if (needsQualitativeEvaluation(bundle, sanityMode)) {
+    const runtime = resolveEvaluatorRuntime({ config: config.evaluator });
+    const { apiKey, model, provider } = runtime;
+    if (!options.tournamentOnly && needsQualitativeEvaluation(bundle, sanityMode)) {
       if (options.input) {
         console.log(`[preflight] ${model}`);
-        bundle.metadata.evaluatorPreflight = await preflightEvaluator({ apiKey, model });
+        bundle.metadata.evaluatorPreflight = await preflightEvaluator(runtime);
         await writeJsonAtomic(checkpointPath, bundle);
       }
       await evaluateBundle({
@@ -281,9 +446,27 @@ async function main() {
         config,
         apiKey,
         model,
+        provider,
         sanityMode,
         persist: (current) => writeJsonAtomic(checkpointPath, current)
       });
+    }
+    if (options.tournament && config.tournament?.enabled !== false) {
+      const tournamentModel = process.env[config.tournament?.modelEnv || "TOURNAMENT_EVAL_MODEL"] || model;
+      const cohorts = createTournamentCohorts(bundle.runs || [], config.tournament?.pairingSeed || `${config.pairingSeed}:tournament`);
+      const selectedCohorts = options.tournamentCohorts ? cohorts.slice(0, options.tournamentCohorts) : cohorts;
+      if (needsTournamentEvaluation(bundle, selectedCohorts) || selectedCohorts.some((cohort) => cohort.comparisons.some((comparison) => options.mirrorComparisonIds.includes(comparison.comparisonId)))) {
+        await evaluateTournamentBundle({
+          bundle,
+          config,
+          apiKey,
+          model: tournamentModel,
+          provider,
+          cohortLimit: options.tournamentCohorts,
+          explicitMirrorIds: options.mirrorComparisonIds,
+          persist: (current) => writeJsonAtomic(checkpointPath, current)
+        });
+      }
     }
   }
 

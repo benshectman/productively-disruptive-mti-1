@@ -19,8 +19,45 @@ import {
   validateConfig
 } from "../scripts/evaluation/core.mjs";
 import { buildMarkdownReport } from "../scripts/evaluation/report.mjs";
-import { evaluatePair, preflightEvaluator } from "../scripts/evaluation/evaluator.mjs";
-import { args, evaluateBundle, needsQualitativeEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
+import {
+  buildArbitrationBody,
+  buildIndependentAssessmentBody,
+  buildTournamentBody,
+  evaluateTournamentComparison,
+  evaluatePair,
+  INDEPENDENT_CRITERION_RUBRICS,
+  INDEPENDENT_OVERALL_RUBRIC,
+  preflightEvaluator
+} from "../scripts/evaluation/evaluator.mjs";
+import {
+  buildProviderRequest,
+  parseEvaluatorJson,
+  resolveEvaluatorProvider,
+  resolveEvaluatorRuntime
+} from "../scripts/evaluation/evaluator-provider.mjs";
+import { buildDefaultEvaluatorEvidenceContext, buildEvaluatorEvidenceContext } from "../scripts/evaluation/evidence-context.mjs";
+import {
+  OPENROUTER_VALIDATION_MODEL,
+  referenceComparison,
+  selectValidationMirrors
+} from "../scripts/evaluation/cross-provider-validation.mjs";
+import { OPENROUTER_FULL_TOURNAMENT_MODEL } from "../scripts/evaluation/full-tournament-validation.mjs";
+import { args, evaluateBundle, evaluateTournamentBundle, needsQualitativeEvaluation, needsTournamentEvaluation, writeJsonAtomic } from "../scripts/evaluation/run.mjs";
+import {
+  aggregateTournament,
+  canonicalPairIdentity,
+  createTournamentCohorts,
+  mapTournamentJudgment,
+  mirrorTournamentComparison,
+  rankTournamentCohort,
+  reconcileTournamentMirror,
+  selectStratifiedDirectComparisons,
+  tournamentRequest
+} from "../scripts/evaluation/tournament.mjs";
+import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
+import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata.ts";
+import { assembleApprovedBenFactsNarrative } from "../src/shared/approved-benfacts.ts";
+import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence.ts";
 
 const sections = ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"];
 
@@ -83,10 +120,33 @@ function run(environment, configuration, repetition, overrides = {}) {
 
 const criteriaNames = ["topicRelevance", "selectivity", "synthesis", "coherence", "nonRepetition", "specificity", "groundedness", "attributionDiscipline", "readability", "evidenceEconomy"];
 
-function assessment(rating = "adequate", overrides = {}) {
-  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { rating, rationale: `${criterion} rationale` }]));
-  for (const [criterion, value] of Object.entries(overrides.criteria || {})) criteria[criterion] = { rating: value, rationale: `${criterion} override` };
-  return { criteria, overall: { rating: overrides.overall || rating, rationale: "Overall rationale" }, concerns: overrides.concerns || [], confidence: overrides.confidence || "moderate" };
+function criterionAssessment(criterion, value) {
+  if (typeof value === "object") {
+    return {
+      rating: value.rating,
+      exception: value.exception ?? null,
+      confidence: value.confidence || "medium",
+      rationale: `${criterion} override`
+    };
+  }
+  return { rating: value, exception: null, confidence: "medium", rationale: `${criterion} rationale` };
+}
+
+function assessment(rating = 3, overrides = {}) {
+  const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, criterionAssessment(criterion, rating)]));
+  for (const [criterion, value] of Object.entries(overrides.criteria || {})) criteria[criterion] = criterionAssessment(criterion, value);
+  const overallValue = typeof overrides.overall === "object" ? overrides.overall : { rating: overrides.overall || rating };
+  return {
+    criteria,
+    overall: {
+      rating: overallValue.rating,
+      exception: overallValue.exception ?? null,
+      confidence: overallValue.confidence || "medium",
+      rationale: "Overall rationale"
+    },
+    concerns: overrides.concerns || [],
+    confidence: overrides.confidence || "medium"
+  };
 }
 
 function completedEvaluation(pair, control = assessment(), treatment = assessment()) {
@@ -103,7 +163,498 @@ function completedEvaluation(pair, control = assessment(), treatment = assessmen
   };
 }
 
-function arbitrationPass(pair, judgment, confidence = "moderate") {
+describe("evaluator evidence context", () => {
+  it("reconstructs the same eligible section and proof-project pools used by generation", () => {
+    const selectedTopicIds = ["T-003"];
+    const narrative = assembleApprovedBenFactsNarrative(selectedTopicIds);
+    const prose = {
+      sections: narrative.sections.map((section) => ({
+        id: section.id,
+        proofItems: (section.proof_items || []).map((item) => ({ projectId: item.project_id }))
+      }))
+    };
+    const context = buildEvaluatorEvidenceContext({
+      approvedFacts: approvedCorpusJson.facts,
+      editorialMetadata: approvedEditorialMetadata,
+      selectedTopicIds,
+      prose
+    });
+
+    for (const pool of buildEligibleSectionEvidencePools(selectedTopicIds)) {
+      expect(context.eligibleEvidenceBySection[pool.sectionId]).toEqual(pool.facts);
+    }
+    for (const item of narrative.sections.find((section) => section.id === "proof-to-scale").proof_items) {
+      expect(context.eligibleEvidenceByProject[item.project_id]).toEqual(buildEligibleProjectEvidence(item.project_id, selectedTopicIds));
+    }
+    expect(buildDefaultEvaluatorEvidenceContext({ selectedTopicIds, prose })).toEqual(context);
+  });
+
+  it("limits project pools to projects present in the assessed response", () => {
+    const context = buildEvaluatorEvidenceContext({
+      approvedFacts: approvedCorpusJson.facts,
+      editorialMetadata: approvedEditorialMetadata,
+      selectedTopicIds: ["T-003"],
+      prose: { sections: [{ proofItems: [{ projectId: "askgs" }] }] }
+    });
+
+    expect(Object.keys(context.eligibleEvidenceByProject)).toEqual(["askgs"]);
+    expect(context.eligibleEvidenceByProject.askgs.length).toBeGreaterThan(0);
+    expect(context.eligibleEvidenceByProject.askgs.every((fact) => fact.project_id === "askgs")).toBe(true);
+  });
+
+  it("includes cited evidence and reconstructed eligible pools in independent assessment requests", () => {
+    const prose = { sections: [{ id: "proof-to-scale", proofItems: [{ projectId: "askgs" }] }] };
+    const citedEvidence = [{ id: "BF-C-051", claim: "Selected AskGS evidence", attribution: "leadership", topics: ["T-003"] }];
+    const request = independentAssessmentRequest(
+      { prose, evidence: citedEvidence },
+      { topicConfigurationId: "enterprise-ux", topicConfigurationLabel: "Enterprise UX", selectedTopicIds: ["T-003"] }
+    );
+
+    expect(request.response.citedEvidence).toEqual(citedEvidence);
+    expect(request.response.eligibleEvidence.eligibleEvidenceByProject.askgs).toEqual(buildEligibleProjectEvidence("askgs", ["T-003"]));
+    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"]).toEqual(
+      buildEligibleSectionEvidencePools(["T-003"]).find((pool) => pool.sectionId === "operating-model").facts
+    );
+  });
+});
+
+describe("evaluator provider adapter", () => {
+  it("pins the sparse OpenRouter validation to the exact paid Qwen model", () => {
+    expect(OPENROUTER_VALIDATION_MODEL).toBe("qwen/qwen3-235b-a22b-2507");
+    expect(OPENROUTER_FULL_TOURNAMENT_MODEL).toBe("qwen/qwen3-235b-a22b-2507");
+  });
+
+  it("pins the workflow provider and model instead of relying on OpenRouter routing preferences", async () => {
+    const workflow = await readFile(new URL("../.github/workflows/evaluator-calibration.yml", import.meta.url), "utf8");
+    expect(workflow).toContain("EVAL_PROVIDER: openrouter");
+    expect(workflow).toContain("EVAL_MODEL: qwen/qwen3-235b-a22b-2507");
+    expect(workflow).toContain("OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}");
+    expect(workflow).toContain("eval:full-qwen-tournament");
+    expect(workflow).toContain("qwen-full-tournament-validation-${{ github.run_id }}");
+  });
+
+  it("defaults to OpenAI and selects OpenRouter explicitly", () => {
+    expect(resolveEvaluatorProvider()).toMatchObject({ id: "openai", apiKeyEnv: "OPENAI_API_KEY" });
+    expect(resolveEvaluatorProvider("OPENROUTER")).toMatchObject({ id: "openrouter", apiKeyEnv: "OPENROUTER_API_KEY" });
+    expect(() => resolveEvaluatorProvider("unknown")).toThrow("Unsupported evaluator provider");
+  });
+
+  it("resolves only the selected provider secret and never falls back to the other key", () => {
+    const config = { defaultProvider: "openai", defaultModel: "openai-model" };
+    expect(resolveEvaluatorRuntime({ config, environment: { OPENAI_API_KEY: "openai-key" } })).toMatchObject({ provider: "openai", apiKeyEnv: "OPENAI_API_KEY", apiKey: "openai-key", model: "openai-model" });
+    expect(resolveEvaluatorRuntime({ config, environment: { EVAL_PROVIDER: "openrouter", OPENROUTER_API_KEY: "router-key", EVAL_MODEL: "router-model" } })).toMatchObject({ provider: "openrouter", apiKeyEnv: "OPENROUTER_API_KEY", apiKey: "router-key", model: "router-model" });
+    expect(() => resolveEvaluatorRuntime({ config, environment: { EVAL_PROVIDER: "openrouter", OPENAI_API_KEY: "wrong-key" } })).toThrow("Set OPENROUTER_API_KEY");
+  });
+
+  it("preserves the existing OpenAI request body and parses strict or surrounded JSON", () => {
+    const body = { model: "test-model", store: false, input: "payload", text: { format: { type: "json_schema" } } };
+    const request = buildProviderRequest({ provider: "openai", apiKey: "test-key", body, signal: null });
+    expect(request.url).toBe("https://api.openai.com/v1/responses");
+    expect(JSON.parse(request.init.body)).toEqual(body);
+    expect(parseEvaluatorJson('{"winner":"A_stronger"}')).toEqual({ winner: "A_stronger" });
+    expect(parseEvaluatorJson('comment {"winner":"B_stronger"}')).toEqual({ winner: "B_stronger" });
+  });
+});
+
+describe("relative-quality tournament", () => {
+  function sixRuns(configuration = "one") {
+    return [1, 2, 3].flatMap((repetition) => [run("control", configuration, repetition), run("treatment", configuration, repetition)]);
+  }
+
+  function result(comparison, winner = "A_stronger", margin = "clear", confidence = "high") {
+    const judgment = { winner, margin, confidence, rationale: "Sharper synthesis and a clearer throughline." };
+    return { comparison, judgment, mappedJudgment: mapTournamentJudgment(comparison, judgment), durationMs: 100, usage: { input_tokens: 10, output_tokens: 5, total_tokens: 15 } };
+  }
+
+  it("creates all 15 unique round-robin comparisons with no self-comparisons", () => {
+    const [cohort] = createTournamentCohorts(sixRuns(), "seed");
+    expect(cohort.candidates).toHaveLength(6);
+    expect(cohort.comparisons).toHaveLength(15);
+    expect(new Set(cohort.comparisons.map((item) => item.candidateIds.join(":"))).size).toBe(15);
+    expect(cohort.comparisons.every((item) => item.candidateIds[0] !== item.candidateIds[1])).toBe(true);
+    const appearances = Object.fromEntries(cohort.candidates.map((candidate) => [candidate.candidateId, 0]));
+    for (const comparison of cohort.comparisons) for (const id of comparison.candidateIds) appearances[id] += 1;
+    expect(Object.values(appearances)).toEqual([5, 5, 5, 5, 5, 5]);
+  });
+
+  it("counterbalances A/B placement for every candidate", () => {
+    const first = createTournamentCohorts(sixRuns(), "seed")[0];
+    const second = createTournamentCohorts(sixRuns(), "seed")[0];
+    expect(first).toEqual(second);
+    const byCandidate = Object.fromEntries(first.candidates.map((candidate) => [candidate.candidateId, { A: 0, B: 0 }]));
+    for (const comparison of first.comparisons) {
+      byCandidate[comparison.blind.A].A += 1;
+      byCandidate[comparison.blind.B].B += 1;
+    }
+    for (const placement of Object.values(byCandidate)) expect(Math.abs(placement.A - placement.B)).toBeLessThanOrEqual(1);
+  });
+
+  it("selects exactly three direct comparisons per cohort with balanced repetitions and placement", () => {
+    const runs = Array.from({ length: 11 }, (_, index) => sixRuns(`cohort-${index}`)).flat();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const selected = selectStratifiedDirectComparisons(cohorts, "sample-seed");
+    expect(selected).toHaveLength(33);
+    expect(selectStratifiedDirectComparisons(cohorts, "sample-seed")).toEqual(selected);
+    expect(Math.abs(selected.filter((comparison) => comparison.mappedCandidates.A.environment === "treatment").length - 16.5)).toBe(0.5);
+    for (const cohort of cohorts) {
+      const comparisons = selected.filter((comparison) => comparison.cohortId === cohort.cohortId);
+      expect(comparisons).toHaveLength(3);
+      expect(comparisons.every((comparison) => comparison.mappedCandidates.A.environment !== comparison.mappedCandidates.B.environment)).toBe(true);
+      for (const environment of ["control", "treatment"]) {
+        expect(comparisons.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === environment).repetition).sort()).toEqual([1, 2, 3]);
+      }
+    }
+  });
+
+  it("uses an A/B-order-independent canonical identity for the underlying pair", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mirrored = mirrorTournamentComparison(comparison);
+    expect(canonicalPairIdentity(mirrored)).toBe(canonicalPairIdentity(comparison));
+    expect(canonicalPairIdentity({ ...comparison, comparisonId: "different-local-id" })).toBe(canonicalPairIdentity(comparison));
+  });
+
+  it("matches reference outcomes by canonical candidate pair instead of local comparison ID", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const sampled = result({ ...comparison, comparisonId: "qwen-local-id" }, "A_stronger");
+    const mirroredReference = result({ ...mirrorTournamentComparison(comparison), comparisonId: "reference-local-id" }, "B_stronger");
+    const agreement = referenceComparison([sampled], { tournament: { evaluatorModel: "reference-model", comparisons: [mirroredReference] } });
+    expect(agreement).toMatchObject({ sampledPairsFound: 1, comparablePairs: 1, sameDirection: 1, oppositeDirection: 0, agreementRate: 1 });
+    expect(agreement.outcomes[0].pairIdentity).toBe(canonicalPairIdentity(comparison));
+  });
+
+  it("keeps environment and model identity out of blinded evaluator input", () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    const request = tournamentRequest(comparison, new Map(runs.map((item) => [item.runId, item])));
+    const serialized = JSON.stringify(request);
+    const collectKeys = (value) => value && typeof value === "object"
+      ? Object.entries(value).flatMap(([key, child]) => [key, ...collectKeys(child)]) : [];
+    expect(Object.keys(request)).toEqual(["topicConfiguration", "evidenceContext", "responseA", "responseB"]);
+    expect(collectKeys(request)).not.toEqual(expect.arrayContaining(["environment", "environmentId", "model", "evaluatorModel"]));
+    expect(serialized).not.toContain("feature/example");
+    expect(serialized).not.toContain("gpt-4.1-mini");
+    expect(serialized).not.toContain("gpt-5.6-luna");
+    expect(request.evidenceContext.eligibleEvidenceBySection).toBeTruthy();
+    expect(request.responseA).toHaveProperty("citedEvidence");
+  });
+
+  it.each([["A_stronger", "A"], ["B_stronger", "B"]])("maps %s back to the correct candidate", (winner, position) => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mapped = mapTournamentJudgment(comparison, { winner, margin: "slight", confidence: "medium", rationale: "Editorial distinction" });
+    expect(mapped.winnerCandidateId).toBe(comparison.blind[position]);
+    expect(mapped.winnerEnvironment).toBe(comparison.mappedCandidates[position].environment);
+    expect(mapped.margin).toBe("slight");
+    expect(mapped.confidence).toBe("medium");
+  });
+
+  it("does not create an arbitrary winner for exceptional unclear results", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    expect(mapTournamentJudgment(comparison, { winner: "unclear", margin: "slight", confidence: "low", rationale: "Insufficient information" })).toMatchObject({ winnerCandidateId: null, winnerEnvironment: null });
+  });
+
+  it("uses the forced-preference schema and editorial prompt", () => {
+    const body = buildTournamentBody({}, "test-model");
+    expect(body.text.format.schema.properties.winner.enum).toEqual(["A_stronger", "B_stronger", "unclear"]);
+    expect(body.text.format.schema.properties.margin.enum).toEqual(["slight", "clear", "substantial"]);
+    expect(body.text.format.schema.properties.confidence.enum).toEqual(["low", "medium", "high"]);
+    expect(body.instructions).toContain("If only one could be published");
+    expect(body.instructions).toContain("There is no ordinary equivalent option");
+  });
+
+  it("parses a tournament response and preserves audit mapping and usage", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async (url, init) => {
+        expect(url).toBe("https://api.openai.com/v1/responses");
+        const body = JSON.parse(init.body);
+        expect(body.input).not.toContain('"environment":');
+        expect(body.input).not.toContain('"environmentId":');
+        expect(body.input).not.toContain("feature/example");
+        expect(body.input).not.toContain("test-model");
+        return new Response(JSON.stringify({ output_text: JSON.stringify({ winner: "B_stronger", margin: "substantial", confidence: "high", rationale: "Better synthesis." }), usage: { input_tokens: 100, output_tokens: 20, total_tokens: 120 } }), { status: 200 });
+      }
+    });
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.B);
+    expect(evaluated.judgment).toMatchObject({ margin: "substantial", confidence: "high" });
+    expect(evaluated.placement.candidateMapping.B.candidateId).toBe(comparison.blind.B);
+    expect(evaluated.usage.total_tokens).toBe(120);
+  });
+
+  it("retries one transient malformed tournament response", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      fetcher: async () => {
+        calls += 1;
+        const outputText = calls === 1 ? "{" : JSON.stringify({ winner: "A_stronger", margin: "clear", confidence: "high", rationale: "Better synthesis." });
+        return new Response(JSON.stringify({ output_text: outputText }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(2);
+    expect(evaluated.attemptCount).toBe(2);
+    expect(evaluated.attempts[0].error).toContain("SyntaxError");
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
+  });
+
+  it("allows the sparse validation to request additional retries without changing the default OpenAI path", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      apiKey: "test-key",
+      model: "test-model",
+      maxAttempts: 4,
+      retryDelayMs: 0,
+      fetcher: async () => {
+        calls += 1;
+        const outputText = calls < 4 ? "{" : JSON.stringify({ winner: "A_stronger", margin: "clear", confidence: "high", rationale: "Better synthesis." });
+        return new Response(JSON.stringify({ output_text: outputText }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(4);
+    expect(evaluated.attemptCount).toBe(4);
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.A);
+  });
+
+  it("builds OpenRouter chat requests without API-enforced response_format and retries invalid JSON", async () => {
+    const runs = sixRuns();
+    const comparison = createTournamentCohorts(runs, "seed")[0].comparisons[0];
+    let calls = 0;
+    const evaluated = await evaluateTournamentComparison({
+      comparison,
+      runsById: new Map(runs.map((item) => [item.runId, item])),
+      provider: "openrouter",
+      apiKey: "openrouter-test-key",
+      model: "qwen/qwen3-235b-a22b-2507",
+      fetcher: async (url, init) => {
+        calls += 1;
+        expect(url).toBe("https://openrouter.ai/api/v1/chat/completions");
+        expect(init.headers.Authorization).toBe("Bearer openrouter-test-key");
+        const body = JSON.parse(init.body);
+        expect(body.model).toBe("qwen/qwen3-235b-a22b-2507");
+        expect(body).not.toHaveProperty("response_format");
+        expect(body).not.toHaveProperty("text");
+        expect(body.messages[0].content).toContain("Return only one strict JSON object");
+        expect(body.messages[0].content).toContain('"winner"');
+        const content = calls === 1 ? '{"winner":"A_stronger"}' : JSON.stringify({ winner: "B_stronger", margin: "clear", confidence: "medium", rationale: "More coherent." });
+        return new Response(JSON.stringify({ choices: [{ message: { content } }], usage: { prompt_tokens: 90, completion_tokens: 10, total_tokens: 100 } }), { status: 200 });
+      }
+    });
+    expect(calls).toBe(2);
+    expect(evaluated.evaluatorProvider).toBe("openrouter");
+    expect(evaluated.mappedJudgment.winnerCandidateId).toBe(comparison.blind.B);
+    expect(evaluated.usage).toMatchObject({ input_tokens: 90, output_tokens: 10, total_tokens: 100 });
+  });
+
+  it("maps a selective mirror and flags an order-sensitive reversal as unstable", () => {
+    const comparison = createTournamentCohorts(sixRuns(), "seed")[0].comparisons[0];
+    const mirroredComparison = mirrorTournamentComparison(comparison);
+    expect(mirroredComparison.blind).toEqual({ A: comparison.blind.B, B: comparison.blind.A });
+    const original = result(comparison, "A_stronger");
+    const stableMirror = result(mirroredComparison, "B_stronger");
+    expect(reconcileTournamentMirror(original, stableMirror)).toMatchObject({ unstable: false, winnerCandidateId: comparison.blind.A });
+    const reversedMirror = result(mirroredComparison, "A_stronger");
+    expect(reconcileTournamentMirror(original, reversedMirror)).toMatchObject({ unstable: true, winnerCandidateId: null });
+  });
+
+  it("aggregates wins, losses, direct environment outcomes, and deterministic ranking", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = cohort.comparisons.map((comparison) => result(comparison, "A_stronger"));
+    const first = rankTournamentCohort(cohort, results);
+    const second = rankTournamentCohort(cohort, results);
+    expect(first).toEqual(second);
+    expect(first.reduce((sum, candidate) => sum + candidate.wins, 0)).toBe(15);
+    expect(first.reduce((sum, candidate) => sum + candidate.losses, 0)).toBe(15);
+    const aggregate = aggregateTournament([cohort], results);
+    expect(aggregate.summary.directControlTreatmentComparisons).toBe(9);
+    expect(aggregate.summary.directWins.control + aggregate.summary.directWins.treatment).toBe(9);
+    expect(aggregate.summary.placement.control.top3 + aggregate.summary.placement.treatment.top3).toBe(3);
+    expect(aggregate.summary.positionBias.allPasses.total).toBe(15);
+  });
+
+  it("handles a non-transitive A over B, B over C, C over A cycle", () => {
+    const runs = [run("control", "cycle", 1), run("control", "cycle", 2), run("treatment", "cycle", 1)];
+    const cohort = createTournamentCohorts(runs, "cycle-seed")[0];
+    const [a, b, c] = cohort.candidates;
+    const desiredWinner = new Map([[`${a.candidateId}:${b.candidateId}`, a.candidateId], [`${b.candidateId}:${c.candidateId}`, b.candidateId], [`${a.candidateId}:${c.candidateId}`, c.candidateId]]);
+    const results = cohort.comparisons.map((comparison) => {
+      const winnerId = desiredWinner.get(comparison.candidateIds.join(":"));
+      return result(comparison, comparison.blind.A === winnerId ? "A_stronger" : "B_stronger");
+    });
+    const ranking = rankTournamentCohort(cohort, results);
+    expect(ranking).toHaveLength(3);
+    expect(ranking.every((candidate) => Number.isFinite(candidate.relativeStrength))).toBe(true);
+    expect(ranking.map((candidate) => candidate.wins).sort()).toEqual([1, 1, 1]);
+  });
+
+  it("retains unstable matchups as unresolved in ranking and review data", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const comparison = cohort.comparisons[0];
+    const original = result(comparison, "A_stronger", "slight", "low");
+    original.mirror = result(mirrorTournamentComparison(comparison), "A_stronger");
+    original.mirrorAudit = reconcileTournamentMirror(original, original.mirror);
+    const ranking = rankTournamentCohort(cohort, [original]);
+    expect(original.mirrorAudit.unstable).toBe(true);
+    expect(ranking.reduce((sum, candidate) => sum + candidate.unresolved, 0)).toBe(2);
+    const aggregate = aggregateTournament([cohort], [original]);
+    expect(aggregate.summary.unstableComparisons).toEqual([comparison.comparisonId]);
+    expect(aggregate.summary.directWins.control + aggregate.summary.directWins.treatment).toBe(0);
+  });
+
+  it("excludes failed and fallback candidates under existing reliability rules", () => {
+    const runs = sixRuns();
+    runs[0] = { ...runs[0], ok: false };
+    runs[1] = { ...runs[1], totalFallbackFields: 1 };
+    const cohort = createTournamentCohorts(runs, "seed")[0];
+    expect(cohort.candidates).toHaveLength(4);
+    expect(cohort.comparisons).toHaveLength(6);
+    expect(cohort.excludedCandidates.map((candidate) => candidate.reason).sort()).toEqual(["fallback-containing-response", "generation-failed"]);
+  });
+
+  it("preserves a fallback repetition as a reliability event and reduces the sparse sample", () => {
+    const runs = sixRuns();
+    const fallbackRunId = runs[0].runId;
+    runs[0] = { ...runs[0], totalFallbackFields: 1 };
+    const [cohort] = createTournamentCohorts(runs, "seed");
+    const selected = selectStratifiedDirectComparisons([cohort], "sample-seed");
+    expect(selected).toHaveLength(2);
+    expect(selected.every((comparison) => comparison.qualitativeEligible === true)).toBe(true);
+    expect(selected.every((comparison) => !comparison.candidateIds.includes(fallbackRunId))).toBe(true);
+    expect(cohort.excludedCandidates).toContainEqual(expect.objectContaining({ candidateId: fallbackRunId, reason: "fallback-containing-response" }));
+    const controlRepetitions = selected.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === "control").repetition).sort();
+    const treatmentRepetitions = selected.map((comparison) => Object.values(comparison.mappedCandidates).find((candidate) => candidate.environment === "treatment").repetition).sort();
+    expect(treatmentRepetitions).toEqual(controlRepetitions);
+  });
+
+  it("mirrors every slight or low-confidence result plus a deterministic clear/high audit sample", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = [
+      result(cohort.comparisons[0], "A_stronger", "slight", "high"),
+      result(cohort.comparisons[1], "A_stronger", "clear", "low"),
+      result(cohort.comparisons[2], "A_stronger", "clear", "high"),
+      result(cohort.comparisons[3], "A_stronger", "clear", "high"),
+      result(cohort.comparisons[4], "A_stronger", "substantial", "medium")
+    ];
+    const selected = selectValidationMirrors(results, { clearHighSampleSize: 1, seed: "mirror-seed" });
+    expect(selected).toHaveLength(3);
+    expect(selected).toEqual(expect.arrayContaining([results[0], results[1]]));
+    expect(selected.filter((item) => [results[2], results[3]].includes(item))).toHaveLength(1);
+    expect(selectValidationMirrors(results, { clearHighSampleSize: 1, seed: "mirror-seed" })).toEqual(selected);
+  });
+
+  it("resumes tournament progress without repeating completed comparisons", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const completed = result(cohorts[0].comparisons[0]);
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [completed] } };
+    const evaluated = [];
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(true);
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorLowConfidence: false, mirrorSlight: false, mirrorTopImpact: false }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: "test-model",
+      evaluator: async ({ comparison }) => {
+        evaluated.push(comparison.comparisonId);
+        return result(comparison);
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toHaveLength(14);
+    expect(evaluated).not.toContain(completed.comparison.comparisonId);
+    expect(bundle.tournament.comparisons).toHaveLength(15);
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(false);
+  });
+
+  it("mirrors every eligible base comparison and preserves a stable underlying winner", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [] } };
+    const evaluated = [];
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorEvery: true, maxAttempts: 6, retryDelayMs: 5000 }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: OPENROUTER_FULL_TOURNAMENT_MODEL,
+      provider: "openrouter",
+      evaluator: async ({ comparison, maxAttempts, retryDelayMs }) => {
+        evaluated.push(comparison);
+        expect(maxAttempts).toBe(6);
+        expect(retryDelayMs).toBe(5000);
+        const winnerCandidateId = [...comparison.candidateIds].sort()[0];
+        return result(comparison, comparison.blind.A === winnerCandidateId ? "A_stronger" : "B_stronger");
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toHaveLength(30);
+    expect(bundle.tournament.comparisons).toHaveLength(15);
+    expect(bundle.tournament.comparisons.every((item) => item.mirror && item.mirrorAudit?.unstable === false)).toBe(true);
+    expect(bundle.tournament.comparisons.every((item) => item.mirror.comparison.blind.A === item.comparison.blind.B
+      && item.mirror.comparison.blind.B === item.comparison.blind.A)).toBe(true);
+    expect(bundle.tournament.summary).toMatchObject({ stableComparisons: 15, mirroredComparisons: 15 });
+  });
+
+  it("neutralizes orientation-dependent winners across all pair types", async () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons: [] } };
+    await evaluateTournamentBundle({
+      bundle,
+      config: { pairingSeed: "seed", requestDelayMs: 0, tournament: { pairingSeed: "seed", concurrency: 2, mirrorEvery: true }, shortlist: { maximum: 10 } },
+      apiKey: "test-key",
+      model: "test-model",
+      evaluator: async ({ comparison }) => result(comparison, "A_stronger"),
+      persist: async () => {}
+    });
+    expect(bundle.tournament.comparisons.every((item) => item.mirrorAudit?.unstable)).toBe(true);
+    expect(bundle.tournament.summary.directWins).toEqual({ control: 0, treatment: 0 });
+    expect(bundle.tournament.summary.stabilityByType).toMatchObject({
+      controlTreatment: { total: 9, stable: 0, unstable: 9 },
+      controlControl: { total: 3, stable: 0, unstable: 3 },
+      treatmentTreatment: { total: 3, stable: 0, unstable: 3 }
+    });
+    expect(bundle.tournament.cohorts[0].graph).toMatchObject({ stableEdges: 0, connectedComponents: 6, orderingStrength: "underdetermined" });
+  });
+
+  it("recognizes a failed selective mirror as resumable work", () => {
+    const runs = sixRuns();
+    const cohorts = createTournamentCohorts(runs, "seed");
+    const comparisons = cohorts[0].comparisons.map((comparison) => result(comparison));
+    comparisons[0].mirror = { error: "Evaluator HTTP 429" };
+    comparisons[0].mirrorError = "Evaluator HTTP 429";
+    const bundle = { runs, tournament: { schemaVersion: 1, cohorts, comparisons } };
+    expect(needsTournamentEvaluation(bundle, cohorts)).toBe(true);
+  });
+
+  it("renders a separated tournament summary and cohort ranking", () => {
+    const cohort = createTournamentCohorts(sixRuns(), "seed")[0];
+    const results = cohort.comparisons.map((comparison) => result(comparison));
+    const aggregate = aggregateTournament([cohort], results);
+    const tournament = { ...aggregate, evaluatorModel: "gpt-5.6-luna", usage: { calls: 15 }, humanReviewShortlist: [] };
+    const report = buildMarkdownReport({
+      metadata: { generatedAt: "2026-09-22T00:00:00Z", environments: { control: { id: "develop" }, treatment: { id: "experiment" } }, topicConfigurationCount: 1, repetitions: 3 },
+      reliability: aggregateReliability(sixRuns()), qualitative: null, tournament, shortlist: [], runs: sixRuns(), sanity: null
+    });
+    expect(report).toContain("## Relative-quality tournament");
+    expect(report).toContain("Regression interpretation:");
+    expect(report).toContain("| Rank | Candidate | Environment | W | L | Unresolved | Relative strength |");
+    expect(report).toContain("API attempts: 15");
+  });
+});
+
+function arbitrationPass(pair, judgment, confidence = "medium") {
   const criteria = Object.fromEntries(criteriaNames.map((criterion) => [criterion, { judgment, rationale: `${criterion} rationale` }]));
   const raw = { criteria, overall: { judgment, rationale: "Arbitration rationale" }, concerns: [], confidence };
   const translate = (value) => value === "A_stronger" ? pair.mapping.A : value === "B_stronger" ? pair.mapping.B : value;
@@ -198,10 +749,16 @@ describe("evaluation harness", () => {
     const controlAsA = first.filter((pair) => pair.mapping.A === "control").length;
     expect(Math.abs(controlAsA - (first.length - controlAsA))).toBeLessThanOrEqual(1);
     const request = independentAssessmentRequest(runs[0], first[0]);
-    expect(JSON.stringify(request)).not.toContain("develop");
-    expect(JSON.stringify(request)).not.toContain("feature/example");
-    expect(JSON.stringify(request)).not.toContain("responseA");
-    expect(JSON.stringify(request)).not.toContain("responseB");
+    expect(Object.keys(request)).toEqual(["topicConfiguration", "response"]);
+    expect(request).not.toHaveProperty("environment");
+    expect(request.response).not.toHaveProperty("environment");
+    expect(request.response).not.toHaveProperty("environmentId");
+    expect(request).not.toHaveProperty("responseA");
+    expect(request).not.toHaveProperty("responseB");
+    expect(request.response.citedEvidence).toEqual(runs[0].evidence);
+    expect(request.response).not.toHaveProperty("evidence");
+    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"].length).toBeGreaterThan(runs[0].evidence.length);
+    expect(request.response.eligibleEvidence.eligibleEvidenceByProject).toEqual({});
     expect(arbitrationRequest(first[0], new Map(runs.map((item) => [item.runId, item])))).toHaveProperty("responseA");
   });
 
@@ -209,29 +766,112 @@ describe("evaluation harness", () => {
     expect(compareIndependentAssessments(assessment(), assessment())).toMatchObject({ classification: "equivalent" });
   });
 
+  it("defines the independent five-point schema and calibration guidance", () => {
+    const body = buildIndependentAssessmentBody({}, "test-model");
+    const criterion = body.text.format.schema.properties.criteria.properties.topicRelevance;
+    expect(criterion.properties.rating).toMatchObject({ type: "integer", enum: [1, 2, 3, 4, 5] });
+    expect(criterion.properties.exception.enum).toEqual([null, "concern", "unclear"]);
+    expect(criterion.properties.confidence.enum).toEqual(["high", "medium", "low"]);
+    expect(body.instructions).toContain("A score of 5 should be uncommon");
+    expect(body.instructions).toContain("Most competent portfolio content should fall around 3 or 4");
+    expect(body.instructions).toContain("Do not impose a numerical cap on 5 ratings");
+    expect(body.instructions).toContain("If a criterion rationale identifies a meaningful improvement, that criterion cannot receive 5");
+    expect(body.instructions).toContain("Absence of a problem normally supports 3");
+    expect(body.instructions).toContain("Overall is not a mathematical average");
+    expect(body.instructions).toContain("any materially important criterion rationale identifies a meaningful improvement");
+    expect(body.instructions).toContain("citedEvidence contains the evidence returned with the finished narrative");
+    expect(body.instructions).toContain("eligibleEvidence field contains the section and project evidence pools that were available for selection");
+    expect(body.instructions).toContain("Considering both the eligible evidence and the final prose");
+    expect(body.instructions).toContain("choose the strongest and most discriminating evidence from the eligible pool");
+    expect(body.instructions).toContain("avoid using additional evidence when fewer, stronger facts would make the point more effectively");
+    for (const criterionName of criteriaNames) {
+      expect(Object.keys(INDEPENDENT_CRITERION_RUBRICS[criterionName])).toEqual(["1", "2", "3", "4", "5"]);
+      for (const rating of [1, 2, 3, 4, 5]) expect(body.instructions).toContain(INDEPENDENT_CRITERION_RUBRICS[criterionName][rating]);
+    }
+    expect(Object.keys(INDEPENDENT_OVERALL_RUBRIC)).toEqual(["1", "2", "3", "4", "5"]);
+    for (const rating of [1, 2, 3, 4, 5]) expect(body.instructions).toContain(INDEPENDENT_OVERALL_RUBRIC[rating]);
+    expect(buildArbitrationBody({}, "test-model").instructions).not.toContain("eligible evidence and the final prose");
+    expect(buildArbitrationBody({}, "test-model").instructions).not.toContain("Criterion-specific rating anchors");
+  });
+
+  it.each([1, 2, 3, 4, 5])("parses and reports rating %i without using exception states", (rating) => {
+    const result = compareIndependentAssessments(assessment(rating), assessment(rating));
+    expect(result).toMatchObject({ classification: "equivalent" });
+    expect(result.criteria.topicRelevance).toMatchObject({
+      controlRating: rating,
+      treatmentRating: rating,
+      controlException: null,
+      treatmentException: null,
+      result: "equivalent"
+    });
+  });
+
+  it("keeps concern separate from numeric ratings", () => {
+    const control = assessment(4, { criteria: { groundedness: { rating: 4, exception: "concern" } } });
+    const result = compareIndependentAssessments(control, assessment(4));
+    expect(result).toMatchObject({ classification: "unresolved", concernCriteriaCount: 1 });
+    expect(result.criteria.groundedness).toMatchObject({ controlRating: 4, controlException: "concern", result: "concern" });
+    expect(deterministicUnblindedOutcome(result, control, assessment(4)).criteria.groundedness).toMatchObject({
+      environmentResult: "unresolved",
+      controlException: "concern",
+      treatmentException: null
+    });
+  });
+
+  it("keeps unclear separate from numeric ratings", () => {
+    const treatment = assessment(3, { criteria: { specificity: { rating: 3, exception: "unclear" } } });
+    const result = compareIndependentAssessments(assessment(3), treatment);
+    expect(result).toMatchObject({ classification: "equivalent", unclearCriteriaCount: 1 });
+    expect(result.criteria.specificity).toMatchObject({ treatmentRating: 3, treatmentException: "unclear", result: "unresolved" });
+  });
+
   it("classifies a clearly stronger control assessment", () => {
-    expect(compareIndependentAssessments(assessment("strong"), assessment("adequate"))).toMatchObject({ classification: "control_stronger" });
+    expect(compareIndependentAssessments(assessment(5), assessment(3))).toMatchObject({ classification: "control_stronger" });
   });
 
   it("classifies a clearly stronger treatment assessment", () => {
-    expect(compareIndependentAssessments(assessment("adequate"), assessment("strong"))).toMatchObject({ classification: "treatment_stronger" });
+    expect(compareIndependentAssessments(assessment(3), assessment(5))).toMatchObject({ classification: "treatment_stronger" });
   });
 
   it("leaves mixed criterion signals unresolved", () => {
-    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
-    const treatment = assessment("adequate", { criteria: { readability: "strong" } });
+    const control = assessment(3, { criteria: { synthesis: 4 } });
+    const treatment = assessment(3, { criteria: { readability: 4 } });
     expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criteriaConflict: true });
   });
 
   it("does not let an opposing criterion disappear behind a stronger overall rating", () => {
-    const control = assessment("adequate", { overall: "strong", criteria: { synthesis: "weak" } });
-    const treatment = assessment("adequate");
+    const control = assessment(3, { overall: 5, criteria: { synthesis: 2 } });
+    const treatment = assessment(3);
     expect(compareIndependentAssessments(control, treatment)).toMatchObject({ classification: "unresolved", criterionOpposesOverall: true });
   });
 
   it("treats one isolated criterion difference as effectively equivalent", () => {
-    const control = assessment("adequate", { criteria: { synthesis: "strong" } });
-    expect(compareIndependentAssessments(control, assessment("adequate"))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
+    const control = assessment(3, { criteria: { synthesis: 4 } });
+    expect(compareIndependentAssessments(control, assessment(3))).toMatchObject({ classification: "equivalent", minimumCriterionLead: 3 });
+  });
+
+  it("does not force a winner from a trivial one-point overall difference", () => {
+    expect(compareIndependentAssessments(assessment(3, { overall: 4 }), assessment(3))).toMatchObject({ classification: "equivalent" });
+  });
+
+  it("does not resolve a numeric lead when an assessment is low confidence", () => {
+    expect(compareIndependentAssessments(assessment(5, { confidence: "low" }), assessment(3))).toMatchObject({ classification: "unresolved", confidence: "low" });
+  });
+
+  it("preserves exception states through comparison and reporting aggregates", () => {
+    const runs = [run("control", "none", 1), run("treatment", "none", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const evaluation = completedEvaluation(
+      pair,
+      assessment(4, { criteria: { groundedness: { rating: 4, exception: "concern" } } }),
+      assessment(4, { criteria: { specificity: { rating: 4, exception: "unclear" } } })
+    );
+    const aggregate = aggregateQualitative([evaluation]);
+    expect(aggregate.exceptionCounts).toMatchObject({ concern: 1, unclear: 1 });
+    expect(aggregate.overallRatingDistribution[4]).toBe(2);
+    expect(aggregate.overallExceptionCounts).toMatchObject({ concern: 0, unclear: 0 });
+    expect(aggregate.criterionExceptionCounts.groundedness.concern).toBe(1);
+    expect(aggregate.criterionExceptionCounts.specificity.unclear).toBe(1);
   });
 
   it("excludes generated-vs-fallback and fallback-vs-fallback from prose comparison", () => {
@@ -287,15 +927,15 @@ describe("evaluation harness", () => {
     expect(result.error).toBeUndefined();
     expect(result.final.classification).toBe("equivalent");
     expect(result.arbitrationRequired).toBe(false);
-    expect(result.final.confidence).toBe("moderate");
+    expect(result.final.confidence).toBe("medium");
   });
 
   it("uses blinded arbitration only after conflicting independent assessments", async () => {
     const runs = [run("control", "none", 1), run("treatment", "none", 1)];
     const pair = createBlindPairs(runs, "seed")[0];
     const responses = [
-      assessment("adequate", { criteria: { synthesis: "strong" } }),
-      assessment("adequate", { criteria: { readability: "strong" } }),
+      assessment(3, { criteria: { synthesis: 4 } }),
+      assessment(3, { criteria: { readability: 4 } }),
       arbitrationPass(pair, "B_stronger").judgment,
       arbitrationPass(mirrorPair(pair), "B_stronger").judgment
     ];
@@ -344,6 +984,23 @@ describe("evaluation harness", () => {
     expect(result.evaluatorModel).toBe("test-model");
   });
 
+  it("preflights OpenRouter with validated strict JSON and enough output room for reasoning models", async () => {
+    let requestBody;
+    const result = await preflightEvaluator({
+      apiKey: "test-key",
+      model: "qwen/qwen3-235b-a22b-2507",
+      provider: "openrouter",
+      fetcher: async (_url, init) => {
+        requestBody = JSON.parse(init.body);
+        return new Response(JSON.stringify({ choices: [{ message: { content: '```json\n{"status":"EVALUATOR_PREFLIGHT_OK"}\n```' } }] }), { status: 200 });
+      }
+    });
+    expect(requestBody).toMatchObject({ model: "qwen/qwen3-235b-a22b-2507", max_tokens: 256 });
+    expect(requestBody.messages[0].content).toContain("strict JSON");
+    expect(JSON.stringify(requestBody)).not.toContain("Approved evidence");
+    expect(result).toMatchObject({ evaluatorModel: "qwen/qwen3-235b-a22b-2507", evaluatorProvider: "openrouter" });
+  });
+
   it("supports explicit staged evaluation and atomically persists checkpoints", async () => {
     expect(args(["--evaluate-existing", "capture.json", "--output", "reports"])).toMatchObject({ input: "capture.json", output: "reports" });
     const directory = await mkdtemp(path.join(os.tmpdir(), "portfolio-eval-checkpoint-"));
@@ -375,7 +1032,7 @@ describe("evaluation harness", () => {
       sanityMode: false,
       evaluator: async ({ pair }) => {
         evaluated.push(pair.pairId);
-        return completedEvaluation(pair, assessment("adequate"), assessment("strong"));
+        return completedEvaluation(pair, assessment(3), assessment(5));
       },
       persist: async () => { persisted += 1; }
     });
@@ -383,6 +1040,66 @@ describe("evaluation harness", () => {
     expect(persisted).toBe(1);
     expect(bundle.evaluations).toHaveLength(2);
     expect(needsQualitativeEvaluation(bundle, false)).toBe(false);
+  });
+
+  it("re-evaluates legacy direct-comparison records with the new independent schema", async () => {
+    const runs = [run("control", "one", 1), run("treatment", "one", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const bundle = {
+      metadata: { mode: "comparison" },
+      runs,
+      pairs: [pair],
+      evaluations: [{ pair, judgment: { overall: { judgment: "equivalent" } }, qualitativeEligible: true }]
+    };
+    const evaluated = [];
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(true);
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: false,
+      evaluator: async ({ pair: evaluatedPair }) => {
+        evaluated.push(evaluatedPair.pairId);
+        return completedEvaluation(evaluatedPair);
+      },
+      persist: async () => {}
+    });
+    expect(evaluated).toEqual([pair.pairId]);
+    expect(bundle.evaluations[0].independentAssessments).toBeTruthy();
+  });
+
+  it("re-evaluates legacy categorical independent records", async () => {
+    const runs = [run("control", "one", 1), run("treatment", "one", 1)];
+    const pair = createBlindPairs(runs, "seed")[0];
+    const legacyAssessment = {
+      criteria: Object.fromEntries(criteriaNames.map((criterion) => [criterion, { rating: "strong", rationale: `${criterion} rationale` }])),
+      overall: { rating: "strong", rationale: "Overall rationale" },
+      concerns: [],
+      confidence: "high"
+    };
+    const bundle = {
+      metadata: { mode: "comparison" },
+      runs,
+      pairs: [pair],
+      evaluations: [{ pair, qualitativeEligible: true, independentAssessments: { control: { assessment: legacyAssessment }, treatment: { assessment: legacyAssessment } } }]
+    };
+    let calls = 0;
+    expect(needsQualitativeEvaluation(bundle, false)).toBe(true);
+    await evaluateBundle({
+      bundle,
+      config: { requestDelayMs: 0 },
+      apiKey: "test-key",
+      model: "test-model",
+      sanityMode: false,
+      evaluator: async ({ pair: evaluatedPair }) => {
+        calls += 1;
+        return completedEvaluation(evaluatedPair);
+      },
+      persist: async () => {}
+    });
+    expect(calls).toBe(1);
+    expect(bundle.evaluations[0].independentAssessments.control.assessment.overall.rating).toBe(3);
   });
 
   it("keeps an equivalent control-vs-control sanity set out of arbitration and position-bias counts", async () => {
@@ -446,6 +1163,10 @@ describe("evaluation harness", () => {
     expect(report).toContain("Detailed rejected candidates, reasons, and context remain");
     expect(report).toContain("headline-acronym: 1");
     expect(report).toContain("## Cases Ben should review");
+    expect(report).toContain("### Independent rating distributions");
+    expect(report).toContain("Exception counts: concern 0; unclear 0.");
+    expect(report).toContain("Overall rating distribution:");
+    expect(report).toContain("| Criterion | Control rating | Control exception | Control confidence | Control rationale |");
     expect(report).toContain("Independent control assessment");
     expect(report).toContain("Arbitration required: 0");
     expect(report).toContain("control headline");
@@ -461,8 +1182,8 @@ describe("evaluation harness", () => {
     const equivalent = completedEvaluation(pairs[0]);
     const mixed = completedEvaluation(
       pairs[1],
-      assessment("adequate", { criteria: { synthesis: "strong" } }),
-      assessment("adequate", { criteria: { readability: "strong" } })
+      assessment(3, { criteria: { synthesis: 4 } }),
+      assessment(3, { criteria: { readability: 4 } })
     );
     const original = arbitrationPass(pairs[1], "B_stronger");
     const mirrored = arbitrationPass(mirrorPair(pairs[1]), "B_stronger");

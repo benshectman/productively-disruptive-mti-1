@@ -1,0 +1,124 @@
+name: OpenRouter Full Tournament Validation
+
+run-name: Run fully mirrored stored-corpus tournament with Qwen
+
+on:
+  push:
+    branches:
+      - experiment/gpt-5-6-luna-comparison-2026-09-20
+    paths:
+      - .github/workflows/evaluator-calibration.yml
+      - scripts/evaluation/cross-provider-validation.mjs
+      - scripts/evaluation/full-tournament-validation.mjs
+      - scripts/evaluation/evaluator-provider.mjs
+      - scripts/evaluation/evaluator.mjs
+      - scripts/evaluation/run.mjs
+      - scripts/evaluation/tournament.mjs
+      - tests/evaluation-harness.test.mjs
+      - package.json
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  validate:
+    name: Evaluate every eligible pair in both orientations
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    env:
+      EVAL_PROVIDER: openrouter
+      EVAL_MODEL: qwen/qwen3-235b-a22b-2507
+      LUNA_ARTIFACT_ID: "10716816853"
+      MINI_ARTIFACT_ID: "10718309826"
+      SOL_ARTIFACT_ID: "10729140009"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run focused tests
+        run: npm test -- --run tests/evaluation-harness.test.mjs
+
+      - name: Download saved corpus and reference evaluator results
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "The GitHub Actions token is unavailable."
+            exit 1
+          fi
+
+          download_artifact() {
+            local artifact_id="$1"
+            local destination="$2"
+            mkdir -p "$destination"
+            curl --fail --silent --show-error --location \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" \
+              --output "$destination.zip"
+            unzip -q "$destination.zip" -d "$destination"
+          }
+
+          download_artifact "$LUNA_ARTIFACT_ID" references/luna
+          download_artifact "$MINI_ARTIFACT_ID" references/mini
+          download_artifact "$SOL_ARTIFACT_ID" references/sol
+
+          for name in luna mini sol; do
+            result_path="$(find "references/$name" -type f -name 'portfolio-generation-evaluation-*.json' -print -quit)"
+            if [ -z "$result_path" ]; then
+              echo "No evaluation JSON found for $name."
+              exit 1
+            fi
+            cp "$result_path" "reference-$name.json"
+          done
+
+          node --input-type=module - <<'NODE'
+          import { readFileSync } from "node:fs";
+          for (const name of ["luna", "mini", "sol"]) {
+            const bundle = JSON.parse(readFileSync(`reference-${name}.json`, "utf8"));
+            if (bundle.runs?.length !== 66) throw new Error(`${name} reference does not contain the 66-response corpus`);
+            console.log(`${name}: ${bundle.tournament?.evaluatorModel}; ${bundle.tournament?.comparisons?.length || 0} comparisons`);
+          }
+          NODE
+
+      - name: Run full mirrored Qwen tournament
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "The OPENROUTER_API_KEY repository secret is not configured."
+            exit 1
+          fi
+
+          npm run eval:full-qwen-tournament -- \
+            --input reference-mini.json \
+            --reference luna=reference-luna.json \
+            --reference sol=reference-sol.json \
+            --reference mini=reference-mini.json \
+            --output qwen-full-tournament-results
+
+      - name: Upload full tournament results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: qwen-full-tournament-validation-${{ github.run_id }}
+          path: qwen-full-tournament-results
+          if-no-files-found: warn
+          retention-days: 30

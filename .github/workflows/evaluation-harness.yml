@@ -31,7 +31,7 @@ on:
         description: OpenAI model used to judge the generated responses
         required: true
         type: string
-        default: gpt-4.1-mini
+        default: gpt-5.6-luna
 
       sanity:
         description: Run mirrored control-vs-control sanity evaluation
@@ -69,6 +69,7 @@ jobs:
           EVAL_CONTROL_ID: ${{ inputs.control_id }}
           EVAL_TREATMENT_ID: ${{ inputs.treatment_id }}
           EVAL_MODEL: ${{ inputs.evaluator_model }}
+          TOURNAMENT_EVAL_MODEL: ${{ inputs.evaluator_model }}
           SANITY_MODE: ${{ inputs.sanity }}
         shell: bash
         run: |

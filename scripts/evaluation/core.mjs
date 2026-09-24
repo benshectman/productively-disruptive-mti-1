@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { buildDefaultEvaluatorEvidenceContext } from "./evidence-context.mjs";
 
 export const CRITERIA = [
   "topicRelevance",
@@ -13,13 +14,13 @@ export const CRITERIA = [
   "evidenceEconomy"
 ];
 
-export const ASSESSMENT_RATINGS = ["strong", "adequate", "weak", "concern", "unclear"];
+export const ASSESSMENT_RATINGS = [1, 2, 3, 4, 5];
+export const ASSESSMENT_EXCEPTIONS = [null, "concern", "unclear"];
 export const QUALITATIVE_CLASSIFICATIONS = ["control_stronger", "treatment_stronger", "equivalent", "unresolved"];
 
 const VALID_TOPICS = new Set(["T-001", "T-002", "T-003", "T-004"]);
 const FIELD_NAMES = ["headline", "summary", "detail"];
-const QUALITY_RANK = { concern: 0, weak: 1, adequate: 2, strong: 3 };
-const CONFIDENCE_RANK = { low: 0, moderate: 1, high: 2 };
+const CONFIDENCE_RANK = { low: 0, medium: 1, moderate: 1, high: 2 };
 
 export function validateConfig(config) {
   if (!config || config.version !== 1) throw new Error("Evaluation config version must be 1");
@@ -303,9 +304,13 @@ export function createBlindPairs(runs, seed) {
 }
 
 export function independentAssessmentRequest(run, pair) {
+  const eligibleEvidence = buildDefaultEvaluatorEvidenceContext({
+    selectedTopicIds: pair.selectedTopicIds,
+    prose: run.prose
+  });
   return {
     topicConfiguration: { id: pair.topicConfigurationId, label: pair.topicConfigurationLabel, topics: pair.selectedTopicIds },
-    response: { prose: run.prose, evidence: run.evidence }
+    response: { prose: run.prose, citedEvidence: run.evidence, eligibleEvidence }
   };
 }
 
@@ -362,31 +367,41 @@ export function unblindJudgment(judgment, pair) {
   };
 }
 
-function compareRating(left, right) {
+function compareRating(left, right, leftException = null, rightException = null) {
+  if (leftException === "concern" || rightException === "concern") return "concern";
+  if (leftException === "unclear" || rightException === "unclear" || left == null || right == null) return "unresolved";
+  if (!Number.isInteger(left) || !Number.isInteger(right) || left < 1 || left > 5 || right < 1 || right > 5) return "unresolved";
   if (left === right) return "equivalent";
-  if (left === "unclear" || right === "unclear" || left == null || right == null) return "unresolved";
-  if (!(left in QUALITY_RANK) || !(right in QUALITY_RANK)) return "unresolved";
-  return QUALITY_RANK[left] > QUALITY_RANK[right] ? "control_stronger" : "treatment_stronger";
+  return left > right ? "control_stronger" : "treatment_stronger";
 }
 
 function assessmentCriterion(assessment, criterion) {
   return assessment?.criteria?.[criterion]?.rating || assessment?.criteria?.[criterion]?.assessment || null;
 }
 
+function assessmentCriterionException(assessment, criterion) {
+  return assessment?.criteria?.[criterion]?.exception ?? null;
+}
+
 function assessmentOverall(assessment) {
   return assessment?.overall?.rating || assessment?.overall?.assessment || null;
+}
+
+function assessmentOverallException(assessment) {
+  return assessment?.overall?.exception ?? null;
 }
 
 function lowestConfidence(left, right) {
   const leftRank = CONFIDENCE_RANK[left] ?? 0;
   const rightRank = CONFIDENCE_RANK[right] ?? 0;
-  return leftRank <= rightRank ? (left || "low") : (right || "low");
+  const value = leftRank <= rightRank ? (left || "low") : (right || "low");
+  return value === "moderate" ? "medium" : value;
 }
 
 function classificationToEnvironmentResult(classification) {
   if (classification === "control_stronger") return "control";
   if (classification === "treatment_stronger") return "treatment";
-  if (classification === "unresolved") return "unresolved";
+  if (classification === "unresolved" || classification === "concern") return "unresolved";
   return "equivalent";
 }
 
@@ -394,36 +409,65 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
   const criteria = Object.fromEntries(CRITERIA.map((criterion) => {
     const controlRating = assessmentCriterion(controlAssessment, criterion);
     const treatmentRating = assessmentCriterion(treatmentAssessment, criterion);
+    const controlException = assessmentCriterionException(controlAssessment, criterion);
+    const treatmentException = assessmentCriterionException(treatmentAssessment, criterion);
+    const ratingDifference = Number.isInteger(controlRating) && Number.isInteger(treatmentRating)
+      ? controlRating - treatmentRating
+      : null;
     return [criterion, {
       controlRating,
       treatmentRating,
-      result: compareRating(controlRating, treatmentRating),
+      controlException,
+      treatmentException,
+      ratingDifference,
+      absoluteDifference: ratingDifference == null ? null : Math.abs(ratingDifference),
+      result: compareRating(controlRating, treatmentRating, controlException, treatmentException),
       controlRationale: controlAssessment?.criteria?.[criterion]?.rationale || "",
-      treatmentRationale: treatmentAssessment?.criteria?.[criterion]?.rationale || ""
+      treatmentRationale: treatmentAssessment?.criteria?.[criterion]?.rationale || "",
+      controlConfidence: controlAssessment?.criteria?.[criterion]?.confidence || controlAssessment?.confidence || "low",
+      treatmentConfidence: treatmentAssessment?.criteria?.[criterion]?.confidence || treatmentAssessment?.confidence || "low"
     }];
   }));
   const criterionResults = Object.values(criteria).map((item) => item.result);
   const controlCriterionWins = criterionResults.filter((result) => result === "control_stronger").length;
   const treatmentCriterionWins = criterionResults.filter((result) => result === "treatment_stronger").length;
+  const concernCriteriaCount = criterionResults.filter((result) => result === "concern").length;
+  const controlRatingAdvantage = Object.values(criteria).filter((item) => item.result === "control_stronger").reduce((sum, item) => sum + item.absoluteDifference, 0);
+  const treatmentRatingAdvantage = Object.values(criteria).filter((item) => item.result === "treatment_stronger").reduce((sum, item) => sum + item.absoluteDifference, 0);
   const hasControlCriteria = controlCriterionWins > 0;
   const hasTreatmentCriteria = treatmentCriterionWins > 0;
   const criteriaConflict = hasControlCriteria && hasTreatmentCriteria;
   const minimumCriterionLead = 3;
+  const minimumMagnitudeLead = 3;
+  const controlMeetsCriterionLead = controlCriterionWins >= minimumCriterionLead && controlRatingAdvantage >= minimumMagnitudeLead;
+  const treatmentMeetsCriterionLead = treatmentCriterionWins >= minimumCriterionLead && treatmentRatingAdvantage >= minimumMagnitudeLead;
   const criterionDirection = criteriaConflict ? "unresolved"
-    : controlCriterionWins >= minimumCriterionLead ? "control_stronger"
-      : treatmentCriterionWins >= minimumCriterionLead ? "treatment_stronger"
+    : controlMeetsCriterionLead ? "control_stronger"
+      : treatmentMeetsCriterionLead ? "treatment_stronger"
         : null;
   const controlOverall = assessmentOverall(controlAssessment);
   const treatmentOverall = assessmentOverall(treatmentAssessment);
-  const overallResult = compareRating(controlOverall, treatmentOverall);
-  const overallDirection = ["control_stronger", "treatment_stronger"].includes(overallResult) ? overallResult : null;
-  const overallLowConfidence = controlOverall === "low_confidence" || treatmentOverall === "low_confidence";
-  const lowConfidence = controlAssessment?.confidence === "low" || treatmentAssessment?.confidence === "low" || overallLowConfidence;
-  const criterionOpposesOverall = (overallDirection === "control_stronger" && treatmentCriterionWins > 0)
-    || (overallDirection === "treatment_stronger" && controlCriterionWins > 0);
+  const controlOverallException = assessmentOverallException(controlAssessment);
+  const treatmentOverallException = assessmentOverallException(treatmentAssessment);
+  const overallResult = compareRating(controlOverall, treatmentOverall, controlOverallException, treatmentOverallException);
+  const overallDifference = Number.isInteger(controlOverall) && Number.isInteger(treatmentOverall) ? controlOverall - treatmentOverall : null;
+  const overallMagnitude = overallDifference == null ? null : Math.abs(overallDifference);
+  const rawOverallDirection = ["control_stronger", "treatment_stronger"].includes(overallResult) ? overallResult : null;
+  const overallDirection = rawOverallDirection && (overallMagnitude >= 2 || rawOverallDirection === criterionDirection) ? rawOverallDirection : null;
+  const lowConfidence = [
+    controlAssessment?.confidence,
+    treatmentAssessment?.confidence,
+    controlAssessment?.overall?.confidence,
+    treatmentAssessment?.overall?.confidence
+  ].includes("low") || Object.values(criteria).some((item) => item.controlConfidence === "low" || item.treatmentConfidence === "low");
+  const criterionOpposesOverall = (rawOverallDirection === "control_stronger" && treatmentCriterionWins > 0)
+    || (rawOverallDirection === "treatment_stronger" && controlCriterionWins > 0);
   let classification = "equivalent";
   let reason = "The independent assessments are effectively tied across the overall and criterion-level ratings.";
-  if (lowConfidence && (overallDirection || criterionDirection)) {
+  if (concernCriteriaCount > 0 || overallResult === "concern") {
+    classification = "unresolved";
+    reason = "At least one independent assessment reported a concrete concern, so the pair is sent to arbitration rather than resolved deterministically.";
+  } else if (lowConfidence && (overallDirection || criterionDirection)) {
     classification = "unresolved";
     reason = "At least one independent assessment reported low confidence, so the apparent difference is not treated as decisive.";
   } else if (criteriaConflict) {
@@ -441,12 +485,14 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
       ? `Both the overall ratings and criterion-level ratings favor ${classification === "control_stronger" ? "control" : "treatment"}.`
       : `The available structured ratings favor ${classification === "control_stronger" ? "control" : "treatment"}.`;
   } else if (controlCriterionWins || treatmentCriterionWins) {
-    reason = `Overall ratings tied, and the isolated criterion difference (${controlCriterionWins} control, ${treatmentCriterionWins} treatment) did not reach the three-criterion threshold for a meaningful advantage.`;
+    reason = `Differences were too small or isolated to be treated as meaningful: ${controlCriterionWins} control criterion wins with ${controlRatingAdvantage} total rating points; ${treatmentCriterionWins} treatment criterion wins with ${treatmentRatingAdvantage} total rating points.`;
+  } else if (rawOverallDirection) {
+    reason = `The overall rating differed by only ${overallMagnitude} point, without enough criterion-level support to treat that as decisive.`;
   }
   const confidence = classification === "unresolved"
     ? "low"
-    : criterionResults.includes("unresolved")
-      ? lowestConfidence(lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence), "moderate")
+    : criterionResults.includes("unresolved") || criterionResults.includes("concern")
+      ? lowestConfidence(lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence), "medium")
       : lowestConfidence(controlAssessment?.confidence, treatmentAssessment?.confidence);
   return {
     classification,
@@ -455,15 +501,23 @@ export function compareIndependentAssessments(controlAssessment, treatmentAssess
     overall: {
       controlRating: controlOverall,
       treatmentRating: treatmentOverall,
-      result: overallResult
+      controlException: controlOverallException,
+      treatmentException: treatmentOverallException,
+      ratingDifference: overallDifference,
+      absoluteDifference: overallMagnitude,
+      result: overallResult,
+      effectiveResult: overallDirection || (overallResult === "equivalent" ? "equivalent" : "unresolved")
     },
     criteria,
     criterionDirection,
     criteriaConflict,
     criterionOpposesOverall,
     unclearCriteriaCount: criterionResults.filter((result) => result === "unresolved").length,
-    criterionCounts: { control: controlCriterionWins, treatment: treatmentCriterionWins, equivalent: CRITERIA.length - controlCriterionWins - treatmentCriterionWins },
-    minimumCriterionLead
+    concernCriteriaCount,
+    criterionCounts: { control: controlCriterionWins, treatment: treatmentCriterionWins, equivalent: criterionResults.filter((result) => result === "equivalent").length, unresolved: criterionResults.filter((result) => result === "unresolved").length, concern: concernCriteriaCount },
+    ratingAdvantage: { control: controlRatingAdvantage, treatment: treatmentRatingAdvantage },
+    minimumCriterionLead,
+    minimumMagnitudeLead
   };
 }
 
@@ -481,15 +535,20 @@ export function deterministicUnblindedOutcome(comparison, controlAssessment, tre
       return [criterion, {
         judgment: item.result,
         environmentResult: classificationToEnvironmentResult(item.result),
+        controlException: item.controlException,
+        treatmentException: item.treatmentException,
         rationale: item.result === "control_stronger" ? item.controlRationale
           : item.result === "treatment_stronger" ? item.treatmentRationale
             : item.result === "equivalent" ? "Both independent assessments gave the same criterion rating."
+              : item.result === "concern" ? "At least one independent assessment reported a concrete concern for this criterion."
               : "The criterion could not be resolved deterministically."
       }];
     })),
     overall: {
       judgment: comparison.classification,
       environmentResult: classificationToEnvironmentResult(comparison.classification),
+      controlException: comparison.overall.controlException,
+      treatmentException: comparison.overall.treatmentException,
       rationale: comparison.reason
     },
     concerns: independentConcerns(controlAssessment, treatmentAssessment)
@@ -661,6 +720,41 @@ export function aggregateQualitative(evaluations) {
   for (const criterion of CRITERIA) {
     criteria[criterion] = countBy(eligible, (evaluation) => criterionEnvironmentResult(evaluation, criterion));
   }
+  const assessmentRecords = eligible.flatMap((evaluation) => [
+    { environment: "control", assessment: evaluation.independentAssessments?.control?.assessment },
+    { environment: "treatment", assessment: evaluation.independentAssessments?.treatment?.assessment }
+  ]).filter((item) => item.assessment);
+  const ratings = Object.fromEntries(ASSESSMENT_RATINGS.map((rating) => [rating, 0]));
+  const ratingsByCriterion = Object.fromEntries(CRITERIA.map((criterion) => [criterion, Object.fromEntries(ASSESSMENT_RATINGS.map((rating) => [rating, 0]))]));
+  const ratingsByEnvironment = {
+    control: Object.fromEntries(ASSESSMENT_RATINGS.map((rating) => [rating, 0])),
+    treatment: Object.fromEntries(ASSESSMENT_RATINGS.map((rating) => [rating, 0]))
+  };
+  const overallRatings = Object.fromEntries(ASSESSMENT_RATINGS.map((rating) => [rating, 0]));
+  const overallExceptions = { concern: 0, unclear: 0 };
+  const exceptions = { concern: 0, unclear: 0 };
+  const exceptionsByCriterion = Object.fromEntries(CRITERIA.map((criterion) => [criterion, { concern: 0, unclear: 0 }]));
+  for (const record of assessmentRecords) {
+    const overall = record.assessment.overall;
+    if (Number.isInteger(overall?.rating) && overallRatings[overall.rating] != null) overallRatings[overall.rating] += 1;
+    if (overall?.exception === "concern" || overall?.exception === "unclear") {
+      overallExceptions[overall.exception] += 1;
+      exceptions[overall.exception] += 1;
+    }
+    for (const criterion of CRITERIA) {
+      const item = record.assessment.criteria?.[criterion];
+      if (!item) continue;
+      if (Number.isInteger(item.rating) && ratings[item.rating] != null) {
+        ratings[item.rating] += 1;
+        ratingsByCriterion[criterion][item.rating] += 1;
+        ratingsByEnvironment[record.environment][item.rating] += 1;
+      }
+      if (item.exception === "concern" || item.exception === "unclear") {
+        exceptions[item.exception] += 1;
+        exceptionsByCriterion[criterion][item.exception] += 1;
+      }
+    }
+  }
   const audit = positionBiasAudit(eligible);
   const mirroredEvaluations = eligible.filter((evaluation) => evaluation.mirrorAudit);
   const excluded = evaluations.filter((evaluation) => !isQualitativeEvaluation(evaluation));
@@ -669,6 +763,13 @@ export function aggregateQualitative(evaluations) {
     excludedPairs: countBy(excluded, (evaluation) => evaluation.pair?.eligibility?.kind || "ineligible"),
     criteria,
     criterionComparisons: criteria,
+    ratingDistribution: ratings,
+    overallRatingDistribution: overallRatings,
+    criterionScoreDistributions: ratingsByCriterion,
+    environmentScoreDistributions: ratingsByEnvironment,
+    exceptionCounts: exceptions,
+    overallExceptionCounts: overallExceptions,
+    criterionExceptionCounts: exceptionsByCriterion,
     overall: countBy(eligible, evaluationClassification),
     confidence: countBy(eligible, finalConfidence),
     concerns: {

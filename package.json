@@ -14,6 +14,9 @@
     "eval:capture": "node scripts/evaluation/run.mjs --capture-only",
     "eval:evaluate": "node scripts/evaluation/run.mjs --evaluate-existing",
     "eval:report": "node scripts/evaluation/run.mjs --report-only",
+    "eval:cross-provider": "node scripts/evaluation/cross-provider-validation.mjs",
+    "eval:full-qwen-tournament": "node scripts/evaluation/full-tournament-validation.mjs",
+    "eval:dimension-calibration": "node scripts/evaluation/dimension-calibration.mjs",
     "test": "vitest run --configLoader runner",
     "test:watch": "vitest --configLoader runner",
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs"
