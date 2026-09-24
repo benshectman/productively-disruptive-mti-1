@@ -394,6 +394,7 @@ export function assembleApprovedBenFactsNarrativeWithFieldEvidence(topics: Topic
   )];
 
   const aboutLead = about[0];
+  const recentLeadershipLead = recentLeadership[0];
   const throughlineLead = throughline.find((record) => approvedEditorialMetadata[record.candidate_id]?.careerPeriod === "earlier") || throughline[0];
   const sections = [
     {
@@ -436,6 +437,10 @@ export function assembleApprovedBenFactsNarrativeWithFieldEvidence(topics: Topic
       ["system-behind-design", {
         summary: [aboutLead.candidate_id],
         detail: about.filter((record) => record !== aboutLead).map((record) => record.candidate_id)
+      }],
+      ["operating-model", {
+        summary: [recentLeadershipLead.candidate_id],
+        detail: recentLeadership.filter((record) => record !== recentLeadershipLead).map((record) => record.candidate_id)
       }],
       ["institutionalized-capability", {
         summary: [throughlineLead.candidate_id],

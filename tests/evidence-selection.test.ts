@@ -5,10 +5,10 @@ import {
   approvedBenFactIds,
   assembleApprovedBenFactsNarrativeWithFieldEvidence
 } from "../src/shared/approved-benfacts";
-import type { GenerationDiagnostics, GenerationRejection, PublicEvidence, TopicId } from "../src/shared/contracts";
+import { NarrativeSchema, type GenerationDiagnostics, type GenerationRejection, type PublicEvidence, type TopicId } from "../src/shared/contracts";
 import { buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence";
 
-const experimentalIds = ["system-behind-design", "institutionalized-capability"];
+const experimentalIds = ["system-behind-design", "operating-model", "institutionalized-capability"];
 
 function setup(topics: TopicId[] = ["T-003"]) {
   const { narrative: fallback, fieldEvidenceBySection } = assembleApprovedBenFactsNarrativeWithFieldEvidence(topics);
@@ -54,9 +54,10 @@ function apply(setupValue: ReturnType<typeof setup>) {
 }
 
 describe("small-pool framing evidence selection", () => {
-  it("makes all seven About Ben and all five Career Throughline facts eligible", () => {
+  it("makes all seven About Ben, all twenty Recent Leadership, and all five Career Throughline facts eligible", () => {
     const pools = buildEligibleSectionEvidencePools(["T-003"]);
     const about = pools.find((pool) => pool.sectionId === "system-behind-design")!;
+    const recentLeadership = pools.find((pool) => pool.sectionId === "operating-model")!;
     const throughline = pools.find((pool) => pool.sectionId === "institutionalized-capability")!;
 
     expect(about.facts.map((fact) => fact.id).sort()).toEqual([
@@ -65,6 +66,7 @@ describe("small-pool framing evidence selection", () => {
     expect(throughline.facts.map((fact) => fact.id).sort()).toEqual([
       "BF-C-075", "BF-C-076", "BF-C-077", "BF-C-078", "BF-C-079"
     ]);
+    expect(recentLeadership.facts).toHaveLength(20);
   });
 
   it("accepts any supplied fact and replaces deterministic rail refs with generated citations", () => {
@@ -130,20 +132,58 @@ describe("small-pool framing evidence selection", () => {
     }));
   });
 
-  it("leaves Recent Leadership and Proof in Practice evidence behavior unchanged", () => {
+  it("updates Recent Leadership evidence from generated citations while leaving Proof in Practice unchanged", () => {
     const value = setup();
     const operatingFallback = value.fallback.sections.find((section) => section.id === "operating-model")!;
     const proofFallback = value.fallback.sections.find((section) => section.id === "proof-to-scale")!;
+    const operatingFraming = value.framing.sections.find((section) => section.id === "operating-model")!;
+    const operatingCitations = [
+      ...(operatingFraming.summary_evidence_fact_ids as string[]),
+      ...(operatingFraming.detail_evidence_fact_ids as string[])
+    ];
 
     const { narrative, diagnostics } = apply(value);
     expect(narrative?.sections.find((section) => section.id === "operating-model")?.evidenceRefs)
-      .toEqual(operatingFallback.evidenceRefs);
+      .toEqual(operatingCitations);
+    expect(operatingCitations.some((id) => !operatingFallback.evidenceRefs.includes(id))).toBe(true);
     expect(narrative?.sections.find((section) => section.id === "proof-to-scale")?.evidenceRefs)
       .toEqual(proofFallback.evidenceRefs);
     expect(narrative?.sections.find((section) => section.id === "proof-to-scale")?.proof_items)
       .toEqual(proofFallback.proof_items);
-    expect(diagnostics?.sections.find((section) => section.id === "operating-model")).not.toHaveProperty("evidence");
+    expect(diagnostics?.sections.find((section) => section.id === "operating-model")?.evidence).toMatchObject({
+      eligibleFactCount: 20,
+      generatedSummaryCitedIds: operatingFraming.summary_evidence_fact_ids,
+      generatedDetailCitedIds: operatingFraming.detail_evidence_fact_ids,
+      finalDisplayedEvidenceIds: operatingCitations
+    });
     expect(diagnostics?.sections.find((section) => section.id === "proof-to-scale")).not.toHaveProperty("evidence");
+  });
+
+  it("preserves generated Recent Leadership summary provenance with fallback detail provenance", () => {
+    const value = setup();
+    const recent = value.framing.sections.find((section) => section.id === "operating-model")!;
+    recent.detail = "Too short";
+    const citedSummary = recent.summary_evidence_fact_ids as string[];
+    const fallbackDetail = value.fieldEvidenceBySection.get("operating-model")!.detail;
+
+    const { narrative } = apply(value);
+    const result = narrative!.sections.find((section) => section.id === "operating-model")!;
+    expect(result.summary).toBe(recent.summary);
+    expect(result.detail).toBe(value.fallback.sections.find((section) => section.id === result.id)!.detail);
+    expect(result.evidenceRefs).toEqual([...new Set([...citedSummary, ...fallbackDetail])]);
+  });
+
+  it("supports a Recent Leadership rail containing all twenty eligible facts", () => {
+    const value = setup();
+    const recent = value.framing.sections.find((section) => section.id === "operating-model")!;
+    const allEligibleIds = value.eligibleEvidenceBySection.get("operating-model")!.map((fact) => fact.id);
+    recent.summary_evidence_fact_ids = allEligibleIds;
+    recent.detail_evidence_fact_ids = allEligibleIds;
+
+    const { narrative } = apply(value);
+    const result = narrative!.sections.find((section) => section.id === "operating-model")!;
+    expect(result.evidenceRefs).toEqual(allEligibleIds);
+    expect(() => NarrativeSchema.parse(narrative)).not.toThrow();
   });
 
   it("reports eligible, cited, rejected, and final displayed evidence IDs", () => {

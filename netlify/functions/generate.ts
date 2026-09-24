@@ -31,7 +31,7 @@ export function allowedOrigin(origin = "", requestHost = "") {
   }
 }
 
-const experimentalProvenanceSectionIds = new Set(["system-behind-design", "institutionalized-capability"]);
+const experimentalProvenanceSectionIds = new Set(["system-behind-design", "operating-model", "institutionalized-capability"]);
 
 function generatedNarrativeJsonSchema(evidenceBySection: Map<string, PublicEvidence[]>) {
   const sectionSchema = (id: string) => {
@@ -551,7 +551,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           "Follow the supplied narrative arc in order: establish Ben's career-wide identity, move into recent leadership, connect it to the longer career throughline, then introduce topic-relevant proof in practice.",
           "Make the sequence of headlines build from broad identity to recent leadership, career continuity, and proof. Do not repeat the same claim or construction.",
           "Use only the approved BenFacts assigned to each section.",
-          "For About Ben and Career throughline, consider all supplied approved evidence. Use the facts that best support the strongest, most coherent framing. You may use some or all of the supplied facts. Do not force inclusion of a fact if it does not materially improve the narrative. Return the IDs of the facts materially used in the lead and detail in summary_evidence_fact_ids and detail_evidence_fact_ids.",
+          "For About Ben, Recent leadership, and Career throughline, consider all supplied approved evidence. Use the facts that best support the strongest, most coherent framing. You may use some or all of the supplied facts. Do not force inclusion of a fact if it does not materially improve the narrative. Return the IDs of the facts materially used in the lead and detail in summary_evidence_fact_ids and detail_evidence_fact_ids.",
           "Preserve every record's attribution. Never turn shared or organizational work into Ben's personal execution.",
           "Do not invent accomplishments, metrics, dates, product descriptions, acronym expansions, or propositions.",
           "Do not add a number unless that exact number appears in the evidence assigned to that section. Preserve its unit and the measure it describes.",

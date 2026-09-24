@@ -70,7 +70,7 @@ export const NarrativeSectionSchema = z.object({
   eyebrow: z.string().min(1).max(60),
   headline: z.string().min(1).max(140),
   summary: z.string().min(1).max(900),
-  evidenceRefs: z.array(EvidenceFactIdSchema).min(1).max(12),
+  evidenceRefs: z.array(EvidenceFactIdSchema).min(1).max(20),
   disclosure: z.enum(["none", "inline", "deep-dive"]),
   detail: z.string().min(1).max(1600).optional(),
   proof_items: z.array(ProofItemSchema).min(1).max(3).optional()

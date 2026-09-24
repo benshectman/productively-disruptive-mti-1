@@ -42,7 +42,7 @@ describe("uncapped approved evidence eligibility", () => {
           const evidenceIds = input.sections.find((section: { id: string }) => section.id === id).evidence.map((fact: { id: string }) => fact.id);
           return {
             id, headline, summary, detail,
-            ...(["system-behind-design", "institutionalized-capability"].includes(id) ? {
+            ...(["system-behind-design", "operating-model", "institutionalized-capability"].includes(id) ? {
               summary_evidence_fact_ids: [evidenceIds[0]],
               detail_evidence_fact_ids: [evidenceIds.at(-1)]
             } : {})
@@ -63,6 +63,8 @@ describe("uncapped approved evidence eligibility", () => {
     const recentFallback = fallback.sections.find((section) => section.id === "operating-model")!;
     expect(recentInput.evidence.length).toBeGreaterThan(recentFallback.evidenceRefs.length);
     expect(recentInput.evidence.some((fact: { id: string }) => !recentFallback.evidenceRefs.includes(fact.id))).toBe(true);
+    expect(recentInput.evidence).toHaveLength(20);
+    expect(recentInput.requiresFieldEvidenceProvenance).toBe(true);
 
     const aboutInput = framingInput.sections.find((section: { id: string }) => section.id === "system-behind-design");
     const throughlineInput = framingInput.sections.find((section: { id: string }) => section.id === "institutionalized-capability");
@@ -73,7 +75,7 @@ describe("uncapped approved evidence eligibility", () => {
     expect(framing.instructions).toContain("You may use some or all of the supplied facts");
 
     const sectionSchemas = framing.text.format.schema.properties.sections.items.anyOf;
-    for (const inputSection of [aboutInput, throughlineInput]) {
+    for (const inputSection of [aboutInput, recentInput, throughlineInput]) {
       const sectionSchema = sectionSchemas.find((schema: any) => schema.properties.id.enum[0] === inputSection.id);
       const eligibleIds = inputSection.evidence.map((fact: { id: string }) => fact.id);
       expect(sectionSchema.properties.summary_evidence_fact_ids.items.enum).toEqual(eligibleIds);
