@@ -1,0 +1,123 @@
+name: Dimension-Specific Evaluator Calibration
+
+run-name: Calibrate fully mirrored editorial dimensions with Qwen
+
+on:
+  push:
+    branches:
+      - experiment/dimension-specific-evaluator
+    paths:
+      - .github/workflows/dimension-evaluator-calibration.yml
+      - scripts/evaluation/dimension-calibration.mjs
+      - scripts/evaluation/dimension-evaluator.mjs
+      - scripts/evaluation/evaluator-provider.mjs
+      - scripts/evaluation/evaluator.mjs
+      - scripts/evaluation/tournament.mjs
+      - tests/dimension-evaluator.test.mjs
+      - tests/evaluation-harness.test.mjs
+      - package.json
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  calibrate:
+    name: Evaluate three dimensions in both orientations
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      EVAL_PROVIDER: openrouter
+      EVAL_MODEL: qwen/qwen3-235b-a22b-2507
+      MINI_ARTIFACT_ID: "10718309826"
+      HOLISTIC_QWEN_ARTIFACT_ID: "10778144484"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run focused evaluator tests
+        run: npm test -- --run tests/dimension-evaluator.test.mjs tests/evaluation-harness.test.mjs
+
+      - name: Run repository verification
+        run: |
+          npm test
+          npm run build
+
+      - name: Download stored corpus and holistic Qwen results
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "The GitHub Actions token is unavailable."
+            exit 1
+          fi
+
+          download_artifact() {
+            local artifact_id="$1"
+            local destination="$2"
+            mkdir -p "$destination"
+            curl --fail --silent --show-error --location \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" \
+              --output "$destination.zip"
+            unzip -q "$destination.zip" -d "$destination"
+          }
+
+          download_artifact "$MINI_ARTIFACT_ID" references/mini
+          download_artifact "$HOLISTIC_QWEN_ARTIFACT_ID" references/qwen-holistic
+
+          corpus_path="$(find references/mini -type f -name 'portfolio-generation-evaluation-*.json' -print -quit)"
+          holistic_path="$(find references/qwen-holistic -type f -name 'qwen-full-tournament.json' -print -quit)"
+          if [ -z "$corpus_path" ] || [ -z "$holistic_path" ]; then
+            echo "Required stored evaluator artifacts were not found."
+            exit 1
+          fi
+          cp "$corpus_path" stored-corpus.json
+          cp "$holistic_path" holistic-qwen.json
+
+          node --input-type=module - <<'NODE'
+          import { readFileSync } from "node:fs";
+          const corpus = JSON.parse(readFileSync("stored-corpus.json", "utf8"));
+          const holistic = JSON.parse(readFileSync("holistic-qwen.json", "utf8"));
+          if (corpus.runs?.length !== 66) throw new Error("Stored corpus must contain 66 responses");
+          if (holistic.tournament?.comparisons?.length !== 160) throw new Error("Holistic Qwen reference must contain 160 eligible comparisons");
+          NODE
+
+      - name: Run dimension-specific calibration
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "The OPENROUTER_API_KEY repository secret is not configured."
+            exit 1
+          fi
+          npm run eval:dimension-calibration -- \
+            --input stored-corpus.json \
+            --holistic holistic-qwen.json \
+            --output dimension-calibration-results
+
+      - name: Upload dimension calibration results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dimension-evaluator-calibration-${{ github.run_id }}
+          path: dimension-calibration-results
+          if-no-files-found: warn
+          retention-days: 30
