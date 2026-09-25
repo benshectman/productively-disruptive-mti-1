@@ -1,0 +1,163 @@
+name: Portfolio Experiment Evaluation
+
+run-name: Experiment ${{ inputs.control_id }} vs ${{ inputs.treatment_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      control_url:
+        description: Control Netlify base URL
+        required: true
+        type: string
+        default: https://develop--portfolio-gpt.netlify.app
+      treatment_url:
+        description: Treatment Netlify branch deploy or Deploy Preview URL
+        required: true
+        type: string
+      control_id:
+        description: Label for the control environment
+        required: true
+        type: string
+        default: develop
+      treatment_id:
+        description: Label for the treatment environment
+        required: true
+        type: string
+      evaluator_provider:
+        description: Evaluator API provider
+        required: true
+        type: choice
+        options:
+          - openai
+          - openrouter
+        default: openai
+      evaluator_model:
+        description: Model used for dimension-specific evaluation
+        required: true
+        type: string
+        default: gpt-5.6-luna
+      runs_per_topic:
+        description: Fresh generations per topic combination and environment
+        required: true
+        type: number
+        default: 3
+
+permissions:
+  contents: read
+
+jobs:
+  generate-corpus:
+    name: Generate fresh paired corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate corpus without editorial evaluation
+        env:
+          EVAL_CONTROL_URL: ${{ inputs.control_url }}
+          EVAL_TREATMENT_URL: ${{ inputs.treatment_url }}
+          EVAL_CONTROL_ID: ${{ inputs.control_id }}
+          EVAL_TREATMENT_ID: ${{ inputs.treatment_id }}
+        run: >-
+          npm run eval:generate-corpus --
+          --runs-per-topic "${{ inputs.runs_per_topic }}"
+          --output experiment-artifacts/corpus.json
+      - name: Upload immutable corpus
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-experiment-corpus-${{ github.run_id }}
+          path: experiment-artifacts/corpus.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  evaluate-dimensions:
+    name: Evaluate three mirrored dimensions
+    needs: generate-corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Download exact generated corpus
+        uses: actions/download-artifact@v8
+        with:
+          name: portfolio-experiment-corpus-${{ github.run_id }}
+          path: experiment-input
+      - name: Run fully mirrored dimension evaluation
+        env:
+          EVAL_PROVIDER: ${{ inputs.evaluator_provider }}
+          EVAL_MODEL: ${{ inputs.evaluator_model }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: >-
+          npm run eval:dimension-tournament --
+          --input experiment-input/corpus.json
+          --output experiment-artifacts/dimension-evaluation
+      - name: Upload raw and reconciled evaluator results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-experiment-dimensions-${{ github.run_id }}
+          path: experiment-artifacts/dimension-evaluation
+          if-no-files-found: warn
+          retention-days: 30
+
+  summarize-experiment:
+    name: Summarize experiment tradeoffs
+    needs:
+      - generate-corpus
+      - evaluate-dimensions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Download generated corpus
+        uses: actions/download-artifact@v8
+        with:
+          name: portfolio-experiment-corpus-${{ github.run_id }}
+          path: experiment-input
+      - name: Download dimension results
+        uses: actions/download-artifact@v8
+        with:
+          name: portfolio-experiment-dimensions-${{ github.run_id }}
+          path: experiment-dimensions
+      - name: Build combined experiment summary
+        run: >-
+          npm run eval:experiment-report --
+          --corpus experiment-input/corpus.json
+          --evaluation experiment-dimensions/dimension-evaluation-results.json
+          --output experiment-artifacts/summary
+      - name: Publish job summary
+        shell: bash
+        run: cat experiment-artifacts/summary/portfolio-experiment-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload experiment summary
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-experiment-summary-${{ github.run_id }}
+          path: experiment-artifacts/summary
+          if-no-files-found: error
+          retention-days: 30

@@ -5,17 +5,14 @@ import {
   ASSESSMENT_EXCEPTIONS,
   ASSESSMENT_RATINGS,
   aggregateQualitative,
-  aggregateReliability,
-  captureGeneration,
   chooseShortlist,
-  createBlindPairs,
   CRITERIA,
   mirrorPair,
   reconcileMirroredArbitrations,
-  resolveEnvironment,
   sanityAssessment,
   validateConfig
 } from "./core.mjs";
+import { generateCorpus } from "./corpus.mjs";
 import { evaluateArbitration, evaluatePair, evaluateTournamentComparison, preflightEvaluator } from "./evaluator.mjs";
 import { resolveEvaluatorRuntime } from "./evaluator-provider.mjs";
 import { buildMarkdownReport } from "./report.mjs";
@@ -31,7 +28,7 @@ import {
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export function args(argv) {
-  const result = { config: path.join(scriptDirectory, "default-config.json"), output: "evaluation-results", input: null, captureOnly: false, reportOnly: false, sanity: false, tournament: true, tournamentOnly: false, tournamentCohorts: null, mirrorComparisonIds: [] };
+  const result = { config: path.join(scriptDirectory, "default-config.json"), output: "evaluation-results", input: null, captureOnly: false, reportOnly: false, sanity: false, tournament: true, fullTournament: false, tournamentOnly: false, tournamentCohorts: null, mirrorComparisonIds: [] };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--config") result.config = argv[++index];
@@ -42,6 +39,7 @@ export function args(argv) {
     else if (value === "--report-only") result.reportOnly = true;
     else if (value === "--sanity") result.sanity = true;
     else if (value === "--no-tournament") result.tournament = false;
+    else if (value === "--full-tournament") result.fullTournament = true;
     else if (value === "--tournament-only") { result.tournament = true; result.tournamentOnly = true; }
     else if (value === "--tournament-cohorts") result.tournamentCohorts = Number.parseInt(argv[++index], 10);
     else if (value === "--mirror-comparison") result.mirrorComparisonIds.push(argv[++index]);
@@ -66,7 +64,7 @@ Required for capture:
   EVAL_TREATMENT_URL     Branch deploy or Deploy Preview base URL
 
 Required for qualitative evaluation:
-  OPENAI_API_KEY         Evaluator API key (never written to output)
+  The API key selected by EVAL_PROVIDER (never written to output)
 
 Optional:
   EVAL_CONTROL_ID, EVAL_TREATMENT_ID, EVAL_MODEL, TOURNAMENT_EVAL_MODEL
@@ -74,11 +72,45 @@ Optional:
 The combined command runs an evaluator preflight before capture, writes an atomic capture checkpoint before qualitative evaluation, and saves evaluator progress after every pair.
 
 Use --sanity with equivalent endpoints to add the control-vs-control audit. Only unresolved pairs receive blinded arbitration, and sanity mode mirrors those arbitration placements.
-The tournament runs by default. Use --no-tournament to omit it, or --tournament-only to evaluate a saved corpus without rerunning independent assessment.`;
+The tournament runs by default. Use --full-tournament to mirror every eligible comparison with expanded retry handling, --no-tournament to omit it, or --tournament-only to evaluate a saved corpus without rerunning independent assessment.`;
 }
-
 const delay = (milliseconds) => milliseconds > 0 ? new Promise((resolve) => setTimeout(resolve, milliseconds)) : Promise.resolve();
 
+export function applyRuntimeMode(config, options = {}) {
+  if (!options.fullTournament) return config;
+  return {
+    ...config,
+    evaluator: {
+      ...config.evaluator,
+      preflightMaxAttempts: 8,
+      preflightRetryDelayMs: 15_000,
+      preflightTimeoutMs: 120_000
+    },
+    tournament: {
+      ...config.tournament,
+      enabled: true,
+      mirrorEvery: true,
+      maxAttempts: 6,
+      retryDelayMs: 5_000
+    }
+  };
+}
+
+export async function preflightWithRetry(runtime, config = {}, preflight = preflightEvaluator) {
+  const maxAttempts = Math.max(1, config.preflightMaxAttempts || 1);
+  const retryDelayMs = Math.max(0, config.preflightRetryDelayMs || 0);
+  let failedAttempts = 0;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const result = await preflight({ ...runtime, timeoutMs: config.preflightTimeoutMs });
+      return { ...result, attemptCount: attempt, failedAttempts };
+    } catch (error) {
+      failedAttempts += 1;
+      if (attempt === maxAttempts) throw error;
+      await delay(retryDelayMs * attempt);
+    }
+  }
+}
 async function mapWithConcurrency(tasks, concurrency, worker) {
   const results = new Array(tasks.length);
   let next = 0;
@@ -380,52 +412,29 @@ async function main() {
     bundle = await loadJson(options.input);
     config = validateConfig(bundle.config || config);
     checkpointPath = path.resolve(options.input);
-  } else {
+  }
+  config = applyRuntimeMode(config, options);
+  if (bundle) bundle.config = config;
+  if (!options.input) {
     if (options.reportOnly) throw new Error("--report-only requires --input");
     let evaluatorPreflight = null;
     if (!options.captureOnly) {
       const runtime = resolveEvaluatorRuntime({ config: config.evaluator });
       console.log(`[preflight] ${runtime.provider} ${runtime.model}`);
-      evaluatorPreflight = await preflightEvaluator(runtime);
+      evaluatorPreflight = await preflightWithRetry(runtime, config.evaluator);
     }
-    const control = resolveEnvironment(config, "control");
-    const treatment = resolveEnvironment(config, "treatment");
-    const tasks = [];
-    for (const topicConfiguration of config.topicConfigurations) {
-      for (let repetition = 1; repetition <= config.repetitions; repetition += 1) {
-        for (const environment of [control, treatment]) {
-          tasks.push({ environment, topicConfiguration, repetition });
-        }
-      }
-    }
-    const runs = await mapWithConcurrency(tasks, config.captureConcurrency || 1, async (task, index) => {
-      console.log(`[${index + 1}/${tasks.length}] ${task.environment.name} ${task.topicConfiguration.id} repetition ${task.repetition}`);
-      const captured = await captureGeneration({ ...task, timeoutMs: config.requestTimeoutMs });
-      await delay(config.requestDelayMs || 0);
-      return captured;
-    });
-    const pairs = createBlindPairs(runs, config.pairingSeed);
-    bundle = {
-      schemaVersion: 1,
-      metadata: {
-        generatedAt: new Date().toISOString(),
-        mode: options.sanity ? "sanity" : "comparison",
-        environments: { control, treatment },
-        topicConfigurationCount: config.topicConfigurations.length,
-        repetitions: config.repetitions,
-        pairingSeed: config.pairingSeed,
-        evaluationFlow: "independent-assessment -> deterministic-comparison -> unresolved-only-blinded-arbitration",
-        evaluatorPreflight
-      },
+    bundle = await generateCorpus({
       config,
-      runs,
-      reliability: aggregateReliability(runs, config.reliabilityRegression),
-      pairs,
-      evaluations: [],
-      qualitative: null,
-      shortlist: [],
-      sanity: options.sanity ? sanityAssessment(null, pairs) : null
+      onProgress: (task, index, total) => console.log(`[${index + 1}/${total}] ${task.environment.name} ${task.topicConfiguration.id} repetition ${task.repetition}`)
+    });
+    bundle.metadata = {
+      ...bundle.metadata,
+      generationOnly: false,
+      mode: options.sanity ? "sanity" : "comparison",
+      evaluationFlow: "independent-assessment -> deterministic-comparison -> unresolved-only-blinded-arbitration",
+      evaluatorPreflight
     };
+    bundle.sanity = options.sanity ? sanityAssessment(null, bundle.pairs) : null;
     checkpointPath = path.resolve(options.output, `portfolio-generation-capture-${timestamp()}.json`);
     await writeJsonAtomic(checkpointPath, bundle);
     console.log(`Capture checkpoint: ${checkpointPath}`);
@@ -438,7 +447,7 @@ async function main() {
     if (!options.tournamentOnly && needsQualitativeEvaluation(bundle, sanityMode)) {
       if (options.input) {
         console.log(`[preflight] ${model}`);
-        bundle.metadata.evaluatorPreflight = await preflightEvaluator(runtime);
+        bundle.metadata.evaluatorPreflight = await preflightWithRetry(runtime, config.evaluator);
         await writeJsonAtomic(checkpointPath, bundle);
       }
       await evaluateBundle({
