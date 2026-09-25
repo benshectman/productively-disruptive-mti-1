@@ -361,6 +361,18 @@ function recordsFor(ids: string[], used: Set<string>) {
 }
 
 export function assembleApprovedBenFactsNarrative(topics: TopicId[]): Narrative {
+  return assembleApprovedBenFactsNarrativeWithFieldEvidence(topics).narrative;
+}
+
+export type NarrativeFieldEvidenceRefs = {
+  summary: string[];
+  detail: string[];
+};
+
+export function assembleApprovedBenFactsNarrativeWithFieldEvidence(topics: TopicId[]): {
+  narrative: Narrative;
+  fieldEvidenceBySection: Map<string, NarrativeFieldEvidenceRefs>;
+} {
   const used = new Set<string>();
 
   const aboutAnchors = recordsFor(["BF-C-073", "BF-C-076"], used);
@@ -381,6 +393,9 @@ export function assembleApprovedBenFactsNarrative(topics: TopicId[]): Narrative 
     ["BF-C-079", "BF-C-078", "BF-C-077", "BF-C-080"]
   )];
 
+  const aboutLead = about[0];
+  const recentLeadershipLead = recentLeadership[0];
+  const throughlineLead = throughline.find((record) => approvedEditorialMetadata[record.candidate_id]?.careerPeriod === "earlier") || throughline[0];
   const sections = [
     {
       id: "system-behind-design", purpose: "proposition" as const, eyebrow: "About Ben",
@@ -397,8 +412,7 @@ export function assembleApprovedBenFactsNarrative(topics: TopicId[]): Narrative 
     {
       id: "institutionalized-capability", purpose: "story" as const, eyebrow: "Career throughline",
       headline: "A pattern across roles and industries",
-      ...editorialCopy(throughline, "The recent work extends a longer career pattern.",
-        throughline.find((record) => approvedEditorialMetadata[record.candidate_id]?.careerPeriod === "earlier")),
+      ...editorialCopy(throughline, "The recent work extends a longer career pattern.", throughlineLead),
       evidenceRefs: throughline.map((item) => item.candidate_id), disclosure: "inline" as const
     },
     {
@@ -417,6 +431,22 @@ export function assembleApprovedBenFactsNarrative(topics: TopicId[]): Narrative 
   ];
   const narrative = NarrativeSchema.parse({ sections, mode: "deterministic", grounding: "approved" });
   if (!validateNarrativeProofProjects(narrative)) throw new Error("Approved proof project validation failed");
-  return narrative;
+  return {
+    narrative,
+    fieldEvidenceBySection: new Map([
+      ["system-behind-design", {
+        summary: [aboutLead.candidate_id],
+        detail: about.filter((record) => record !== aboutLead).map((record) => record.candidate_id)
+      }],
+      ["operating-model", {
+        summary: [recentLeadershipLead.candidate_id],
+        detail: recentLeadership.filter((record) => record !== recentLeadershipLead).map((record) => record.candidate_id)
+      }],
+      ["institutionalized-capability", {
+        summary: [throughlineLead.candidate_id],
+        detail: throughline.filter((record) => record !== throughlineLead).map((record) => record.candidate_id)
+      }]
+    ])
+  };
 }
 

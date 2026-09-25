@@ -6,6 +6,7 @@ export type EligibleEvidenceRecord = PublicEvidence & {
   project_id?: string;
   career_context_id?: string;
   period?: { start_year: number; end_year?: number };
+  legacy_narrative_roles?: NarrativeRole[];
 };
 
 export type NarrativeSectionId =
@@ -51,6 +52,8 @@ const sectionRoles: Record<Exclude<NarrativeSectionId, "proof-to-scale">, Narrat
   "institutionalized-capability": "throughline"
 };
 
+const sharedNonProjectFacts = eligibleFacts.filter((fact) => !fact.project_id);
+
 function topicOverlap(fact: EligibleEvidenceRecord, topics: TopicId[]) {
   return fact.topics.filter((topic) => topics.includes(topic)).length;
 }
@@ -60,12 +63,13 @@ function orderedForTopics(facts: EligibleEvidenceRecord[], topics: TopicId[]) {
 }
 
 export function buildEligibleSectionEvidencePools(topics: TopicId[]): SectionEvidencePool[] {
-  return (Object.entries(sectionRoles) as Array<[Exclude<NarrativeSectionId, "proof-to-scale">, NarrativeRole]>).map(([sectionId, role]) => ({
+  const sharedPool = orderedForTopics(sharedNonProjectFacts, topics).map((fact) => ({
+    ...fact,
+    legacy_narrative_roles: approvedEditorialMetadata[fact.id]?.narrativeRoles || []
+  }));
+  return (Object.keys(sectionRoles) as Array<Exclude<NarrativeSectionId, "proof-to-scale">>).map((sectionId) => ({
     sectionId,
-    facts: orderedForTopics(
-      eligibleFacts.filter((fact) => approvedEditorialMetadata[fact.id]?.narrativeRoles.includes(role)),
-      topics
-    )
+    facts: sharedPool.map((fact) => ({ ...fact, legacy_narrative_roles: [...(fact.legacy_narrative_roles || [])] }))
   }));
 }
 
