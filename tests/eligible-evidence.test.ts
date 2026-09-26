@@ -13,9 +13,15 @@ import type { TopicId } from "../src/shared/contracts";
 afterEach(() => { delete process.env.OPENAI_API_KEY; });
 
 describe("uncapped approved evidence eligibility", () => {
-  it("keeps more than four eligible facts available for recent leadership", () => {
-    const pool = buildEligibleSectionEvidencePools(["T-001"]).find((item) => item.sectionId === "operating-model")!;
-    expect(pool.facts.length).toBeGreaterThan(4);
+  it("gives every non-project framing section the same uncapped pool", () => {
+    const pools = buildEligibleSectionEvidencePools(["T-001"]);
+    expect(pools[0].facts.length).toBeGreaterThan(4);
+    expect(pools.map((pool) => pool.facts.map((fact) => fact.id))).toEqual([
+      pools[0].facts.map((fact) => fact.id),
+      pools[0].facts.map((fact) => fact.id),
+      pools[0].facts.map((fact) => fact.id)
+    ]);
+    expect(pools.every((pool) => pool.facts.every((fact) => !fact.project_id))).toBe(true);
   });
 
   it("does not truncate a selected proof project's eligible facts to four", () => {
@@ -37,7 +43,17 @@ describe("uncapped approved evidence eligibility", () => {
       const body = JSON.parse(String(init?.body));
       requestBodies.push(body);
       if (body.text.format.name === "portfolio_narrative") {
-        return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map(({ id, headline, summary, detail }) => ({ id, headline, summary, detail })) }) }), { status: 200 });
+        const input = JSON.parse(body.input);
+        return new Response(JSON.stringify({ output_text: JSON.stringify({ sections: fallback.sections.map(({ id, headline, summary, detail }) => {
+          const evidenceIds = input.sections.find((section: { id: string }) => section.id === id).evidence.map((fact: { id: string }) => fact.id);
+          return {
+            id, headline, summary, detail,
+            ...(["system-behind-design", "operating-model", "institutionalized-capability"].includes(id) ? {
+              summary_evidence_fact_ids: [evidenceIds[0]],
+              detail_evidence_fact_ids: [evidenceIds.at(-1)]
+            } : {})
+          };
+        }) }) }), { status: 200 });
       }
       const input = JSON.parse(body.input);
       const item = fallback.sections.find((section) => section.id === "proof-to-scale")!.proof_items!
@@ -53,6 +69,26 @@ describe("uncapped approved evidence eligibility", () => {
     const recentFallback = fallback.sections.find((section) => section.id === "operating-model")!;
     expect(recentInput.evidence.length).toBeGreaterThan(recentFallback.evidenceRefs.length);
     expect(recentInput.evidence.some((fact: { id: string }) => !recentFallback.evidenceRefs.includes(fact.id))).toBe(true);
+    expect(recentInput.requiresFieldEvidenceProvenance).toBe(true);
+
+    const aboutInput = framingInput.sections.find((section: { id: string }) => section.id === "system-behind-design");
+    const throughlineInput = framingInput.sections.find((section: { id: string }) => section.id === "institutionalized-capability");
+    const sharedIds = aboutInput.evidence.map((fact: { id: string }) => fact.id);
+    expect(recentInput.evidence.map((fact: { id: string }) => fact.id)).toEqual(sharedIds);
+    expect(throughlineInput.evidence.map((fact: { id: string }) => fact.id)).toEqual(sharedIds);
+    expect(aboutInput.evidence.every((fact: { project_id?: string }) => !fact.project_id)).toBe(true);
+    expect(aboutInput.evidence.every((fact: { legacy_narrative_roles?: string[] }) => Array.isArray(fact.legacy_narrative_roles))).toBe(true);
+    expect(aboutInput.requiresFieldEvidenceProvenance).toBe(true);
+    expect(throughlineInput.requiresFieldEvidenceProvenance).toBe(true);
+    expect(framing.instructions).toContain("Legacy narrative-role metadata is editorial guidance only");
+
+    const sectionSchemas = framing.text.format.schema.properties.sections.items.anyOf;
+    for (const inputSection of [aboutInput, recentInput, throughlineInput]) {
+      const sectionSchema = sectionSchemas.find((schema: any) => schema.properties.id.enum[0] === inputSection.id);
+      const eligibleIds = inputSection.evidence.map((fact: { id: string }) => fact.id);
+      expect(sectionSchema.properties.summary_evidence_fact_ids.items.enum).toEqual(eligibleIds);
+      expect(sectionSchema.properties.detail_evidence_fact_ids.items.enum).toEqual(eligibleIds);
+    }
 
     const proofFallbacks = fallback.sections.find((section) => section.id === "proof-to-scale")!.proof_items!;
     const expandedProofRequest = requestBodies
