@@ -56,17 +56,16 @@ export function buildEvaluatorEvidenceContext({ approvedFacts, editorialMetadata
     ...fact,
     legacy_narrative_roles: editorialMetadata[fact.id]?.narrativeRoles || []
   }));
-  const eligibleEvidenceBySection = Object.fromEntries(SECTION_IDS.map((sectionId) => [
-    sectionId,
-    sharedNonProjectPool.map((fact) => ({ ...fact, legacy_narrative_roles: [...fact.legacy_narrative_roles] }))
-  ]));
-
   const eligibleEvidenceByProject = Object.fromEntries(proofProjectIds(prose).map((projectId) => [
     projectId,
     orderedForTopics(eligibleFacts.filter((fact) => fact.project_id === projectId), selectedTopicIds)
   ]));
 
-  return { eligibleEvidenceBySection, eligibleEvidenceByProject };
+  return {
+    eligibleSharedFramingEvidence: sharedNonProjectPool,
+    sharedFramingSectionIds: SECTION_IDS,
+    eligibleEvidenceByProject
+  };
 }
 
 export function buildDefaultEvaluatorEvidenceContext({ selectedTopicIds = [], prose }) {

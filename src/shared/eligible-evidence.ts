@@ -52,6 +52,10 @@ const sectionRoles: Record<Exclude<NarrativeSectionId, "proof-to-scale">, Narrat
   "institutionalized-capability": "throughline"
 };
 
+export const sharedFramingSectionIds = Object.freeze(
+  Object.keys(sectionRoles) as Array<Exclude<NarrativeSectionId, "proof-to-scale">>
+);
+
 const sharedNonProjectFacts = eligibleFacts.filter((fact) => !fact.project_id);
 
 function topicOverlap(fact: EligibleEvidenceRecord, topics: TopicId[]) {
@@ -62,12 +66,17 @@ function orderedForTopics(facts: EligibleEvidenceRecord[], topics: TopicId[]) {
   return [...facts].sort((a, b) => topicOverlap(b, topics) - topicOverlap(a, topics) || a.id.localeCompare(b.id));
 }
 
-export function buildEligibleSectionEvidencePools(topics: TopicId[]): SectionEvidencePool[] {
-  const sharedPool = orderedForTopics(sharedNonProjectFacts, topics).map((fact) => ({
+export function buildEligibleSharedFramingEvidence(topics: TopicId[]): EligibleEvidenceRecord[] {
+  return orderedForTopics(sharedNonProjectFacts, topics).map((fact) => ({
     ...fact,
     legacy_narrative_roles: approvedEditorialMetadata[fact.id]?.narrativeRoles || []
   }));
-  return (Object.keys(sectionRoles) as Array<Exclude<NarrativeSectionId, "proof-to-scale">>).map((sectionId) => ({
+}
+
+/** Compatibility view for callers that still need section-addressable pools. */
+export function buildEligibleSectionEvidencePools(topics: TopicId[]): SectionEvidencePool[] {
+  const sharedPool = buildEligibleSharedFramingEvidence(topics);
+  return sharedFramingSectionIds.map((sectionId) => ({
     sectionId,
     facts: sharedPool.map((fact) => ({ ...fact, legacy_narrative_roles: [...(fact.legacy_narrative_roles || [])] }))
   }));
@@ -78,11 +87,12 @@ export function buildEligibleProjectEvidence(projectId: string, topics: TopicId[
 }
 
 export function eligibleEvidencePoolDiagnostics(topics: TopicId[]) {
+  const sharedPool = buildEligibleSharedFramingEvidence(topics);
   return {
-    sections: buildEligibleSectionEvidencePools(topics).map((pool) => ({
-      section_id: pool.sectionId,
-      eligible_fact_count: pool.facts.length,
-      eligible_fact_ids: pool.facts.map((fact) => fact.id)
-    }))
+    shared_framing: {
+      unique_eligible_fact_count: sharedPool.length,
+      unique_eligible_fact_ids: sharedPool.map((fact) => fact.id),
+      available_to_section_ids: sharedFramingSectionIds
+    }
   };
 }

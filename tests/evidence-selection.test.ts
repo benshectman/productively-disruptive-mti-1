@@ -7,8 +7,8 @@ import {
   assembleApprovedBenFactsNarrativeWithFieldEvidence
 } from "../src/shared/approved-benfacts";
 import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata";
-import { NarrativeSchema, type GenerationDiagnostics, type GenerationRejection, type PublicEvidence, type TopicId } from "../src/shared/contracts";
-import { buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence";
+import { NarrativeSchema, type GenerationDiagnostics, type GenerationRejection, type TopicId } from "../src/shared/contracts";
+import { buildEligibleSharedFramingEvidence, sharedFramingSectionIds } from "../src/shared/eligible-evidence";
 
 const experimentalIds = ["system-behind-design", "operating-model", "institutionalized-capability"];
 const allowedAttributions = new Set(["personal", "leadership", "team", "organization", "shared_leadership"]);
@@ -24,25 +24,24 @@ function expectedSharedNonProjectIds() {
 
 function setup(topics: TopicId[] = ["T-003"]) {
   const { narrative: fallback, fieldEvidenceBySection } = assembleApprovedBenFactsNarrativeWithFieldEvidence(topics);
-  const eligibleEvidenceBySection = new Map<string, PublicEvidence[]>(
-    buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts])
-  );
+  const eligibleSharedFramingEvidence = buildEligibleSharedFramingEvidence(topics);
+  const sharedEvidenceText = eligibleSharedFramingEvidence.map((fact) => fact.claim).join(" ");
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
     section.id,
-    (eligibleEvidenceBySection.get(section.id) || []).map((fact) => fact.claim).join(" ")
+    experimentalIds.includes(section.id) ? sharedEvidenceText : ""
   ]));
   const framing = {
     sections: fallback.sections.map(({ id, headline, summary, detail }) => {
       const section = { id, headline, summary, detail } as Record<string, unknown>;
       if (experimentalIds.includes(id)) {
-        const ids = eligibleEvidenceBySection.get(id)!.map((fact) => fact.id);
+        const ids = eligibleSharedFramingEvidence.map((fact) => fact.id);
         section.summary_evidence_fact_ids = [ids.at(-1)!];
         section.detail_evidence_fact_ids = [ids.at(-2)!];
       }
       return section;
     })
   };
-  return { fallback, fieldEvidenceBySection, eligibleEvidenceBySection, evidenceTextBySection, framing };
+  return { fallback, fieldEvidenceBySection, eligibleSharedFramingEvidence, evidenceTextBySection, framing };
 }
 
 function apply(setupValue: ReturnType<typeof setup>) {
@@ -57,7 +56,7 @@ function apply(setupValue: ReturnType<typeof setup>) {
     (value) => { diagnostics = value; },
     (rejection) => { rejections.push(rejection); },
     {
-      eligibleEvidenceBySection: setupValue.eligibleEvidenceBySection,
+      eligibleSharedFramingEvidence: setupValue.eligibleSharedFramingEvidence,
       fallbackFieldEvidenceBySection: setupValue.fieldEvidenceBySection,
       includeDiagnostics: true
     }
@@ -67,29 +66,24 @@ function apply(setupValue: ReturnType<typeof setup>) {
 
 describe("shared non-project framing evidence selection", () => {
   it("gives all three framing sections the same complete eligible non-project pool", () => {
-    const pools = buildEligibleSectionEvidencePools(["T-003"]);
-    const about = pools.find((pool) => pool.sectionId === "system-behind-design")!;
-    const recentLeadership = pools.find((pool) => pool.sectionId === "operating-model")!;
-    const throughline = pools.find((pool) => pool.sectionId === "institutionalized-capability")!;
+    const sharedPool = buildEligibleSharedFramingEvidence(["T-003"]);
     const expectedIds = expectedSharedNonProjectIds().sort();
 
-    expect(about.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
-    expect(recentLeadership.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
-    expect(throughline.facts.map((fact) => fact.id).sort()).toEqual(expectedIds);
-    expect(pools.every((pool) => pool.facts.every((fact) => !fact.project_id))).toBe(true);
+    expect(sharedPool.map((fact) => fact.id).sort()).toEqual(expectedIds);
+    expect(sharedPool.every((fact) => !fact.project_id)).toBe(true);
+    expect(sharedFramingSectionIds).toHaveLength(3);
   });
 
   it("keeps legacy narrative roles as hints without changing eligibility", () => {
-    const pools = buildEligibleSectionEvidencePools(["T-003"]);
-    const about = pools.find((pool) => pool.sectionId === "system-behind-design")!;
-    const roleMismatch = about.facts.find((fact) => {
+    const sharedPool = buildEligibleSharedFramingEvidence(["T-003"]);
+    const roleMismatch = sharedPool.find((fact) => {
       const roles = approvedEditorialMetadata[fact.id]?.narrativeRoles || [];
       return roles.length > 0 && !roles.includes("about");
     })!;
 
     expect(roleMismatch).toBeTruthy();
     expect(roleMismatch.legacy_narrative_roles).toEqual(approvedEditorialMetadata[roleMismatch.id].narrativeRoles);
-    expect(pools.every((pool) => pool.facts.some((fact) => fact.id === roleMismatch.id))).toBe(true);
+    expect(sharedFramingSectionIds).toEqual(expect.arrayContaining(experimentalIds));
 
     const value = setup();
     const aboutFraming = value.framing.sections.find((section) => section.id === "system-behind-design")!;
@@ -111,6 +105,18 @@ describe("shared non-project framing evidence selection", () => {
     const { narrative } = apply(value);
     expect(narrative?.sections.find((section) => section.id === "system-behind-design")?.evidenceRefs)
       .toEqual(citedIds);
+  });
+
+  it.each(experimentalIds)("lets %s cite any valid fact from the shared pool", (sectionId) => {
+    const value = setup();
+    const sharedFactId = value.eligibleSharedFramingEvidence[0].id;
+    const framingSection = value.framing.sections.find((section) => section.id === sectionId)!;
+    framingSection.summary_evidence_fact_ids = [sharedFactId];
+    framingSection.detail_evidence_fact_ids = [sharedFactId];
+
+    const { narrative, rejections } = apply(value);
+    expect(narrative?.sections.find((section) => section.id === sectionId)?.evidenceRefs).toEqual([sharedFactId]);
+    expect(rejections.filter((rejection) => rejection.sectionId === sectionId && rejection.category === "evidence-provenance")).toEqual([]);
   });
 
   it("preserves generated summary provenance with fallback detail provenance", () => {
@@ -206,7 +212,7 @@ describe("shared non-project framing evidence selection", () => {
   it("supports a Recent Leadership rail containing the complete shared pool", () => {
     const value = setup();
     const recent = value.framing.sections.find((section) => section.id === "operating-model")!;
-    const allEligibleIds = value.eligibleEvidenceBySection.get("operating-model")!.map((fact) => fact.id);
+    const allEligibleIds = value.eligibleSharedFramingEvidence.map((fact) => fact.id);
     recent.summary_evidence_fact_ids = allEligibleIds;
     recent.detail_evidence_fact_ids = allEligibleIds;
 
@@ -220,7 +226,13 @@ describe("shared non-project framing evidence selection", () => {
     const value = setup();
     const { diagnostics } = apply(value);
     const evidenceDiagnostics = experimentalIds.map((id) => diagnostics!.sections.find((section) => section.id === id)!.evidence!);
-    const expectedIds = value.eligibleEvidenceBySection.get("system-behind-design")!.map((fact) => fact.id);
+    const expectedIds = value.eligibleSharedFramingEvidence.map((fact) => fact.id);
+
+    expect(diagnostics?.sharedFramingEvidence).toEqual({
+      eligibleFactCount: expectedIds.length,
+      eligibleFactIds: expectedIds,
+      availableToSectionIds: sharedFramingSectionIds
+    });
 
     for (const evidence of evidenceDiagnostics) {
       expect(evidence.eligibleFactCount).toBe(expectedIds.length);

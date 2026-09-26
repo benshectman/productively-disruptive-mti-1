@@ -109,7 +109,7 @@ describe("approved BenFacts runtime corpus", () => {
     expect(serialized).not.toContain("review_status");
     expect(serialized).not.toContain("source_refs");
     const framing = requestBodies.find((body) => body.text.format.name === "portfolio_narrative")!;
-    const evidence = JSON.parse(framing.input).sections.flatMap((section: { evidence: Array<{ id: string }> }) => section.evidence);
+    const evidence = JSON.parse(framing.input).sharedFramingEvidence;
     expect(evidence.every((fact: { id: string }) => approvedBenFactIds.has(fact.id))).toBe(true);
   });
 });

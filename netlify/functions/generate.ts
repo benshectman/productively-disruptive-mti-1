@@ -14,7 +14,7 @@ import {
   validateProofItemProjectEvidence
 } from "../../src/shared/approved-benfacts";
 import { allowedHeadlineAcronyms, HEADLINE_MAX_CHARACTERS, HEADLINE_MAX_WORDS, HEADLINE_MIN_WORDS, headlineAcronymsAreExplained } from "../../src/shared/narrative-presentation";
-import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../../src/shared/eligible-evidence";
+import { buildEligibleProjectEvidence, buildEligibleSharedFramingEvidence } from "../../src/shared/eligible-evidence";
 
 const headersFor = (origin: string) => ({ "Content-Type": "application/json", ...(origin ? { "Access-Control-Allow-Origin": origin } : {}), "Vary": "Origin" });
 export const GENERATION_TIMEOUT_MS = 30_000;
@@ -33,10 +33,10 @@ export function allowedOrigin(origin = "", requestHost = "") {
 
 const experimentalProvenanceSectionIds = new Set(["system-behind-design", "operating-model", "institutionalized-capability"]);
 
-function generatedNarrativeJsonSchema(evidenceBySection: Map<string, PublicEvidence[]>) {
+function generatedNarrativeJsonSchema(sharedFramingEvidence: PublicEvidence[]) {
   const sectionSchema = (id: string) => {
     const provenanceRequired = experimentalProvenanceSectionIds.has(id);
-    const allowedEvidenceIds = (evidenceBySection.get(id) || []).map((fact) => fact.id);
+    const allowedEvidenceIds = provenanceRequired ? sharedFramingEvidence.map((fact) => fact.id) : [];
     return {
       type: "object", additionalProperties: false,
       required: provenanceRequired
@@ -305,7 +305,7 @@ function proofItemText(item: ProofItem): string {
 }
 
 type FramingProvenanceContext = {
-  eligibleEvidenceBySection: Map<string, PublicEvidence[]>;
+  eligibleSharedFramingEvidence: PublicEvidence[];
   fallbackFieldEvidenceBySection: Map<string, NarrativeFieldEvidenceRefs>;
   includeDiagnostics?: boolean;
 };
@@ -418,7 +418,9 @@ export function applyAiFraming(
       const summaryResult = GeneratedSummarySchema.safeParse(framing.summary);
       const detailResult = GeneratedDetailSchema.safeParse(framing.detail);
       const evidenceText = evidenceTextBySection?.get(section.id) || "";
-      const eligibleEvidence = provenanceContext?.eligibleEvidenceBySection.get(section.id) || [];
+      const eligibleEvidence = experimentalProvenanceSectionIds.has(section.id)
+        ? provenanceContext?.eligibleSharedFramingEvidence || []
+        : [];
       const eligibleFactIds = eligibleEvidence.map((fact) => fact.id);
       const eligibleIds = new Set(eligibleFactIds);
       const experimentalSection = experimentalProvenanceSectionIds.has(section.id) && Boolean(provenanceContext);
@@ -499,7 +501,7 @@ export function applyAiFraming(
     });
     return null;
   }
-  onProvenance?.(summarizeGenerationDiagnostics(provenance));
+  onProvenance?.(summarizeGenerationDiagnostics(provenance, provenanceContext?.eligibleSharedFramingEvidence));
   return narrative;
 }
 
@@ -519,10 +521,6 @@ async function requestStructured(fetcher: typeof fetch, signal: AbortSignal, bod
   }
 }
 
-function eligibleEvidenceBySection(topics: TopicId[]): Map<string, PublicEvidence[]> {
-  return new Map(buildEligibleSectionEvidencePools(topics).map((pool) => [pool.sectionId, pool.facts]));
-}
-
 export async function generateNarrativeWithStatus(topics: TopicId[], fetcher: typeof fetch = fetch, requestId = "local", diagnosticsEnabled = false):
 Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: GenerationDiagnostics; upstreamStatus?: number; validationStatus?: ValidationStatus }> {
   const { narrative: fallback, fieldEvidenceBySection } = assembleApprovedBenFactsNarrativeWithFieldEvidence(topics);
@@ -532,10 +530,11 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
     diagnosticsEnabled ? { ...diagnostics, model } : diagnostics;
   const allowedIds = approvedBenFactIds;
   if (!process.env.OPENAI_API_KEY) return { narrative: fallback, status: "missing-api-key", diagnostics: fallbackDiagnostics };
-  const evidenceBySection = eligibleEvidenceBySection(topics);
+  const sharedFramingEvidence = buildEligibleSharedFramingEvidence(topics);
+  const sharedFramingEvidenceText = sharedFramingEvidence.map((item) => item.claim).join(" ");
   const evidenceTextBySection = new Map(fallback.sections.map((section) => [
     section.id,
-    (evidenceBySection.get(section.id) || []).map((item) => item.claim).join(" ")
+    experimentalProvenanceSectionIds.has(section.id) ? sharedFramingEvidenceText : ""
   ]));
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GENERATION_TIMEOUT_MS);
@@ -570,6 +569,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
           selectedTopics: topics,
           groundingMode: fallback.grounding,
           approvedProposition: publicApprovedBenFacts(["BF-C-073"])[0]?.claim,
+          sharedFramingEvidence,
           sections: fallback.sections.map((section) => ({
             id: section.id,
             audienceLabel: section.eyebrow,
@@ -580,11 +580,10 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
             narrativeRole: section.id === "system-behind-design" ? "career-wide orientation"
               : section.id === "operating-model" ? "recent leadership and organizational scale"
               : section.id === "proof-to-scale" ? "topic-relevant projects and outcomes"
-              : "connection to earlier career experience",
-            evidence: section.id === "proof-to-scale" ? [] : (evidenceBySection.get(section.id) || [])
+              : "connection to earlier career experience"
           }))
         }),
-        text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema(evidenceBySection) } }
+        text: { format: { type: "json_schema", name: "portfolio_narrative", strict: true, schema: generatedNarrativeJsonSchema(sharedFramingEvidence) } }
       })
     });
 
@@ -653,7 +652,7 @@ Promise<{ narrative: Narrative; status: GenerationStatus; diagnostics: Generatio
             (status) => { validationStatus = status; },
             (value) => { diagnostics = value; },
             rejections ? (rejection) => { rejections.push(rejection); } : undefined,
-            { eligibleEvidenceBySection: evidenceBySection, fallbackFieldEvidenceBySection: fieldEvidenceBySection, includeDiagnostics: diagnosticsEnabled });
+            { eligibleSharedFramingEvidence: sharedFramingEvidence, fallbackFieldEvidenceBySection: fieldEvidenceBySection, includeDiagnostics: diagnosticsEnabled });
         } catch {
           framedNarrative = null;
         }

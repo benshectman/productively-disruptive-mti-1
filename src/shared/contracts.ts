@@ -104,6 +104,11 @@ export const GenerationSectionDiagnosticsSchema = z.object({
   }),
   evidence: GenerationEvidenceDiagnosticsSchema.optional()
 });
+export const SharedFramingEvidenceDiagnosticsSchema = z.object({
+  eligibleFactCount: z.number().int().min(0).max(120),
+  eligibleFactIds: z.array(EvidenceFactIdSchema).max(120),
+  availableToSectionIds: z.array(z.string().min(1).max(80)).max(3)
+}).strict();
 export const GenerationRejectionSchema = z.object({
   sectionId: z.string().min(1).max(80).optional(),
   field: z.string().min(1).max(80),
@@ -123,6 +128,7 @@ export const GenerationDiagnosticsSchema = z.object({
   fallbackSections: z.number().int().min(0).max(4),
   totalSections: z.literal(4),
   sections: z.array(GenerationSectionDiagnosticsSchema).length(4),
+  sharedFramingEvidence: SharedFramingEvidenceDiagnosticsSchema.optional(),
   rejections: z.array(GenerationRejectionSchema).optional()
 });
 

@@ -65,7 +65,7 @@ describe("bounded AI guardrails", () => {
     expect(requestBody?.store).toBe(false);
     expect(requestBody?.text).toMatchObject({ format: { type: "json_schema", strict: true, name: "portfolio_narrative" } });
     const input = JSON.parse(String(requestBody?.input));
-    const visibleEvidence = input.sections.flatMap((section: { evidence: unknown[] }) => section.evidence);
+    const visibleEvidence = input.sharedFramingEvidence;
     const approvedIds = new Set(approvedCorpus.facts.map((item) => item.id));
     expect(visibleEvidence.length).toBeGreaterThan(0);
     expect(visibleEvidence.every((item: { id: string }) => approvedIds.has(item.id))).toBe(true);
