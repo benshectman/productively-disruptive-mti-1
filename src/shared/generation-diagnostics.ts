@@ -1,11 +1,20 @@
-import type { GenerationDiagnostics, GenerationFieldProvenance, GenerationSectionDiagnostics, Narrative } from "./contracts";
+import type { GenerationDiagnostics, GenerationFieldProvenance, GenerationSectionDiagnostics, Narrative, PublicEvidence } from "./contracts";
+import { sharedFramingSectionIds } from "./eligible-evidence";
 
 type SectionFields = GenerationSectionDiagnostics["fields"];
 
-export function summarizeGenerationDiagnostics(sections: Array<{ id: string; fields: SectionFields }>): GenerationDiagnostics {
-  const sectionDiagnostics = sections.map(({ id, fields }) => {
+export function summarizeGenerationDiagnostics(
+  sections: Array<Pick<GenerationSectionDiagnostics, "id" | "fields" | "evidence">>,
+  sharedFramingEvidence?: PublicEvidence[]
+): GenerationDiagnostics {
+  const sectionDiagnostics = sections.map(({ id, fields, evidence }) => {
     const generated = Object.values(fields).filter((value) => value === "ai").length;
-    return { id, fields, status: generated === 3 ? "ai" : generated === 0 ? "fallback" : "mixed" } satisfies GenerationSectionDiagnostics;
+    return {
+      id,
+      fields,
+      status: generated === 3 ? "ai" : generated === 0 ? "fallback" : "mixed",
+      ...(evidence ? { evidence } : {})
+    } satisfies GenerationSectionDiagnostics;
   });
   const generatedFields = sectionDiagnostics.reduce((count, section) =>
     count + Object.values(section.fields).filter((value) => value === "ai").length, 0);
@@ -22,7 +31,12 @@ export function summarizeGenerationDiagnostics(sections: Array<{ id: string; fie
     mixedSections,
     fallbackSections,
     totalSections: 4,
-    sections: sectionDiagnostics
+    sections: sectionDiagnostics,
+    ...(sharedFramingEvidence ? { sharedFramingEvidence: {
+      eligibleFactCount: sharedFramingEvidence.length,
+      eligibleFactIds: sharedFramingEvidence.map((fact) => fact.id),
+      availableToSectionIds: [...sharedFramingSectionIds]
+    } } : {})
   };
 }
 

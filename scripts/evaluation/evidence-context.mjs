@@ -2,11 +2,7 @@ import approvedCorpusJson from "../../src/content/approved/ben-facts.v1.json" wi
 
 const ALLOWED_ATTRIBUTIONS = new Set(["personal", "leadership", "team", "organization", "shared_leadership"]);
 
-const SECTION_ROLES = {
-  "system-behind-design": "about",
-  "operating-model": "recent_leadership",
-  "institutionalized-capability": "throughline"
-};
+const SECTION_IDS = ["system-behind-design", "operating-model", "institutionalized-capability"];
 
 const FACT_IDS_BY_ROLE = {
   about: ["BF-C-033", "BF-C-043", "BF-C-045", "BF-C-049", "BF-C-073", "BF-C-074", "BF-C-076"],
@@ -53,20 +49,23 @@ export function buildEvaluatorEvidenceContext({ approvedFacts, editorialMetadata
     .filter((fact) => fact.visibility === "shareable" && ALLOWED_ATTRIBUTIONS.has(fact.attribution))
     .map(publicEvidence);
 
-  const eligibleEvidenceBySection = Object.fromEntries(Object.entries(SECTION_ROLES).map(([sectionId, role]) => [
-    sectionId,
-    orderedForTopics(
-      eligibleFacts.filter((fact) => editorialMetadata[fact.id]?.narrativeRoles?.includes(role)),
-      selectedTopicIds
-    )
-  ]));
-
+  const sharedNonProjectPool = orderedForTopics(
+    eligibleFacts.filter((fact) => !fact.project_id),
+    selectedTopicIds
+  ).map((fact) => ({
+    ...fact,
+    legacy_narrative_roles: editorialMetadata[fact.id]?.narrativeRoles || []
+  }));
   const eligibleEvidenceByProject = Object.fromEntries(proofProjectIds(prose).map((projectId) => [
     projectId,
     orderedForTopics(eligibleFacts.filter((fact) => fact.project_id === projectId), selectedTopicIds)
   ]));
 
-  return { eligibleEvidenceBySection, eligibleEvidenceByProject };
+  return {
+    eligibleSharedFramingEvidence: sharedNonProjectPool,
+    sharedFramingSectionIds: SECTION_IDS,
+    eligibleEvidenceByProject
+  };
 }
 
 export function buildDefaultEvaluatorEvidenceContext({ selectedTopicIds = [], prose }) {

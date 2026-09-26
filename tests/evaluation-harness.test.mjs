@@ -57,7 +57,11 @@ import {
 import approvedCorpusJson from "../src/content/approved/ben-facts.v1.json";
 import { approvedEditorialMetadata } from "../src/shared/approved-editorial-metadata.ts";
 import { assembleApprovedBenFactsNarrative } from "../src/shared/approved-benfacts.ts";
-import { buildEligibleProjectEvidence, buildEligibleSectionEvidencePools } from "../src/shared/eligible-evidence.ts";
+import {
+  buildEligibleProjectEvidence,
+  buildEligibleSharedFramingEvidence,
+  sharedFramingSectionIds
+} from "../src/shared/eligible-evidence.ts";
 
 const sections = ["system-behind-design", "operating-model", "proof-to-scale", "institutionalized-capability"];
 
@@ -180,9 +184,8 @@ describe("evaluator evidence context", () => {
       prose
     });
 
-    for (const pool of buildEligibleSectionEvidencePools(selectedTopicIds)) {
-      expect(context.eligibleEvidenceBySection[pool.sectionId]).toEqual(pool.facts);
-    }
+    expect(context.eligibleSharedFramingEvidence).toEqual(buildEligibleSharedFramingEvidence(selectedTopicIds));
+    expect(context.sharedFramingSectionIds).toEqual(sharedFramingSectionIds);
     for (const item of narrative.sections.find((section) => section.id === "proof-to-scale").proof_items) {
       expect(context.eligibleEvidenceByProject[item.project_id]).toEqual(buildEligibleProjectEvidence(item.project_id, selectedTopicIds));
     }
@@ -212,9 +215,10 @@ describe("evaluator evidence context", () => {
 
     expect(request.response.citedEvidence).toEqual(citedEvidence);
     expect(request.response.eligibleEvidence.eligibleEvidenceByProject.askgs).toEqual(buildEligibleProjectEvidence("askgs", ["T-003"]));
-    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"]).toEqual(
-      buildEligibleSectionEvidencePools(["T-003"]).find((pool) => pool.sectionId === "operating-model").facts
+    expect(request.response.eligibleEvidence.eligibleSharedFramingEvidence).toEqual(
+      buildEligibleSharedFramingEvidence(["T-003"])
     );
+    expect(request.response.eligibleEvidence.sharedFramingSectionIds).toEqual(sharedFramingSectionIds);
   });
 });
 
@@ -334,7 +338,7 @@ describe("relative-quality tournament", () => {
     expect(serialized).not.toContain("feature/example");
     expect(serialized).not.toContain("gpt-4.1-mini");
     expect(serialized).not.toContain("gpt-5.6-luna");
-    expect(request.evidenceContext.eligibleEvidenceBySection).toBeTruthy();
+    expect(request.evidenceContext.eligibleSharedFramingEvidence).toBeTruthy();
     expect(request.responseA).toHaveProperty("citedEvidence");
   });
 
@@ -757,7 +761,7 @@ describe("evaluation harness", () => {
     expect(request).not.toHaveProperty("responseB");
     expect(request.response.citedEvidence).toEqual(runs[0].evidence);
     expect(request.response).not.toHaveProperty("evidence");
-    expect(request.response.eligibleEvidence.eligibleEvidenceBySection["operating-model"].length).toBeGreaterThan(runs[0].evidence.length);
+    expect(request.response.eligibleEvidence.eligibleSharedFramingEvidence.length).toBeGreaterThan(runs[0].evidence.length);
     expect(request.response.eligibleEvidence.eligibleEvidenceByProject).toEqual({});
     expect(arbitrationRequest(first[0], new Map(runs.map((item) => [item.runId, item])))).toHaveProperty("responseA");
   });
