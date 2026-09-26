@@ -1,0 +1,189 @@
+name: Portfolio Frozen Corpus Re-evaluation
+
+run-name: Re-evaluate corpus artifact ${{ inputs.corpus_artifact_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      corpus_artifact_id:
+        description: GitHub Actions artifact ID containing a previously generated experiment corpus
+        required: true
+        type: string
+      evaluator_provider:
+        description: Evaluator API provider
+        required: true
+        type: choice
+        options:
+          - openai
+          - openrouter
+        default: openai
+      evaluator_model:
+        description: Model used for dimension-specific evaluation
+        required: true
+        type: string
+        default: gpt-5.6-luna
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  evaluate-frozen-corpus:
+    name: Evaluate frozen corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download frozen corpus artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CORPUS_ARTIFACT_ID: ${{ inputs.corpus_artifact_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "$GH_TOKEN" ]; then
+            echo "The GitHub Actions token is unavailable."
+            exit 1
+          fi
+
+          if ! [[ "$CORPUS_ARTIFACT_ID" =~ ^[0-9]+$ ]]; then
+            echo "corpus_artifact_id must be a numeric GitHub Actions artifact ID."
+            exit 1
+          fi
+
+          mkdir -p frozen-corpus experiment-input
+          curl --fail --silent --show-error --location \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$CORPUS_ARTIFACT_ID/zip" \
+            --output frozen-corpus.zip
+          unzip -q frozen-corpus.zip -d frozen-corpus
+
+          corpus_path="$(find frozen-corpus -type f -name 'corpus.json' -print -quit)"
+          if [ -z "$corpus_path" ]; then
+            echo "The artifact does not contain corpus.json."
+            exit 1
+          fi
+
+          cp "$corpus_path" experiment-input/corpus.json
+
+      - name: Validate frozen corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import { readFileSync } from "node:fs";
+
+          const corpus = JSON.parse(readFileSync("experiment-input/corpus.json", "utf8"));
+          if (!Array.isArray(corpus.runs) || corpus.runs.length === 0) {
+            throw new Error("Frozen corpus must contain a non-empty runs array.");
+          }
+
+          const environments = new Set(corpus.runs.map((run) => run.environment));
+          if (!environments.has("control") || !environments.has("treatment")) {
+            throw new Error("Frozen corpus must contain both control and treatment runs.");
+          }
+
+          const topicConfigurations = new Set(corpus.runs.map((run) => run.topicConfigurationId || run.topicConfiguration?.id).filter(Boolean));
+          if (topicConfigurations.size === 0) {
+            throw new Error("Frozen corpus does not contain recognizable topic configurations.");
+          }
+
+          console.log(`Validated frozen corpus: ${corpus.runs.length} responses across ${topicConfigurations.size} topic configurations.`);
+          NODE
+
+      - name: Run fully mirrored dimension evaluation
+        env:
+          EVAL_PROVIDER: ${{ inputs.evaluator_provider }}
+          EVAL_MODEL: ${{ inputs.evaluator_model }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: >-
+          npm run eval:dimension-tournament --
+          --input experiment-input/corpus.json
+          --output experiment-artifacts/dimension-evaluation
+
+      - name: Upload re-evaluation dimension results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-corpus-reevaluation-dimensions-${{ github.run_id }}
+          path: experiment-artifacts/dimension-evaluation
+          if-no-files-found: warn
+          retention-days: 30
+
+  summarize-reevaluation:
+    name: Summarize frozen-corpus re-evaluation
+    needs: evaluate-frozen-corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download frozen corpus artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CORPUS_ARTIFACT_ID: ${{ inputs.corpus_artifact_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p frozen-corpus experiment-input
+          curl --fail --silent --show-error --location \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$CORPUS_ARTIFACT_ID/zip" \
+            --output frozen-corpus.zip
+          unzip -q frozen-corpus.zip -d frozen-corpus
+          corpus_path="$(find frozen-corpus -type f -name 'corpus.json' -print -quit)"
+          if [ -z "$corpus_path" ]; then
+            echo "The artifact does not contain corpus.json."
+            exit 1
+          fi
+          cp "$corpus_path" experiment-input/corpus.json
+
+      - name: Download dimension results
+        uses: actions/download-artifact@v8
+        with:
+          name: portfolio-corpus-reevaluation-dimensions-${{ github.run_id }}
+          path: experiment-dimensions
+
+      - name: Build re-evaluation summary
+        run: >-
+          npm run eval:experiment-report --
+          --corpus experiment-input/corpus.json
+          --evaluation experiment-dimensions/dimension-evaluation-results.json
+          --output experiment-artifacts/summary
+
+      - name: Publish job summary
+        shell: bash
+        run: cat experiment-artifacts/summary/portfolio-experiment-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload re-evaluation summary
+        uses: actions/upload-artifact@v7
+        with:
+          name: portfolio-corpus-reevaluation-summary-${{ github.run_id }}
+          path: experiment-artifacts/summary
+          if-no-files-found: error
+          retention-days: 30
